@@ -1,0 +1,10 @@
+{
+    "name": "truesoftware/blend-engine",
+    "authors": [
+        {
+            "name": "Gevik Babakhani",
+            "email": "gevik@blendjs.com"
+        }
+    ],
+    "require": {}
+}
