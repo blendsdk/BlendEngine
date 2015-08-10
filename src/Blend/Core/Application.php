@@ -29,6 +29,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Blend\Core\JsonToResponseListener;
 use Blend\Core\StringToResponseListener;
+use Blend\Core\SessionServiceListener;
 use Blend\Data\Database;
 
 /**
@@ -165,6 +166,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->registerService(Services::HTTP_KERNEL_SERVICE, $httpKernel);
         $this->getDispatcher()->addSubscriber(new StringToResponseListener());
         $this->getDispatcher()->addSubscriber(new JsonToResponseListener());
+        $this->getDispatcher()->addSubscriber(new SessionServiceListener($this->rootFolder));
     }
 
     /**
