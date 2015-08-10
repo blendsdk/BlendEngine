@@ -40,7 +40,7 @@ class StringToResponseListener implements EventSubscriberInterface {
 
     public static function getSubscribedEvents() {
         return array(
-            KernelEvents::VIEW => array('onKernelView', -10),
+            KernelEvents::VIEW => array('onKernelView'),
         );
     }
 

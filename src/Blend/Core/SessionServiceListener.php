@@ -40,7 +40,7 @@ class SessionServiceListener implements EventSubscriberInterface {
 
     public static function getSubscribedEvents() {
         return array(
-            KernelEvents::REQUEST => array('onKernelRequest', -10),
+            KernelEvents::REQUEST => array('onKernelRequest'),
         );
     }
 

@@ -21,6 +21,8 @@ use Blend\Core\ControllerResolver;
 use Blend\Core\JsonToResponseListener;
 use Blend\Core\StringToResponseListener;
 use Blend\Core\SessionServiceListener;
+use Blend\Core\StaticResourceListener;
+use Blend\Core\ControllerListener;
 use Blend\Data\Database;
 use Blend\Security\User;
 use Symfony\Component\HttpFoundation\Request;
@@ -33,6 +35,7 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
+use Symfony\Component\Routing\Route;
 
 /**
  * Base class for a BlendEngine application
@@ -105,6 +108,15 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     }
 
     /**
+     * Adds a Route to this Application
+     * @param string $name
+     * @param Route $route
+     */
+    public function addRoute($name, Route $route) {
+        $this->routes->add($name, $route);
+    }
+
+    /**
      * Retrives the current user
      * @return User
      */
@@ -127,9 +139,6 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     protected function registerModules() {
         $this->modules = $this->getModules();
-        foreach ($this->modules as $module) {
-            $this->routes->addCollection($module->getRoutes());
-        }
     }
 
     /**
@@ -142,14 +151,23 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->createHttpKernelService();
         $this->createDatabaseService();
         $this->createUrlGeneratorService();
+        $this->createUrlMatcherService();
     }
 
     /**
-     * Retuns the UrlGenerator Service
+     * Retuns the UrlGenerator service
      * @return UrlGenerator
      */
     public function generateUrl($name, $parameters = array(), $referenceType = UrlGenerator::ABSOLUTE_PATH) {
         return $this->services[Services::URL_GENERATOR_SERVICE]->generate($name, $parameters, $referenceType);
+    }
+
+    /**
+     * Returns the RedirectableUrlMatcher service
+     * @return RedirectableUrlMatcher
+     */
+    public function getUrlMatcher() {
+        return $this->getService(Services::URL_MATCHER_SERVICE);
     }
 
     /**
@@ -192,6 +210,11 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         return $this->getService(Services::DATABASE_SERVICE);
     }
 
+    private function createUrlMatcherService() {
+        $urlMatcher = new RedirectableUrlMatcher($this->routes, $this->getService(Services::REQUEST_CONTEXT));
+        $this->registerService(Services::URL_MATCHER_SERVICE, $urlMatcher);
+    }
+
     /**
      * Creates the UrlGenerator service
      */
@@ -222,6 +245,8 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->getDispatcher()->addSubscriber(new JsonToResponseListener());
         $this->getDispatcher()->addSubscriber(new SessionServiceListener());
         $this->getDispatcher()->addSubscriber(new SecurityServiceListener($this));
+        $this->getDispatcher()->addSubscriber(new StaticResourceListener($this->rootFolder . '/web'));
+        $this->getDispatcher()->addSubscriber(new ControllerListener($this->routes, $this->getService(Services::REQUEST_CONTEXT)));
     }
 
     /**
@@ -267,11 +292,20 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return type
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true) {
-        $urlMatcher = new RedirectableUrlMatcher($this->routes, $this->getRequestContext());
-        $urlMatcher->getContext()->fromRequest($request);
-        $request->attributes->add($urlMatcher->match($request->getPathInfo()));
         return $this->getHttpKernel()->handle($request, $type, $catch);
     }
+
+//    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true) {
+//        $urlMatcher = new RedirectableUrlMatcher($this->routes, $this->getRequestContext());
+//        $urlMatcher->getContext()->fromRequest($request);
+//        $request->attributes->add($urlMatcher->match($request->getPathInfo()));
+//        return $this->getHttpKernel()->handle($request, $type, $catch);
+//    }
+//
+//    public function handleStaticFileRequest(Request $request) {
+//        $file = "{$this->rootFolder}/../web{$request->getPathInfo()}";
+//        if (file_exists($file))
+//    }
 
     /**
      * Handles the request and delivers the response.

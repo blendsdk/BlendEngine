@@ -18,9 +18,7 @@ use Blend\Security\SecurityUrlMatcher;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Route;
@@ -46,7 +44,7 @@ class SecurityServiceListener implements EventSubscriberInterface {
      * Creates a login route (config: logout_path)
      */
     private function createLoginRoute() {
-        $$this->application->getRoutes()->add('logout', new Route($this->application->getConfig('logout_path', '/logout'), array(
+        $this->application->addRoute('logout', new Route($this->application->getConfig('logout_path', '/logout'), array(
             '_controller' => array($this, 'logoutUser')
         )));
     }
@@ -98,7 +96,7 @@ class SecurityServiceListener implements EventSubscriberInterface {
 
     public static function getSubscribedEvents() {
         return array(
-            KernelEvents::REQUEST => array('onKernelRequest', -120)
+            KernelEvents::REQUEST => array('onKernelRequest')
         );
     }
 

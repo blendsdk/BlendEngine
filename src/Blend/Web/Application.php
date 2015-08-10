@@ -11,6 +11,7 @@
 
 namespace Blend\Web;
 
+use Blend\Web\RedirectModule;
 use Blend\Core\Services;
 use Blend\Core\Application as BaseApplication;
 
@@ -20,6 +21,11 @@ use Blend\Core\Application as BaseApplication;
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 abstract class Application extends BaseApplication {
+
+    protected function registerModules() {
+        parent::registerModules();
+        $this->modules[] = new RedirectModule($this);
+    }
 
     protected function registerServices() {
         parent::registerServices();
