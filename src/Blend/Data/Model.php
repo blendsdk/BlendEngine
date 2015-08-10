@@ -76,10 +76,6 @@ class Model extends ModelBase {
         $this->data = $result[0];
     }
 
-    private function createIdentifierClause() {
-
-    }
-
     function save(Database $database) {
         if ($this->isNew) {
             $this->insert($database);
