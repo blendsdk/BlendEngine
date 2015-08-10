@@ -32,6 +32,7 @@ use Blend\Core\StringToResponseListener;
 use Blend\Core\SessionServiceListener;
 use Blend\Data\Database;
 use Blend\Security\User;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 
 /**
  * Base class for a BlendEngine application
@@ -96,6 +97,14 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     }
 
     /**
+     * Retrives the list of registered routes
+     * @return RouteCollection
+     */
+    public function getRoutes() {
+        return $this->routes;
+    }
+
+    /**
      * Retrives the current user
      * @return User
      */
@@ -109,6 +118,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @param User $user
      */
     public function setUser(User $user) {
+        $user->password = null;
         $this->user = $user;
     }
 
@@ -131,6 +141,15 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->createEventDispatcherService();
         $this->createHttpKernelService();
         $this->createDatabaseService();
+        $this->createUrlGeneratorService();
+    }
+
+    /**
+     * Retuns the UrlGenerator Service
+     * @return UrlGenerator
+     */
+    public function generateUrl($name, $parameters = array(), $referenceType = UrlGenerator::ABSOLUTE_PATH) {
+        return $this->services[Services::URL_GENERATOR_SERVICE]->generate($name, $parameters, $referenceType);
     }
 
     /**
@@ -173,6 +192,17 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         return $this->getService(Services::DATABASE_SERVICE);
     }
 
+    /**
+     * Creates the UrlGenerator service
+     */
+    private function createUrlGeneratorService() {
+        $urlGenerator = new UrlGenerator($this->routes, $this->getService(Services::REQUEST_CONTEXT, $this->getLogger()));
+        $this->registerService(Services::URL_GENERATOR_SERVICE, $urlGenerator);
+    }
+
+    /**
+     * Creates the database service
+     */
     private function createDatabaseService() {
         $dbConfig = $this->getConfig(Configiration::DATABASE_CONFIG);
         $this->registerService(Services::DATABASE_SERVICE, new Database($dbConfig));
@@ -336,8 +366,8 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         }
     }
 
-    public function getConfig($name) {
-        return $this->getService(Services::CONFIG_SERVICE)->get($name);
+    public function getConfig($name, $default = null) {
+        return $this->getService(Services::CONFIG_SERVICE)->get($name, $default);
     }
 
 }
