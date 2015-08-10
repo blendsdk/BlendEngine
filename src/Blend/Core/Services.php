@@ -24,5 +24,6 @@ class Services {
     const REQUEST_CONTEXT = 'request.context';
     const TWIG_RENDERER = 'twig.renderer';
     const DATABASE_SERVICE = 'postgresql.service';
+    const URL_GENERATOR_SERVICE = 'url.generator';
 
 }
