@@ -163,8 +163,8 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     }
 
     /**
-     * Returns the RedirectableUrlMatcher service
-     * @return RedirectableUrlMatcher
+     * Returns the UrlMatcher service
+     * @return UrlMatcher
      */
     public function getUrlMatcher() {
         return $this->getService(Services::URL_MATCHER_SERVICE);
@@ -211,7 +211,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     }
 
     private function createUrlMatcherService() {
-        $urlMatcher = new RedirectableUrlMatcher($this->routes, $this->getService(Services::REQUEST_CONTEXT));
+        $urlMatcher = new UrlMatcher($this->routes, $this->getService(Services::REQUEST_CONTEXT));
         $this->registerService(Services::URL_MATCHER_SERVICE, $urlMatcher);
     }
 
@@ -294,18 +294,6 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true) {
         return $this->getHttpKernel()->handle($request, $type, $catch);
     }
-
-//    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true) {
-//        $urlMatcher = new RedirectableUrlMatcher($this->routes, $this->getRequestContext());
-//        $urlMatcher->getContext()->fromRequest($request);
-//        $request->attributes->add($urlMatcher->match($request->getPathInfo()));
-//        return $this->getHttpKernel()->handle($request, $type, $catch);
-//    }
-//
-//    public function handleStaticFileRequest(Request $request) {
-//        $file = "{$this->rootFolder}/../web{$request->getPathInfo()}";
-//        if (file_exists($file))
-//    }
 
     /**
      * Handles the request and delivers the response.
