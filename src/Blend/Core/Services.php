@@ -23,5 +23,6 @@ class Services {
     const HTTP_KERNEL_SERVICE = 'http.kernel.service';
     const REQUEST_CONTEXT = 'request.context';
     const TWIG_RENDERER = 'twig.renderer';
+    const DATABASE_SERVICE = 'postgresql.service';
 
 }

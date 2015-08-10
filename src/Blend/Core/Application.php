@@ -29,6 +29,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Blend\Core\JsonToResponseListener;
 use Blend\Core\StringToResponseListener;
+use Blend\Data\Database;
 
 /**
  * Base class for a BlendEngine application
@@ -104,6 +105,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->createConfigService();
         $this->createEventDispatcherService();
         $this->createHttpKernelService();
+        $this->createDatabaseService();
     }
 
     /**
@@ -136,6 +138,19 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     protected function getRequestContext() {
         return $this->services[Services::REQUEST_CONTEXT];
+    }
+
+    /**
+     * Retuns a reference to the \Spot\Locator object
+     * @return \Blend\Data\Database
+     */
+    public function getDatabase() {
+        return $this->getService(Services::DATABASE_SERVICE);
+    }
+
+    private function createDatabaseService() {
+        $dbConfig = $this->getConfig(Configiration::DATABASE_CONFIG);
+        $this->registerService(Services::DATABASE_SERVICE, new Database($dbConfig));
     }
 
     /**
@@ -234,7 +249,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
             $msg = $exception->getMessage();
         }
         $this->getLogger()->error($message);
-        new Response($message, 500);
+        return new Response($message, $this->isDevelopment() ? 200 : 500);
     }
 
     /**
@@ -287,11 +302,15 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return object
      */
     public function getService($name) {
-        if (!isset($this->services[$name])) {
+        if (isset($this->services[$name])) {
             return $this->services[$name];
         } else {
             return null;
         }
+    }
+
+    public function getConfig($name) {
+        return $this->getService(Services::CONFIG_SERVICE)->get($name);
     }
 
 }

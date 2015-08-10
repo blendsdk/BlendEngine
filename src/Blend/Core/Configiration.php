@@ -21,6 +21,8 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
  */
 class Configiration {
 
+    const DATABASE_CONFIG = 'database';
+
     /**
      * Holds the list of paremeters
      * @var \ArrayAccess
