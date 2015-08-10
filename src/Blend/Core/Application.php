@@ -166,7 +166,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->registerService(Services::HTTP_KERNEL_SERVICE, $httpKernel);
         $this->getDispatcher()->addSubscriber(new StringToResponseListener());
         $this->getDispatcher()->addSubscriber(new JsonToResponseListener());
-        $this->getDispatcher()->addSubscriber(new SessionServiceListener($this->rootFolder));
+        $this->getDispatcher()->addSubscriber(new SessionServiceListener());
     }
 
     /**

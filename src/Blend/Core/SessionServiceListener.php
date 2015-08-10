@@ -27,12 +27,11 @@ class SessionServiceListener implements EventSubscriberInterface {
 
     protected $sessionObject;
 
-    public function __construct($appRoot) {
-        $sessionFolder = "{$appRoot}/var/session";
-        if (!is_dir($sessionFolder)) {
-            mkdir($sessionFolder);
-        }
-        $this->sessionObject = new Session(new NativeSessionStorage(array(), new NativeFileSessionHandler($sessionFolder)));
+    public function __construct() {
+        $this->sessionObject = new Session(
+                new NativeSessionStorage(array(), new NativeFileSessionHandler()
+                )
+        );
     }
 
     public function onKernelRequest(GetResponseEvent $event) {
