@@ -21,7 +21,8 @@ use Blend\Data\Database;
  */
 class Model extends ModelBase {
 
-    protected $data = array();
+    protected $identifier = 'id';
+    protected $table = null;
     protected $modified = array();
     protected $isNew;
 

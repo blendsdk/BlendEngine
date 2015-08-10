@@ -18,8 +18,7 @@ namespace Blend\Core;
  */
 abstract class Model {
 
-    protected $identifier = 'id';
-    protected $table = null;
+    protected $data = array();
 
     protected function getCamlCaseName($name, $prefix) {
         $n = str_replace('_', ' ', $name);

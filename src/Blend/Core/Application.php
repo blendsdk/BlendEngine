@@ -31,6 +31,7 @@ use Blend\Core\JsonToResponseListener;
 use Blend\Core\StringToResponseListener;
 use Blend\Core\SessionServiceListener;
 use Blend\Data\Database;
+use Blend\Security\User;
 
 /**
  * Base class for a BlendEngine application
@@ -74,6 +75,12 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     protected $routes;
 
     /**
+     * Holds an instance of the current (authenticated) user
+     * @var User
+     */
+    protected $user;
+
+    /**
      * Retuns an array of instantiated Module objects
      */
     protected abstract function getModules();
@@ -86,6 +93,23 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->routes = new RouteCollection();
         $this->registerServices();
         $this->registerModules();
+    }
+
+    /**
+     * Retrives the current user
+     * @return User
+     */
+    public function getUser() {
+        return $this->user;
+    }
+
+    /**
+     * Sets the current (authenticated) user for this application. The User is
+     * set by the SecurityServiceListener
+     * @param User $user
+     */
+    public function setUser(User $user) {
+        $this->user = $user;
     }
 
     /**
@@ -167,6 +191,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->getDispatcher()->addSubscriber(new StringToResponseListener());
         $this->getDispatcher()->addSubscriber(new JsonToResponseListener());
         $this->getDispatcher()->addSubscriber(new SessionServiceListener());
+        $this->getDispatcher()->addSubscriber(new SecurityServiceListener($this));
     }
 
     /**
