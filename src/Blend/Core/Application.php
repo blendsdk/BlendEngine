@@ -23,6 +23,7 @@ use Blend\Core\StringToResponseListener;
 use Blend\Core\SessionServiceListener;
 use Blend\Core\StaticResourceListener;
 use Blend\Core\ControllerListener;
+use Blend\Core\LocaleServiceListener;
 use Blend\Data\Database;
 use Blend\Security\User;
 use Symfony\Component\Routing\Route;
@@ -43,6 +44,12 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 abstract class Application implements HttpKernelInterface, TerminableInterface {
+
+    /**
+     * Holds the value of the current locale
+     * @var type
+     */
+    private $locale;
 
     /**
      * Holds instantiated service objects
@@ -101,6 +108,23 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     }
 
     /**
+     * Gets the current locale set for this application by LocaleServiceListener
+     * @return type
+     */
+    public function getLocale() {
+        return $this->locale;
+    }
+
+    /**
+     * Sets the locale for this application. This function is called
+     * from LocaleServiceListener
+     * @param type $locale
+     */
+    public function setLocale($locale) {
+        $this->locale = $locale;
+    }
+
+    /**
      * Retrives the list of registered routes
      * @return RouteCollection
      */
@@ -149,6 +173,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->createLoggerService();
         $this->createConfigService();
         $this->createEventDispatcherService();
+        $this->createTranslationService();
         $this->createHttpKernelService();
         $this->createDatabaseService();
         $this->createUrlGeneratorService();
@@ -211,6 +236,10 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         return $this->getService(Services::DATABASE_SERVICE);
     }
 
+    private function createTranslationService() {
+
+    }
+
     private function createUrlMatcherService() {
         $urlMatcher = new UrlMatcher($this->routes, $this->getService(Services::REQUEST_CONTEXT));
         $this->registerService(Services::URL_MATCHER_SERVICE, $urlMatcher);
@@ -242,12 +271,16 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         );
         $this->registerService(Services::REQUEST_CONTEXT, new RequestContext());
         $this->registerService(Services::HTTP_KERNEL_SERVICE, $httpKernel);
+
+        $requestContext = $this->getService(Services::REQUEST_CONTEXT);
+
         $this->getDispatcher()->addSubscriber(new StringToResponseListener());
         $this->getDispatcher()->addSubscriber(new JsonToResponseListener());
         $this->getDispatcher()->addSubscriber(new SessionServiceListener());
         $this->getDispatcher()->addSubscriber(new SecurityServiceListener($this));
         $this->getDispatcher()->addSubscriber(new StaticResourceListener($this->rootFolder . '/web'));
-        $this->getDispatcher()->addSubscriber(new ControllerListener($this->routes, $this->getService(Services::REQUEST_CONTEXT)));
+        $this->getDispatcher()->addSubscriber(new ControllerListener($this->routes, $requestContext));
+        $this->getDispatcher()->addSubscriber(new LocaleServiceListener($this, $this->getConfig('defaultLocale', 'en'), $requestContext));
     }
 
     /**
