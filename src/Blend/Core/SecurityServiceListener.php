@@ -39,16 +39,32 @@ class SecurityServiceListener implements EventSubscriberInterface {
     public function __construct(Application $application) {
         $this->application = $application;
         $this->logoutPathName = $application->getConfig('logout_path', '/logout');
-        $application->getRoutes()->add('logout', new Route($this->application->getConfig('logout_path', '/logout'), array(
+        $this->createLoginRoute();
+    }
+
+    /**
+     * Creates a login route (config: logout_path)
+     */
+    private function createLoginRoute() {
+        $$this->application->getRoutes()->add('logout', new Route($this->application->getConfig('logout_path', '/logout'), array(
             '_controller' => array($this, 'logoutUser')
         )));
     }
 
+    /**
+     * Clears the session cache for this for and redirects the request to after_logout_path
+     * @param Request $request
+     * @return RedirectResponse
+     */
     public function logoutUser(Request $request) {
         $request->getSession()->clear();
         return new RedirectResponse($this->application->getConfig('after_logout_path', '/'));
     }
 
+    /**
+     * Chechs the current user's authentication and redirects to login_path
+     * if needed
+     */
     public function onKernelRequest(GetResponseEvent $event) {
         $session = $event->getRequest()->getSession();
 
@@ -56,13 +72,19 @@ class SecurityServiceListener implements EventSubscriberInterface {
             $session->set(self::SEC_SUTHENTICATED_USER, new User());
         }
         $user = $session->get(self::SEC_SUTHENTICATED_USER);
-        $this->application->setUser($user);
-        if (!$user->isAuthenticated() && $this->needAuthentication($event->getRequest())) {
+        if (!$user->isAuthenticated() && $this->needsAuthentication($event->getRequest())) {
             $event->setResponse(new RedirectResponse($this->application->getConfig('login_path', '/login')));
+        } else {
+            $this->application->setUser($user);
         }
     }
 
-    private function needAuthentication(Request $request) {
+    /**
+     * Checks if the current request is needed authentication
+     * @param Request $request
+     * @return type
+     */
+    private function needsAuthentication(Request $request) {
         $routes = new RouteCollection();
         foreach ($this->application->getRoutes()->all() as $name => $route) {
             if ($route->getDefault('secure')) {
