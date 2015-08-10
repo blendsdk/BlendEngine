@@ -42,7 +42,7 @@ abstract class Module {
     protected function addRedirectRoute($name, $oldUrl, $newUrl) {
         $this->addRoute($name, new Route($oldUrl, array(
             '_controller' => function() use ($newUrl) {
-                return new RedirectResponse($url, 301);
+                return new RedirectResponse($newUrl, 301);
             }
         )));
     }
