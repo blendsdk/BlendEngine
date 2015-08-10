@@ -11,8 +11,8 @@
 
 namespace Blend\Data;
 
-use Blend\Core\Model as ModelBase;
 use Blend\Data\Database;
+use Blend\Core\Model as ModelBase;
 
 /**
  * Base class for a database model

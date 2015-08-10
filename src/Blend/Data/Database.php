@@ -11,10 +11,6 @@
 
 namespace Blend\Data;
 
-define('DB_NULL', 'NULL');
-
-use Blend\Data;
-
 /**
  * Encapsulates common database functionality. This class is available as
  * a service from the Blend\Core\Application

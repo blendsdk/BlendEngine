@@ -11,9 +11,8 @@
 
 namespace Blend\Core;
 
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Route;
 use Blend\Core\Application;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Base class for all modules in BlendEngine

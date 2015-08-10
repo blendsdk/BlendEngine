@@ -13,6 +13,8 @@ namespace Blend\Core;
 
 use Blend\Security\User;
 use Blend\Core\Application;
+use Blend\Core\Services;
+use Blend\Security\SecurityUrlMatcher;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -20,8 +22,6 @@ use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\HttpFoundation\Request;
-use Blend\Core\Services;
-use Blend\Security\SecurityUrlMatcher;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Route;
 

@@ -18,6 +18,11 @@ use Blend\Core\Environments;
 use Blend\Core\Services;
 use Blend\Core\Configiration;
 use Blend\Core\ControllerResolver;
+use Blend\Core\JsonToResponseListener;
+use Blend\Core\StringToResponseListener;
+use Blend\Core\SessionServiceListener;
+use Blend\Data\Database;
+use Blend\Security\User;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -27,11 +32,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Blend\Core\JsonToResponseListener;
-use Blend\Core\StringToResponseListener;
-use Blend\Core\SessionServiceListener;
-use Blend\Data\Database;
-use Blend\Security\User;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 
 /**
