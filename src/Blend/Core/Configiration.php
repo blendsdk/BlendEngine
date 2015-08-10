@@ -34,12 +34,21 @@ class Configiration {
      * @param string $name
      * @return object|null
      */
-    public function get($name) {
+    public function get($name, $default = null) {
         if (isset($this->params[$name])) {
             return $this->params[$name];
         } else {
-            return null;
+            return $default;
         }
+    }
+
+    /**
+     * Checks if the given name exists in this configuration
+     * @param string $name
+     * @return boolean
+     */
+    public function has($name) {
+        return isset($this->params[$name]);
     }
 
     public function __construct($fname) {
