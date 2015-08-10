@@ -25,6 +25,7 @@ use Blend\Core\StaticResourceListener;
 use Blend\Core\ControllerListener;
 use Blend\Data\Database;
 use Blend\Security\User;
+use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -35,7 +36,7 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
-use Symfony\Component\Routing\Route;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
 
 /**
  * Base class for a BlendEngine application
