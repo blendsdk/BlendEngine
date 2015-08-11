@@ -31,7 +31,7 @@ class LocaleServiceListener implements EventSubscriberInterface {
     private $defaultLocale;
     private $requestContext;
 
-    public function __construct(Application $application, $defaultLocale = 'en', RequestContext $requestContext) {
+    public function __construct(Application $application, $defaultLocale = 'en', RequestContext $requestContext = null) {
         $this->application = $application;
         $this->defaultLocale = $defaultLocale;
         $this->requestContext = $requestContext;
