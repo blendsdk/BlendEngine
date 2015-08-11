@@ -26,5 +26,6 @@ class Services {
     const DATABASE_SERVICE = 'postgresql.service';
     const URL_GENERATOR_SERVICE = 'url.generator';
     const URL_MATCHER_SERVICE = 'url.matcher';
+    const TRANSLATION_SERVICE = 'translation.service';
 
 }

@@ -14,6 +14,11 @@ namespace Blend\Web;
 use Blend\Web\RedirectModule;
 use Blend\Core\Services;
 use Blend\Core\Application as BaseApplication;
+use Symfony\Bridge\Twig\Extension\RoutingExtension;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Bridge\Twig\Extension\FormExtension;
+use Symfony\Bridge\Twig\Form\TwigRendererEngine;
+use Symfony\Bridge\Twig\Form\TwigRenderer;
 
 /**
  * Base class for all web application. This class provides the twig renderer as
@@ -39,7 +44,10 @@ abstract class Application extends BaseApplication {
         $loader = new \Twig_Loader_Filesystem($this->rootFolder);
         $twig = new \Twig_Environment($loader, array(
             'cache' => $this->isProduction() ? "{$this->rootFolder}/var/cache" : false,
+            'debug' => $this->isDevelopment(),
+            'strict_variables' => true
         ));
+        $twig->addExtension(new TranslationExtension($this->getService(Services::TRANSLATION_SERVICE)));
         $this->registerService(Services::TWIG_RENDERER, $twig);
     }
 

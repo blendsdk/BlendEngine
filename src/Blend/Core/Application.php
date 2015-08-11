@@ -26,6 +26,7 @@ use Blend\Core\ControllerListener;
 use Blend\Core\LocaleServiceListener;
 use Blend\Data\Database;
 use Blend\Security\User;
+use Blend\Core\Translator;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,6 +39,9 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Loader\XliffFileLoader;
 
 /**
  * Base class for a BlendEngine application
@@ -178,6 +182,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->createDatabaseService();
         $this->createUrlGeneratorService();
         $this->createUrlMatcherService();
+        $this->createTranslationService();
     }
 
     /**
@@ -229,15 +234,28 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     }
 
     /**
-     * Retuns a reference to the \Spot\Locator object
+     * Retuns a reference to the Database object
      * @return \Blend\Data\Database
      */
     public function getDatabase() {
         return $this->getService(Services::DATABASE_SERVICE);
     }
 
-    private function createTranslationService() {
+    /**
+     * Retuns a reference to the Translator object
+     * @return Translator;
+     */
+    public function getTranslator() {
+        return $this->getService(Services::TRANSLATION_SERVICE);
+    }
 
+    private function createTranslationService() {
+        $messageSelector = new MessageSelector();
+        $cacheDir = $this->rootFolder . '/cache';
+        $translator = new Translator($this, $messageSelector, $cacheDir, $this->isDevelopment());
+        $translator->addLoader('array', new ArrayLoader());
+        $translator->addLoader('xliff', new XliffFileLoader());
+        $this->registerService(Services::TRANSLATION_SERVICE, $translator);
     }
 
     private function createUrlMatcherService() {
