@@ -13,17 +13,13 @@ namespace Blend\Web;
 
 use Blend\Core\Application;
 use Blend\Core\Services;
+use Blend\Core\Controller as ControlerBase;
 
 /**
  * Base controller for all web applications in BlendEngine
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Controller {
-
-    /**
-     * @var Application
-     */
-    protected $application;
+class Controller extends ControlerBase {
 
     /**
      * Reference to the Twig template engine
@@ -32,7 +28,7 @@ class Controller {
     protected $renderer;
 
     public function __construct(Application $application) {
-        $this->application = $application;
+        parent::__construct($application);
         $this->renderer = $this->application->getService(Services::TWIG_RENDERER);
     }
 

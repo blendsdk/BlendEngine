@@ -33,7 +33,10 @@ class ControllerResolver extends ControllerResolverBase {
     }
 
     protected function instantiateController($class) {
-        return new $class($this->application);
+        $refClass = new \ReflectionClass($class);
+        $controller = new $class($this->application);
+        $this->application->getTranslator()->loadTranslations(dirname($refClass->getFileName()));
+        return $controller;
     }
 
 }
