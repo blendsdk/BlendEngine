@@ -12,13 +12,15 @@
         }
     ],
     "require": {
-        "php": ">=5.5.9",
         "symfony/event-dispatcher": "~2.3,<3.0",
         "symfony/http-foundation": "~2.3,<3.0",
         "symfony/http-kernel": "~2.3,<3.0",
         "symfony/routing": "~2.3,<3.0",
         "monolog/monolog": "^1.15@dev",
-        "twig/twig": "^1.19"
+        "twig/twig": "^1.19",
+        "symfony/translation": "^2.7",
+        "symfony/twig-bridge": "^2.7",
+        "symfony/config": "^2.7"
     },
     "autoload": {
         "psr-4": {
