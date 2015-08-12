@@ -107,8 +107,6 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->services = array();
         $this->modules = array();
         $this->routes = new RouteCollection();
-        $this->registerServices();
-        $this->registerModules();
     }
 
     /**
@@ -221,7 +219,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Retuns an instance to the Logger service
      * @return \Monolog\Logger
      */
-    protected function getLogger() {
+    public function getLogger() {
         return $this->services[Services::LOGGER_SERVICE];
     }
 
@@ -251,8 +249,8 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
     private function createTranslationService() {
         $messageSelector = new MessageSelector();
-        $cacheDir = $this->rootFolder . '/cache';
-        $translator = new Translator($this, $messageSelector, $cacheDir, $this->isDevelopment());
+        $cacheDir = $this->rootFolder . '/var/cache';
+        $translator = new Translator($this, $messageSelector, $cacheDir);
         $translator->addLoader('array', new ArrayLoader());
         $translator->addLoader('xliff', new XliffFileLoader());
         $this->registerService(Services::TRANSLATION_SERVICE, $translator);
@@ -355,6 +353,10 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     public function run(Request $request = null) {
 
         try {
+
+            $this->registerServices();
+            $this->registerModules();
+
             if (null === $request) {
                 $request = Request::createFromGlobals();
             }
