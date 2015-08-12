@@ -27,6 +27,7 @@ use Blend\Core\LocaleServiceListener;
 use Blend\Data\Database;
 use Blend\Security\User;
 use Blend\Core\Translator;
+use Blend\Core\MailerService;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -172,23 +173,49 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Regsiters the services for this application
      */
     protected function registerServices() {
+
+        /**
+         * The following services are Layze loaded:
+         *  Database, SwiftMailer, UrlGenerator
+         */
         $this->createLoggerService();
         $this->createConfigService();
         $this->createEventDispatcherService();
         $this->createTranslationService();
         $this->createHttpKernelService();
-        $this->createDatabaseService();
         $this->createUrlGeneratorService();
         $this->createUrlMatcherService();
         $this->createTranslationService();
     }
 
     /**
+     * Retuns an instance of the Swift_Mailer
+     * @return \Swift_Mailer
+     */
+    public function getMailer() {
+        if (!isset($this->services[Services::EMAIL_SERVICE])) {
+            $this->createMailerService();
+        }
+        return $this->services[Services::EMAIL_SERVICE]->getMailer();
+    }
+
+    /**
      * Retuns the UrlGenerator service
      * @return UrlGenerator
      */
+    public function getUrlGenerator() {
+        if (!isset($this->services[Services::URL_GENERATOR_SERVICE])) {
+            $this->createUrlGeneratorService();
+        }
+        return $this->services[Services::URL_GENERATOR_SERVICE];
+    }
+
+    /**
+     * Generates a url using the UrlGenerator
+     * @return UrlGenerator
+     */
     public function generateUrl($name, $parameters = array(), $referenceType = UrlGenerator::ABSOLUTE_PATH) {
-        return $this->services[Services::URL_GENERATOR_SERVICE]->generate($name, $parameters, $referenceType);
+        return $this->getUrlGenerator()->generate($name, $parameters, $referenceType);
     }
 
     /**
@@ -211,7 +238,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Retuns the EventDispatcher service
      * @return EventDispatcher
      */
-    protected function getDispatcher() {
+    public function getDispatcher() {
         return $this->services[Services::EVENT_DISPATCHER_SERVICE];
     }
 
@@ -227,7 +254,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Retuns the current Requests context
      * @return RequestContext
      */
-    protected function getRequestContext() {
+    public function getRequestContext() {
         return $this->services[Services::REQUEST_CONTEXT];
     }
 
@@ -236,214 +263,230 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return \Blend\Data\Database
      */
     public function getDatabase() {
-        return $this->getService(Services::DATABASE_SERVICE);
+        if (!isset($this->services[Services::DATABASE_SERVICE])) {
+        $this->createDatabaseService();
     }
+    return $this->getService(Services::DATABASE_SERVICE);
+}
 
-    /**
-     * Retuns a reference to the Translator object
-     * @return Translator;
-     */
-    public function getTranslator() {
-        return $this->getService(Services::TRANSLATION_SERVICE);
-    }
+/**
+ * Retuns a reference to the Translator object
+ * @return Translator;
+ */
+public function getTranslator() {
+return $this->getService(Services::TRANSLATION_SERVICE);
+}
 
-    private function createTranslationService() {
-        $messageSelector = new MessageSelector();
-        $cacheDir = $this->rootFolder . '/var/cache';
-        $translator = new Translator($this, $messageSelector, $cacheDir);
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addLoader('xliff', new XliffFileLoader());
-        $this->registerService(Services::TRANSLATION_SERVICE, $translator);
-    }
+private function createMailerService() {
+$this->registerService(Services::EMAIL_SERVICE, new MailerService($this));
+}
 
-    private function createUrlMatcherService() {
-        $urlMatcher = new UrlMatcher($this->routes, $this->getService(Services::REQUEST_CONTEXT));
-        $this->registerService(Services::URL_MATCHER_SERVICE, $urlMatcher);
-    }
+private function createTranslationService() {
+$messageSelector = new MessageSelector();
+$cacheDir = $this->rootFolder . '/var/cache';
+$translator = new Translator($this, $messageSelector, $cacheDir);
+$translator->addLoader('array', new ArrayLoader());
+$translator->addLoader('xliff', new XliffFileLoader());
+$this->registerService(Services::TRANSLATION_SERVICE, $translator);
+}
 
-    /**
-     * Creates the UrlGenerator service
-     */
-    private function createUrlGeneratorService() {
-        $urlGenerator = new UrlGenerator($this->routes, $this->getService(Services::REQUEST_CONTEXT, $this->getLogger()));
-        $this->registerService(Services::URL_GENERATOR_SERVICE, $urlGenerator);
-    }
+private function createUrlMatcherService() {
+$urlMatcher = new UrlMatcher($this->routes, $this->getService(Services::REQUEST_CONTEXT));
+$this->registerService(Services::URL_MATCHER_SERVICE, $urlMatcher);
+}
 
-    /**
-     * Creates the database service
-     */
-    private function createDatabaseService() {
-        $dbConfig = $this->getConfig(Configiration::DATABASE_CONFIG);
-        $this->registerService(Services::DATABASE_SERVICE, new Database($dbConfig));
-    }
+/**
+ * Creates the UrlGenerator service
+ */
+private function createUrlGeneratorService() {
+$urlGenerator = new UrlGenerator($this->routes, $this->getService(Services::REQUEST_CONTEXT, $this->getLogger()));
+$this->registerService(Services::URL_GENERATOR_SERVICE, $urlGenerator);
+}
 
-    /**
-     * Creates the HttpKernel service
-     */
-    private function createHttpKernelService() {
-        $this->controllerResolver = new ControllerResolver($this->getLogger(), $this);
-        $httpKernel = new HttpKernel(
-                $this->getDispatcher(), $this->controllerResolver
-        );
-        $this->registerService(Services::REQUEST_CONTEXT, new RequestContext());
-        $this->registerService(Services::HTTP_KERNEL_SERVICE, $httpKernel);
+/**
+ * Creates the database service
+ */
+private function createDatabaseService() {
+$dbConfig = $this->getConfig(Configiration::DATABASE_CONFIG);
+$this->registerService(Services::DATABASE_SERVICE, new Database($dbConfig));
+}
 
-        $requestContext = $this->getService(Services::REQUEST_CONTEXT);
+/**
+ * Creates the HttpKernel service
+ */
+private function createHttpKernelService() {
+$this->controllerResolver = new ControllerResolver($this->getLogger(), $this);
+$httpKernel = new HttpKernel(
+$this->getDispatcher(), $this->controllerResolver
+);
+$this->registerService(Services::REQUEST_CONTEXT, new RequestContext());
+$this->registerService(Services::HTTP_KERNEL_SERVICE, $httpKernel);
 
-        $this->getDispatcher()->addSubscriber(new StringToResponseListener());
-        $this->getDispatcher()->addSubscriber(new JsonToResponseListener());
-        $this->getDispatcher()->addSubscriber(new SessionServiceListener());
-        $this->getDispatcher()->addSubscriber(new SecurityServiceListener($this));
-        $this->getDispatcher()->addSubscriber(new StaticResourceListener($this->rootFolder . '/web'));
-        $this->getDispatcher()->addSubscriber(new ControllerListener($this->routes, $requestContext));
-        $this->getDispatcher()->addSubscriber(new LocaleServiceListener($this, $this->getConfig('defaultLocale', 'en'), $requestContext));
-    }
+$requestContext = $this->getService(Services::REQUEST_CONTEXT);
 
-    /**
-     * Creates the EventDispatcher service
-     */
-    private function createEventDispatcherService() {
-        $dispatcher = new EventDispatcher();
-        $this->registerService(Services::EVENT_DISPATCHER_SERVICE, $dispatcher);
-    }
+$this->getDispatcher()->addSubscriber(new StringToResponseListener());
+$this->getDispatcher()->addSubscriber(new JsonToResponseListener());
+$this->getDispatcher()->addSubscriber(new SessionServiceListener());
+$this->getDispatcher()->addSubscriber(new SecurityServiceListener($this));
+$this->getDispatcher()->addSubscriber(new StaticResourceListener($this->rootFolder . '/web' ) );
+$this->getDispatcher()->addSubscriber(new ControllerListener($this->routes, $requestContext));
+$this->getDispatcher()->addSubscriber(new LocaleServiceListener($this, $this->getConfig('defaultLocale', 'en'),  $requestContext));
+}
 
-    /**
-     * Creates the application configuration service
-     */
-    private function createConfigService() {
-        $config = new Configiration("{$this->rootFolder}/config/{$this->environment}.config.php");
-        $this->registerService(Services::CONFIG_SERVICE, $config);
-    }
+/**
+ * Creates the EventDispatcher service
+ */
+private function createEventDispatcherService() {
+$dispatcher = new EventDispatcher();
+$this->registerService(Services::EVENT_DISPATCHER_SERVICE, $dispatcher);
+}
 
-    /**
-     * Creates the Logger service
-     */
-    private function createLoggerService() {
-        $logger = new Logger($this->environment);
+/**
+ * Creates the application configuration service
+ */
+private function createConfigService() {
+$config = new Configiration("{$this->rootFolder}/config/{$this->environment}.config.php");
+$this->registerService(Services::CONFIG_SERVICE, $config);
+}
 
-        if ($this->isProduction()) {
-            $logger->pushHandler(
-                    new StreamHandler("{$this->rootFolder}/var/logs/{$this->environment}.log", Logger::WARNING)
-            );
-        } else {
-            $logger->pushHandler(
-                    new ChromePHPHandler(Logger::DEBUG)
-            );
-        }
-        $this->registerService(Services::LOGGER_SERVICE, $logger);
-    }
+/**
+ * Creates the Logger service
+ */
+private function createLoggerService() {
+$logger = new Logger($this->environment);
 
-    /**
-     * Handles the incoming http request by matching the request of the registered
-     * routs in this application
-     * @param Request $request
-     * @param type $type
-     * @param type $catch
-     * @return type
-     */
-    public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true) {
-        return $this->getHttpKernel()->handle($request, $type, $catch);
-    }
+if ($this->isProduction()) {
+$logger->pushHandler(
+new StreamHandler("{$this->rootFolder}/var/logs/{$this->environment}.log", Logger::WARNING)
+);
+} else {
+$logger->pushHandler(
+new ChromePHPHandler(Logger::DEBUG)
+);
+}
+$this->registerService(Services::LOGGER_SERVICE, $logger);
+}
 
-    /**
-     * Handles the request and delivers the response.
-     *
-     * @param Request|null $request Request to process
-     */
-    public function run(Request $request = null) {
+/**
+ * Handles the incoming http request by matching the request of the registered
+ * routs in this application
+ * @param Request $request
+ * @param type $type
+ * @param type $catch
+ * @return type
+ */
+public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true) {
+return $this->getHttpKernel()->handle($request, $type, $catch);
+}
 
-        try {
+/**
+ * Handles the request and delivers the response.
+ *
+ * @param Request|null $request Request to process
+ */
+public function run(Request $request = null) {
 
-            $this->registerServices();
-            $this->registerModules();
+try {
 
-            if (null === $request) {
-                $request = Request::createFromGlobals();
-            }
-            $response = $this->handle($request);
-        } catch (ResourceNotFoundException $e) {
-            $response = $this->resourceNotFoundResponse($e->getMessage());
-        } catch (\Exception $e) {
-            $response = $this->fatalExceptionResponse($e->getMessage(), $e);
-        }
-        $response->send();
+$this->registerServices();
+$this->registerModules();
 
-        $this->terminate($request, $response);
-    }
+if (null === $request) {
+$request = Request::createFromGlobals();
+}
+$response = $this->handle($request);
+} catch (ResourceNotFoundException $e) {
+$response = $this->resourceNotFoundResponse($e->getMessage());
+} catch (\Exception $e) {
+$response = $this->fatalExceptionResponse($e->getMessage(), $e);
+}
+$response->send();
 
-    /**
-     * Creates a fatal exception response (500)
-     * @param type $message
-     * @param type $exception
-     */
-    protected function fatalExceptionResponse($message, $exception = null) {
-        $msg = $message;
-        if ($this->isDevelopment()) {
-            $msg = $exception->getMessage();
-        }
-        $this->getLogger()->error($message);
-        return new Response($message, $this->isDevelopment() ? 200 : 500);
-    }
+$this->terminate($request, $response);
+}
 
-    /**
-     * Creates a resource not found response (404)
-     * @param type $message
-     * @return Response
-     */
-    protected function resourceNotFoundResponse($message) {
-        $this->getLogger()->warn($message);
-        return new Response($message, 404);
-    }
+/**
+ * Creates a fatal exception response (500)
+ * @param type $message
+ * @param type $exception
+ */
+protected function fatalExceptionResponse($message, $exception = null) {
+$msg = $message;
+if ($this->isDevelopment()) {
+$msg = $exception->getMessage();
+}
+$this->getLogger()->error($message);
+return new Response($message, $this->isDevelopment() ? 200 : 500);
+}
 
-    /**
-     * Check if this application is in production mode
-     * @return boolean
-     */
-    protected function isProduction() {
-        return $this->environment === Environments::PRODUCTION;
-    }
+/**
+ * Creates a resource not found response (404)
+ * @param type $message
+ * @return Response
+ */
+protected function resourceNotFoundResponse($message) {
+$this->getLogger()->warn($message);
+return new Response($message, 404);
+}
 
-    /**
-     * Check if this application is in development mode
-     * @return boolean
-     */
-    protected function isDevelopment() {
-        return $this->environment === Environments::DEVELOPMENT;
-    }
+/**
+ * Check if this application is in production mode
+ * @return boolean
+ */
+protected function isProduction() {
+return $this->environment === Environments::PRODUCTION;
+}
 
-    /**
-     * Handles the application termination using the HttpKernel object
-     * @param Request $request
-     * @param Response $response
-     */
-    public function terminate(Request $request, Response $response) {
-        $this->getHttpKernel()->terminate($request, $response);
-    }
+/**
+ * Check if this application is in development mode
+ * @return boolean
+ */
+protected function isDevelopment() {
+return $this->environment === Environments::DEVELOPMENT;
+}
 
-    /**
-     * Registeres a service in this Application
-     * @param type $name
-     * @param type $service
-     */
-    protected function registerService($name, $service) {
-        $this->services[$name] = $service;
-    }
+/**
+ * Handles the application termination using the HttpKernel object
+ * @param Request $request
+ * @param Response $response
+ */
+public function terminate(Request $request, Response $response) {
+$this->getHttpKernel()->terminate($request, $response);
+}
 
-    /**
-     * Retusna a service by its name
-     * @param string $name
-     * @return object
-     */
-    public function getService($name) {
-        if (isset($this->services[$name])) {
-            return $this->services[$name];
-        } else {
-            return null;
-        }
-    }
+/**
+ * Registeres a service in this Application
+ * @param type $name
+ * @param type $service
+ */
+protected function registerService($name, $service) {
+$this->services[$name] = $service;
+}
 
-    public function getConfig($name, $default = null) {
-        return $this->getService(Services::CONFIG_SERVICE)->get($name, $default);
-    }
+/**
+ * Retusna a service by its name
+ * @param string $name
+ * @return object
+ */
+protected function getService($name) {
+if (isset($this->services[$name])) {
+return $this->services[$name];
+} else {
+return null;
+}
+}
+
+public function getConfig($name, $default = null) {
+return $this->getService(Services::CONFIG_SERVICE)->get($name, $default);
+}
 
 }
+
+
+
+
+
+
+
+
+

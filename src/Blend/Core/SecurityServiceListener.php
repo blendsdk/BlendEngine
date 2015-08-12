@@ -89,7 +89,7 @@ class SecurityServiceListener implements EventSubscriberInterface {
                 $routes->add($name, $route);
             }
         }
-        $urlMatcher = new SecurityUrlMatcher($routes, $this->application->getService(Services::REQUEST_CONTEXT));
+        $urlMatcher = new SecurityUrlMatcher($routes, $this->application->getRequestContext());
         $urlMatcher->getContext()->fromRequest($request);
         return $urlMatcher->match($request->getPathInfo());
     }

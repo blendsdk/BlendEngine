@@ -11,7 +11,7 @@
 
 namespace Blend\Web;
 
-use Blend\Core\Application;
+use Blend\Web\Application;
 use Blend\Core\Services;
 use Blend\Core\Controller as ControlerBase;
 
@@ -29,7 +29,7 @@ class Controller extends ControlerBase {
 
     public function __construct(Application $application) {
         parent::__construct($application);
-        $this->renderer = $this->application->getService(Services::TWIG_RENDERER);
+        $this->renderer = $this->application->getRenderer();
     }
 
     /**

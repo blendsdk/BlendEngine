@@ -47,8 +47,8 @@ abstract class Application extends BaseApplication {
             'debug' => $this->isDevelopment(),
             'strict_variables' => true
         ));
-        $twig->addExtension(new TranslationExtension($this->getService(Services::TRANSLATION_SERVICE)));
-        $twig->addExtension(new RoutingExtension($this->getService(Services::URL_GENERATOR_SERVICE)));
+        $twig->addExtension(new TranslationExtension($this->getTranslator()));
+        $twig->addExtension(new RoutingExtension($this->getUrlGenerator()));
         $this->registerService(Services::TWIG_RENDERER, $twig);
     }
 
