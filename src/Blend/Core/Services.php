@@ -28,5 +28,6 @@ class Services {
     const URL_MATCHER_SERVICE = 'url.matcher';
     const TRANSLATION_SERVICE = 'translation.service';
     const EMAIL_SERVICE = 'email.service';
+    const PDF_PRINTER_SERVICE = 'pdf.printer';
 
 }
