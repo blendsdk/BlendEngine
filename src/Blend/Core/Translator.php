@@ -41,4 +41,37 @@ class Translator extends BaseTranslator {
         parent::setLocale($locale);
     }
 
+    /**
+     * Load the translation resources for the messages folder
+     * @param string $controllerPath
+     */
+    public function loadTranslations($controllerPath) {
+        $searchPath = array_values(array_diff(array(
+            realpath("{$controllerPath}/messages"),
+            realpath("{$controllerPath}/../messages"),
+                        ), array(false)));
+        if (count($searchPath) !== 0) {
+            $resources = array_diff(glob("{$searchPath[0]}/{$this->application->getLocale()}/*"), array(false));
+            foreach ($resources as $file) {
+                $this->loadTranslation($file);
+            }
+        }
+    }
+
+    /**
+     * Loads a translation file
+     * @param string $file
+     */
+    private function loadTranslation($file) {
+        $fileInfo = pathinfo($file);
+        if ($fileInfo['extension'] === 'php') {
+            $format = 'array';
+            $data = include($file);
+        } else {
+            $format = $fileInfo['extension'];
+            $data = file_get_contents($file);
+        }
+        $this->application->getTranslator()->addResource($format, $data, $this->application->getLocale(), $fileInfo['filename']);
+    }
+
 }
