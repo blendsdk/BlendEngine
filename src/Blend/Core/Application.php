@@ -25,8 +25,9 @@ use Blend\Core\StaticResourceListener;
 use Blend\Core\ControllerListener;
 use Blend\Core\LocaleServiceListener;
 use Blend\Data\Database;
+use Blend\Security\SecurityServiceListener;
 use Blend\Security\User;
-use Blend\Core\Translator;
+use Blend\Translation\Translator;
 use Blend\Core\MailerService;
 use Blend\Core\PDFPrinterService;
 use Symfony\Component\Routing\Route;
@@ -41,9 +42,6 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
-use Symfony\Component\Translation\MessageSelector;
-use Symfony\Component\Translation\Loader\ArrayLoader;
-use Symfony\Component\Translation\Loader\XliffFileLoader;
 
 /**
  * Base class for a BlendEngine application
@@ -318,12 +316,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * * Creates the Translation service
      */
     private function createTranslationService() {
-        $messageSelector = new MessageSelector();
-        $cacheDir = $this->rootFolder . '/var/cache';
-        $translator = new Translator($this, $messageSelector, $cacheDir);
-        $translator->addLoader('array', new ArrayLoader());
-        $translator->addLoader('xliff', new XliffFileLoader());
-        $this->registerService(Services::TRANSLATION_SERVICE, $translator);
+        $this->registerService(Services::TRANSLATION_SERVICE, new Translator($this));
     }
 
     /**

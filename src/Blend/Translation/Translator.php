@@ -9,11 +9,13 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Core;
+namespace Blend\Translation;
 
 use Blend\Core\Application;
 use Symfony\Component\Translation\Translator as BaseTranslator;
 use Symfony\Component\Translation\MessageSelector;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Loader\XliffFileLoader;
 
 /**
  * Translator that gets the current locale from the BlendEngine application.
@@ -24,9 +26,11 @@ class Translator extends BaseTranslator {
 
     protected $application;
 
-    public function __construct(Application $application, MessageSelector $selector, $cacheDir = null, $debug = false) {
+    public function __construct(Application $application) {
         $this->application = $application;
-        parent::__construct(null, $selector, $cacheDir, $debug);
+        parent::__construct(null, new MessageSelector(), $this->application->getRootFolder('/var/cache'));
+        $this->addLoader('array', new ArrayLoader());
+        $this->addLoader('xliff', new XliffFileLoader());
     }
 
     public function getLocale() {

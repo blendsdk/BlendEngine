@@ -9,11 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Core;
+namespace Blend\Security;
 
 use Blend\Security\User;
 use Blend\Core\Application;
-use Blend\Core\Services;
 use Blend\Security\SecurityUrlMatcher;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
