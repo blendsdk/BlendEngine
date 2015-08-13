@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Core;
+namespace Blend\Mail;
 
 use Blend\Core\Application;
 use Symfony\Component\HttpKernel\KernelEvents;
