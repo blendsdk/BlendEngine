@@ -31,13 +31,14 @@ class Database extends \PDO {
             'username' => 'postgres',
             'password' => 'postgres',
             'host' => 'localhost',
-            'port' => 5432
+            'port' => 5432,
+            'options' => array()
         );
 
         $config = array_replace($defaultConfig, $this->application->getConfig('database', array()));
 
         $dsn = "pgsql:host={$config['host']};dbname={$config['database']};port={$config['port']}";
-        parent::__construct($dsn, $config['username'], $config['password']);
+        parent::__construct($dsn, $config['username'], $config['password'], $config['options']);
     }
 
     public function executeQuery($sql, $params = array()) {
