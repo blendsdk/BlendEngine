@@ -11,6 +11,8 @@
 
 namespace Blend\Data;
 
+use Blend\Core\Application;
+
 /**
  * Encapsulates common database functionality. This class is available as
  * a service from the Blend\Core\Application
@@ -19,7 +21,21 @@ namespace Blend\Data;
  */
 class Database extends \PDO {
 
-    public function __construct($config) {
+    private $application;
+
+    public function __construct(Application $application) {
+        $this->application = $application;
+
+        $defaultConfig = array(
+            'database' => 'blend',
+            'username' => 'postgres',
+            'password' => 'postgres',
+            'host' => 'localhost',
+            'port' => 5432
+        );
+
+        $config = array_replace($defaultConfig, $this->application->getConfig('database', array()));
+
         $dsn = "pgsql:host={$config['host']};dbname={$config['database']};port={$config['port']}";
         parent::__construct($dsn, $config['username'], $config['password']);
     }

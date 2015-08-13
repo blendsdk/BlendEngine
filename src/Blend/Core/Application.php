@@ -343,8 +343,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Creates the database service
      */
     private function createDatabaseService() {
-        $dbConfig = $this->getConfig(Configiration::DATABASE_CONFIG);
-        $this->registerService(Services::DATABASE_SERVICE, new Database($dbConfig));
+        $this->registerService(Services::DATABASE_SERVICE, new Database($this));
     }
 
     /**
