@@ -53,6 +53,7 @@ abstract class Module {
      * @param Route $route
      */
     protected function addRoute($name, Route $route) {
+        $route->setDefault('_module_', $this);
         $this->application->addRoute($name, $route);
     }
 

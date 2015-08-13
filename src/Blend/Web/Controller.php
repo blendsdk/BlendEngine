@@ -12,7 +12,7 @@
 namespace Blend\Web;
 
 use Blend\Web\Application;
-use Blend\Core\Services;
+use Blend\Core\Module;
 use Blend\Core\Controller as ControlerBase;
 
 /**
@@ -27,8 +27,8 @@ class Controller extends ControlerBase {
      */
     protected $renderer;
 
-    public function __construct(Application $application) {
-        parent::__construct($application);
+    public function __construct(Application $application, Module $module) {
+        parent::__construct($application, $module);
         $this->renderer = $this->application->getRenderer();
     }
 

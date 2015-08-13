@@ -12,7 +12,9 @@
 namespace Blend\Core;
 
 use Blend\Core\Application;
+use Blend\Core\Module;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerResolver as ControllerResolverBase;
 
 /**
@@ -27,14 +29,25 @@ class ControllerResolver extends ControllerResolverBase {
      */
     protected $application;
 
+    /**
+     * @var Module
+     */
+    protected $module;
+
     public function __construct(LoggerInterface $logger, Application $application) {
         parent::__construct($logger);
         $this->application = $application;
     }
 
+    public function getController(Request $request) {
+        $this->module = $request->attributes->get('_module_');
+        $request->attributes->remove('_module_');
+        return parent::getController($request);
+    }
+
     protected function instantiateController($class) {
-        $refClass = new \ReflectionClass($class);
-        $controller = new $class($this->application);
+        $refClass = new \ReflectionClass(get_class($this->module));
+        $controller = new $class($this->application, $this->module);
         $this->application->getTranslator()->loadTranslations(dirname($refClass->getFileName()));
         return $controller;
     }

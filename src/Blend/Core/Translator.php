@@ -43,12 +43,12 @@ class Translator extends BaseTranslator {
 
     /**
      * Load the translation resources for the messages folder
-     * @param string $controllerPath
+     * @param string $path
      */
-    public function loadTranslations($controllerPath) {
+    public function loadTranslations($path) {
         $searchPath = array_values(array_diff(array(
-            realpath("{$controllerPath}/messages"),
-            realpath("{$controllerPath}/../messages"),
+            realpath("{$path}/messages"),
+            realpath("{$path}/../messages"),
                         ), array(false)));
         if (count($searchPath) !== 0) {
             $resources = array_diff(glob("{$searchPath[0]}/{$this->application->getLocale()}/*"), array(false));

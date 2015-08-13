@@ -11,6 +11,9 @@
 
 namespace Blend\Core;
 
+use Blend\Core\Application;
+use Blend\Core\Module;
+
 /**
  * Base class for all Controllers in BlendEngine
  *
@@ -23,8 +26,14 @@ class Controller {
      */
     protected $application;
 
-    public function __construct(Application $application) {
+    /**
+     * @var Module
+     */
+    protected $module;
+
+    public function __construct(Application $application, Module $module) {
         $this->application = $application;
+        $this->module = $module;
     }
 
 }

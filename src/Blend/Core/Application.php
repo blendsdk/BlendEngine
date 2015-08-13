@@ -103,7 +103,10 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     protected abstract function getModules();
 
-    public function __construct($environment, $rootFolder) {
+    public function __construct($rootFolder, $environment = null) {
+        if (is_null($environment)) {
+            $environment = Environments::PRODUCTION;
+        }
         $this->environment = $environment;
         $this->rootFolder = $rootFolder;
         $this->services = array();
