@@ -67,6 +67,12 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     private $controllerResolver;
 
     /**
+     * Holds the name of this application
+     * @var string
+     */
+    protected $name;
+
+    /**
      * Points to the root folder of this application
      * @var string
      */
@@ -101,11 +107,9 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     protected abstract function getModules();
 
-    public function __construct($rootFolder, $environment = null) {
-        if (is_null($environment)) {
-            $environment = Environments::PRODUCTION;
-        }
-        $this->environment = $environment;
+    public function __construct($rootFolder, $name, $devMode = false) {
+        $this->name = $name;
+        $this->environment = $devMode === true ? Environments::DEVELOPMENT : Environments::PRODUCTION;
         $this->rootFolder = $rootFolder;
         $this->services = array();
         $this->modules = array();
@@ -388,7 +392,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
         if ($this->isProduction()) {
             $logger->pushHandler(
-                    new StreamHandler("{$this->rootFolder}/var/logs/{$this->environment}.log", Logger::WARNING)
+                    new StreamHandler("{$this->rootFolder}/var/logs/{$this->name}-{$this->environment}.log", Logger::WARNING)
             );
         } else {
             $logger->pushHandler(
