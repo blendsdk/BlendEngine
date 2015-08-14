@@ -17,7 +17,7 @@ namespace Blend\Core;
  */
 class Environments {
 
-    const PRODUCTION = 'production';
-    const DEVELOPMENT = 'development';
+    const PRODUCTION = 'prod';
+    const DEVELOPMENT = 'devel';
 
 }
