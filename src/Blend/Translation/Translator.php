@@ -28,7 +28,8 @@ class Translator extends BaseTranslator {
 
     public function __construct(Application $application) {
         $this->application = $application;
-        parent::__construct(null, new MessageSelector(), $this->application->getRootFolder('/var/cache'));
+        $cacheDir = $this->application->isProduction() ? $this->application->getRootFolder('/var/cache') : null;
+        parent::__construct(null, new MessageSelector(), $cacheDir);
         $this->addLoader('array', new ArrayLoader());
         $this->addLoader('xliff', new XliffFileLoader());
     }
@@ -53,6 +54,8 @@ class Translator extends BaseTranslator {
         $searchPath = array_values(array_diff(array(
             realpath("{$path}/messages"),
             realpath("{$path}/../messages"),
+            realpath("{$path}/Messages"),
+            realpath("{$path}/../Messages"),
                         ), array(false)));
         if (count($searchPath) !== 0) {
             $resources = array_diff(glob("{$searchPath[0]}/{$this->application->getLocale()}/*"), array(false));
