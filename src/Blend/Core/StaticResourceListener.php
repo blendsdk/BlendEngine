@@ -33,6 +33,9 @@ class StaticResourceListener implements EventSubscriberInterface {
     public function onKernelRequest(GetResponseEvent $event) {
         $request = $event->getRequest();
         $filename = "{$this->serveFolder}/{$request->getRequestUri()}";
+        if (stripos($filename, '?') !== false) {
+            $filename = substr($filename, 0, strpos($filename, "?"));
+        }
         if (file_exists($filename) && is_file($filename)) {
             $response = new Response(file_get_contents($filename));
             $response->headers->set('Content-Type', MimeTypes::getFileMIMEType($filename));
