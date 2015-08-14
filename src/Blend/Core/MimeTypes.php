@@ -27,8 +27,8 @@ class MimeTypes {
         'ico' => 'image/x-icon',
         'pdf' => 'application/pdf',
         'svg' => 'svg+xml',
-        'woff' => 'application/x-font-woff',
-        'woff2' => 'application/x-font-woff2',
+        'woff' => 'application/font-woff',
+        'woff2' => 'application/font-woff2',
         'eot' => 'application/vnd.ms-fontobject',
         'ttf' => 'font/opentype'
     );
