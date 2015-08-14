@@ -55,7 +55,7 @@ class Configiration {
         if (file_exists($fname)) {
             $this->params = include($fname);
         } else {
-            throw new FileNotFoundException("Configuration file [{$fname}] does not exist!", 500);
+            throw new FileNotFoundException($fname, 500);
         }
     }
 
