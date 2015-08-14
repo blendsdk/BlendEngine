@@ -107,9 +107,9 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     protected abstract function getModules();
 
-    public function __construct($rootFolder, $name, $devMode = false) {
+    public function __construct($rootFolder, $name, $environment = Environments::PRODUCTION) {
         $this->name = $name;
-        $this->environment = $devMode === true ? Environments::DEVELOPMENT : Environments::PRODUCTION;
+        $this->environment = $environment;
         $this->rootFolder = $rootFolder;
         $this->services = array();
         $this->modules = array();
@@ -380,7 +380,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Creates the application configuration service
      */
     private function createConfigService() {
-        $config = new Configiration("{$this->rootFolder}/config/{$this->environment}.config.php");
+        $config = new Configiration("{$this->rootFolder}/config/{$this->name}-{$this->environment}-config.php");
         $this->registerService(Services::CONFIG_SERVICE, $config);
     }
 
