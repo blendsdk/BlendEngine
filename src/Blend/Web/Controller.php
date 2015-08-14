@@ -14,6 +14,7 @@ namespace Blend\Web;
 use Blend\Web\Application;
 use Blend\Core\Module;
 use Blend\Core\Controller as ControlerBase;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Base controller for all web applications in BlendEngine
@@ -27,8 +28,8 @@ class Controller extends ControlerBase {
      */
     protected $renderer;
 
-    public function __construct(Application $application, Module $module) {
-        parent::__construct($application, $module);
+    public function __construct(Application $application, Module $module, Request $request) {
+        parent::__construct($application, $module, $request);
         $this->renderer = $this->application->getRenderer();
     }
 
@@ -38,9 +39,35 @@ class Controller extends ControlerBase {
      * @param array $context
      * @return string
      */
-    public function renderView($viewFile, $context) {
+    public function renderView($viewFile, $context = array()) {
         $context['app'] = $this->application;
-        return $this->renderer->render($viewFile, $context);
+        $this->request->attributes->set('_route_params', $this->createRouteParams());
+        $context['request'] = $this->request;
+        return $this->renderer->render($this->checkSetViewsPath($viewFile), $context);
+    }
+
+    /**
+     * Prepares values for the _route_params
+     * @return type
+     */
+    private function createRouteParams() {
+        $params = $this->request->attributes->all();
+        unset($params['_controller']);
+        unset($params['_view']);
+        unset($params['_route']);
+        return $params;
+    }
+
+    /**
+     * Sets a View path corresponding to the current module
+     * @param type $viewFile
+     * @return type
+     */
+    private function checkSetViewsPath($viewFile) {
+        $modulePath = str_replace($this->application->getRootFolder('/'), '', $this->module->getPath('/Views/'));
+        $find = array('@module/');
+        $replace = array($modulePath);
+        return str_replace($find, $replace, $viewFile);
     }
 
 }

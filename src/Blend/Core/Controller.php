@@ -13,6 +13,7 @@ namespace Blend\Core;
 
 use Blend\Core\Application;
 use Blend\Core\Module;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Base class for all Controllers in BlendEngine
@@ -31,9 +32,15 @@ class Controller {
      */
     protected $module;
 
-    public function __construct(Application $application, Module $module) {
+    /**
+     * @var Request
+     */
+    protected $request;
+
+    public function __construct(Application $application, Module $module, Request $request) {
         $this->application = $application;
         $this->module = $module;
+        $this->request = $request;
     }
 
 }

@@ -34,6 +34,11 @@ class ControllerResolver extends ControllerResolverBase {
      */
     protected $module;
 
+    /**
+     * @var Request
+     */
+    protected $request;
+
     public function __construct(LoggerInterface $logger, Application $application) {
         parent::__construct($logger);
         $this->application = $application;
@@ -41,13 +46,17 @@ class ControllerResolver extends ControllerResolverBase {
 
     public function getController(Request $request) {
         $this->module = $request->attributes->get('_module_');
+        $this->request = $request;
         $request->attributes->remove('_module_');
         return parent::getController($request);
     }
 
     protected function instantiateController($class) {
         $refClass = new \ReflectionClass(get_class($this->module));
-        $controller = new $class($this->application, $this->module);
+        $controller = new $class($this->application, $this->module, $this->request);
+        if (empty($this->module->getPath())) {
+            $this->module->setPath(dirname($refClass->getFileName()));
+        }
         $this->application->getTranslator()->loadTranslations(dirname($refClass->getFileName()));
         return $controller;
     }

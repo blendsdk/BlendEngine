@@ -26,7 +26,26 @@ abstract class Module {
      */
     protected $application;
 
+    /**
+     * Reference to there this module is located on the filesystem
+     * @var type
+     */
+    protected $path;
+
     protected abstract function createRoutes();
+
+    /**
+     * Set the path of this module. This funcion is called when the controller
+     * is resolved
+     * @param string $path
+     */
+    public function setPath($path) {
+        $this->path = $path;
+    }
+
+    public function getPath($append = '') {
+        return $this->path . $append;
+    }
 
     public function __construct(Application $application) {
         $this->application = $application;
@@ -58,6 +77,13 @@ abstract class Module {
             $route->setDefault('_locale', $this->application->getLocale());
         }
         $this->application->addRoute($name, $route);
+    }
+
+    protected function addSimpleRoute($name, $path, $controllerAction, $defaults = array()) {
+        $routeDefaults = array_replace($defaults, array(
+            '_controller' => $controllerAction
+        ));
+        $this->addRoute($name, new Route($path, $routeDefaults));
     }
 
 }
