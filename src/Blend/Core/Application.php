@@ -468,7 +468,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Check if this application is in production mode
      * @return boolean
      */
-    protected function isProduction() {
+    public function isProduction() {
         return $this->environment === Environments::PRODUCTION;
     }
 
@@ -476,7 +476,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Check if this application is in development mode
      * @return boolean
      */
-    protected function isDevelopment() {
+    public function isDevelopment() {
         return $this->environment === Environments::DEVELOPMENT;
     }
 
