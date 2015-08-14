@@ -54,6 +54,9 @@ abstract class Module {
      */
     protected function addRoute($name, Route $route) {
         $route->setDefault('_module_', $this);
+        if (is_null($route->getDefault('_locale'))) {
+            $route->setDefault('_locale', $this->application->getLocale());
+        }
         $this->application->addRoute($name, $route);
     }
 
