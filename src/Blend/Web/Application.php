@@ -16,9 +16,6 @@ use Blend\Core\Services;
 use Blend\Core\Application as BaseApplication;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
-use Symfony\Bridge\Twig\Extension\FormExtension;
-use Symfony\Bridge\Twig\Form\TwigRendererEngine;
-use Symfony\Bridge\Twig\Form\TwigRenderer;
 
 /**
  * Base class for all web application. This class provides the twig renderer as
