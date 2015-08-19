@@ -117,11 +117,16 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     }
 
     /**
-     * Retuns the application name;
+     * Retuns the application name either hashed or the plain name
+     * @param boolean $hashed, false by default
      * @return string
      */
-    public function getName() {
-        return $this->name;
+    public function getName($hashed = false) {
+        if ($hashed) {
+            return md5($this->name . date('Y'));
+        } else {
+            return $this->name;
+        }
     }
 
     /**
