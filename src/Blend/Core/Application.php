@@ -117,6 +117,14 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     }
 
     /**
+     * Retuns the application name;
+     * @return string
+     */
+    public function getName() {
+        return $this->name;
+    }
+
+    /**
      * Retuns the root folder of this application;
      * @return string
      */
