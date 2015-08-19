@@ -53,7 +53,8 @@ class ControllerResolver extends ControllerResolverBase {
 
     protected function instantiateController($class) {
         $refClass = new \ReflectionClass(get_class($this->module));
-        $controller = new $class($this->application, $this->module, $this->request);
+        $controller = new $class($this->application, $this->module);
+        $controller->prepareAction($this->request);
         if (empty($this->module->getPath())) {
             $this->module->setPath(dirname($refClass->getFileName()));
         }

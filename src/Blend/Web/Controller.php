@@ -28,9 +28,18 @@ class Controller extends ControlerBase {
      */
     protected $renderer;
 
-    public function __construct(Application $application, Module $module, Request $request) {
-        parent::__construct($application, $module, $request);
+    /**
+     * @var Request;
+     */
+    protected $request;
+
+    public function __construct(Application $application, Module $module) {
+        parent::__construct($application, $module);
         $this->renderer = $this->application->getRenderer();
+    }
+
+    public function prepareAction(Request $request) {
+        $this->request = $request;
     }
 
     /**

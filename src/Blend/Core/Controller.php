@@ -32,15 +32,13 @@ class Controller {
      */
     protected $module;
 
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    public function __construct(Application $application, Module $module, Request $request) {
+    public function __construct(Application $application, Module $module) {
         $this->application = $application;
         $this->module = $module;
-        $this->request = $request;
+    }
+
+    public function prepareAction(Request $request) {
+        return;
     }
 
 }
