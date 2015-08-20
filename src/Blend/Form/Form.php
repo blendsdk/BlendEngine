@@ -14,20 +14,16 @@ namespace Blend\Form;
 use Blend\Core\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Blend\Form\FormException;
-use Blend\Form\FieldSet;
-use Blend\Form\Field;
-use Blend\Form\ErrorProvider;
+use Blend\Model\Model;
 
 /**
  * Description of Form
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class Form extends ErrorProvider {
+abstract class Form {
 
     const FORM_TYPE_POST = 'POST';
-    const FORM_TYPE_GET = 'GET';
-    const DEFAULT_FIELDSET = false;
 
     private $csrf_key;
 
@@ -37,33 +33,19 @@ abstract class Form extends ErrorProvider {
     protected $request;
 
     /**
-     * @var Application
+     * @var Model
      */
-    protected $method;
-    protected $submitted;
-    protected $name;
+    protected $model;
 
     /**
-     * @var FieldSet[]
+     * @var Application
      */
-    protected $fieldsets;
+    protected $submitted;
 
-    public function __construct($name, $csrf_key_name, $method = Form::FORM_TYPE_POST) {
-        parent::__construct();
-        $this->method = $method;
+    public function __construct($csrf_key_name, Model $model) {
         $this->submitted = false;
+        $this->model = $model;
         $this->csrf_key = $csrf_key_name;
-        $this->name = $name;
-        $this->fieldsets = array();
-        $this->addFieldSet(new FieldSet($name));
-    }
-
-    public function addFieldSet(FieldSet $fieldset) {
-        $this->fieldsets[$fieldset->getName()] = $fieldset;
-    }
-
-    public function addField($id, Field $field) {
-        $this->fieldsets[$this->name]->addField($id, $field);
     }
 
     public function getCSRF() {
@@ -93,61 +75,23 @@ abstract class Form extends ErrorProvider {
     public function handleRequest(Request $request) {
         $this->request = $request;
         if ($this->checkSubmitted()) {
-            if ($request->getMethod() !== $this->method) {
+            if ($request->getMethod() !== self::FORM_TYPE_POST) {
                 throw new FormException("Invalid request method. Expected {$this->method} got {$request->getMethod()}");
             } else {
-                $this->setDataInternal($request);
+                $this->model->setValues($request->request->all());
             }
         } else {
             $request->getSession()->set($this->csrf_key, md5(uniqid()));
         }
     }
 
-    public function getData($fielsetName = Form::DEFAULT_FIELDSET) {
-        $name = $fielsetName === Form::DEFAULT_FIELDSET ? $this->name : $fielsetName;
-        if (isset($this->fieldsets[$name])) {
-            return $this->fieldsets[$name]->getData();
-        } else if (is_null($fielsetName)) {
-            $result = array();
-            foreach ($this->fieldsets as $name => $fieldset) {
-                $result[$name] = $fieldset->getData();
-            }
-            return $result;
-        } else {
-            return null;
-        }
-    }
-
-    public function setData($data = array(), $fieldsets = Form::DEFAULT_FIELDSET) {
-        $fset = $fieldsets === Form::DEFAULT_FIELDSET ? $this->name : $fieldsets;
-        if (isset($this->fieldsets[$set])) {
-            $this->fieldsets[$set]->setData($data);
-        } else {
-            foreach ($this->fieldsets as $fieldset) {
-                $fieldset->setData($data);
-            }
-        }
-    }
-
-    protected function setDataInternal(Request $request) {
-        foreach ($this->fieldsets as $fieldset) {
-            $name = $fieldset->getName();
-            $fieldset->setData($request->get($name, null));
-        }
-    }
-
-    protected function validate() {
-        foreach ($this->fieldsets as $fieldset) {
-            if ($fieldset->validate() === false) {
-                $this->errors = array_merge($this->errors, $fieldset->getErrors());
-            }
-        }
+    public function isSubmitted() {
+        return $this->submitted;
     }
 
     public function isValid() {
         if ($this->submitted) {
-            $this->validate();
-            return parent::isValid();
+            return $this->model->isValid();
         } else {
             return false;
         }
