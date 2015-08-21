@@ -43,12 +43,12 @@ abstract class FieldProvider extends ValidationProvider {
      * @param array $validators
      * @param array $attributes
      */
-    protected function field($id, $label, $default = null, $validators = array(), $attributes = array()) {
+    protected function field($id, $label = null, $default = null, $validators = array(), $attributes = array()) {
         $this->checkField($id);
         $this->fields[$id] = array(
             self::KEY_VALUE => null,
             self::KEY_DEFAULT => $default,
-            self::KEY_LABEL => $label,
+            self::KEY_LABEL => is_null($label) ? 'label.' . $id : $label,
             self::KEY_VALIDATORS => $validators,
             self::KEY_ATTRS => $attributes,
             self::KEY_ERRORS => array()
@@ -97,9 +97,12 @@ abstract class FieldProvider extends ValidationProvider {
         $setter = $this->getSetterName($id);
         if (method_exists($this, $setter)) {
             call_user_func(array($this, $setter), $value);
+            return true;
         } else if ($this->hasField($id)) {
             $this->fields[$id][self::KEY_VALUE] = $value;
+            return true;
         }
+        return false;
     }
 
     /**
@@ -160,7 +163,7 @@ abstract class FieldProvider extends ValidationProvider {
      * @param string $prefix
      * @return string
      */
-    private function getCamlCaseName($name, $prefix) {
+    protected function getCamlCaseName($name, $prefix) {
         $n = str_replace('_', ' ', $name);
         return $prefix . ucwords($n);
     }
