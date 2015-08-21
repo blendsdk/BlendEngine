@@ -253,7 +253,8 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return UrlGenerator
      */
     public function generateUrl($name, $parameters = array(), $referenceType = UrlGenerator::ABSOLUTE_PATH) {
-        return $this->getUrlGenerator()->generate($name, $parameters, $referenceType);
+        $params = array_replace(array('_locale' => $this->getLocale()), $parameters);
+        return $this->getUrlGenerator()->generate($name, $params, $referenceType);
     }
 
     /**
@@ -372,13 +373,12 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
         $requestContext = $this->getService(Services::REQUEST_CONTEXT);
 
+        $this->getDispatcher()->addSubscriber(new LocaleServiceListener($this, $this->getConfig('defaultLocale', 'en'), $requestContext));
         $this->getDispatcher()->addSubscriber(new StringToResponseListener());
         $this->getDispatcher()->addSubscriber(new JsonToResponseListener());
         $this->getDispatcher()->addSubscriber(new SessionServiceListener());
         $this->getDispatcher()->addSubscriber(new SecurityServiceListener($this));
         $this->getDispatcher()->addSubscriber(new StaticResourceListener($this->rootFolder . '/web'));
-        $this->getDispatcher()->addSubscriber(new ControllerListener($this->routes, $requestContext));
-        $this->getDispatcher()->addSubscriber(new LocaleServiceListener($this, $this->getConfig('defaultLocale', 'en'), $requestContext));
     }
 
     /**
@@ -424,7 +424,17 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return type
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true) {
+        $this->setRequestAttributes($request);
         return $this->getHttpKernel()->handle($request, $type, $catch);
+    }
+
+    /**
+     * Sets the request attributes extracted from a matched route
+     */
+    protected function setRequestAttributes(Request $request) {
+        $urlMatcher = new UrlMatcher($this->routes, $this->getRequestContext());
+        $urlMatcher->getContext()->fromRequest($request);
+        $request->attributes->add($urlMatcher->match($request->getPathInfo()));
     }
 
     /**
