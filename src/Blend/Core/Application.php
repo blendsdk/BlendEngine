@@ -22,7 +22,6 @@ use Blend\Core\JsonToResponseListener;
 use Blend\Core\StringToResponseListener;
 use Blend\Core\SessionServiceListener;
 use Blend\Core\StaticResourceListener;
-use Blend\Core\ControllerListener;
 use Blend\Core\LocaleServiceListener;
 use Blend\Data\Database;
 use Blend\Security\SecurityServiceListener;
@@ -33,6 +32,7 @@ use Blend\PDF\PDFPrinterService;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\TerminableInterface;
 use Symfony\Component\HttpKernel\HttpKernel;
@@ -101,6 +101,12 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @var User
      */
     protected $user;
+
+    /**
+     * Holds a reference to the current Request
+     * @var type
+     */
+    protected $request;
 
     /**
      * Retuns an array of instantiated Module objects
@@ -424,6 +430,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return type
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true) {
+        $this->request = $request;
         $this->setRequestAttributes($request);
         return $this->getHttpKernel()->handle($request, $type, $catch);
     }
@@ -536,6 +543,11 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
     public function getConfig($name, $default = null) {
         return $this->getService(Services::CONFIG_SERVICE)->get($name, $default);
+    }
+
+    public function logout($redirectTo = '/') {
+        $this->request->getSession()->clear();
+        return new RedirectResponse($redirectTo);
     }
 
 }

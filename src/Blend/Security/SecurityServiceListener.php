@@ -35,27 +35,26 @@ class SecurityServiceListener implements EventSubscriberInterface {
 
     public function __construct(Application $application) {
         $this->application = $application;
-        $this->logoutPathName = $application->getConfig('logout_path', '/logout');
-        $this->createLoginRoute();
+        $this->createLogoutRoute();
     }
 
     /**
      * Creates a login route (config: logout_path)
      */
-    private function createLoginRoute() {
-        $this->application->addRoute('logout', new Route($this->application->getConfig('logout_path', '/logout'), array(
-            '_controller' => array($this, 'logoutUser')
-        )));
+    private function createLogoutRoute() {
+        if (is_null($this->application->getRoutes()->get('logout'))) {
+            $this->application->addRoute('logout', new Route('/logout', array(
+                '_controller' => array($this, 'logoutUser')
+            )));
+        }
     }
 
     /**
      * Clears the session cache for this for and redirects the request to after_logout_path
-     * @param Request $request
      * @return RedirectResponse
      */
-    public function logoutUser(Request $request) {
-        $request->getSession()->clear();
-        return new RedirectResponse($this->application->getConfig('after_logout_path', '/'));
+    public function logoutUser() {
+        return $this->application->logout($this->getAfterLogoutPath());
     }
 
     /**
@@ -70,7 +69,7 @@ class SecurityServiceListener implements EventSubscriberInterface {
         }
         $user = $session->get(self::SEC_SUTHENTICATED_USER);
         if (!$user->isAuthenticated() && $this->needsAuthentication($event->getRequest())) {
-            $event->setResponse(new RedirectResponse($this->application->getConfig('login_path', '/login')));
+            $event->setResponse(new RedirectResponse($this->getLoginPath()));
         } else {
             $this->application->setUser($user);
         }
@@ -97,6 +96,22 @@ class SecurityServiceListener implements EventSubscriberInterface {
         return array(
             KernelEvents::REQUEST => array('onKernelRequest')
         );
+    }
+
+    private function getAfterLogoutPath() {
+        if ($this->application->getRoutes()->get('after_logout')) {
+            return $this->application->generateUrl('after_logout');
+        } else {
+            return '/';
+        }
+    }
+
+    private function getLoginPath() {
+        if ($this->application->getRoutes()->get('login')) {
+            return $this->application->generateUrl('login');
+        } else {
+            return '/login';
+        }
     }
 
 }
