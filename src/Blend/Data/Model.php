@@ -12,7 +12,7 @@
 namespace Blend\Data;
 
 use Blend\Data\Database;
-use Blend\Core\Model as ModelBase;
+use Blend\Model\Model as ModelBase;
 
 /**
  * Base class for a database model
@@ -27,34 +27,41 @@ class Model extends ModelBase {
     protected $isNew;
 
     public function __construct($data = array(), $isNew = true) {
-        $this->data = $data;
+        parent::__construct();
         $this->isNew = $isNew;
     }
 
-    public function __set($name, $value) {
-        $setter = $this->getSetterName($name);
-        if ($this->hasSetter($setter)) {
-            call_user_func(array($this, $setter), $value);
-        } else if ($this->isNew === false && isset($this->data[$name])) {
-            $this->modified[$name] = array($this->data[$name], $value);
-            $this->data[$name] = $value;
-        } else if ($this->isNew) {
-            $this->data[$name] = $value;
+    public function setValue($id, $value) {
+        if ($this->hasField($id)) {
+            $cur = $this->fields[$id][self::KEY_VALUE];
+        }
+        if (parent::setValue($id, $value)) {
+            if ($this->isNew === false) {
+                $this->modified[$id] = array($cur, $value);
+            }
         }
     }
 
+    public function __set($name, $value) {
+        $this->setValue($name, $value);
+    }
+
+    public function __get($name) {
+        return $this->getValue($name);
+    }
+
     protected function insert(Database $database) {
-        $fieldNames = array_keys($this->data);
+        $fieldNames = array_keys($this->fields);
         $fieldValues = array();
         foreach ($fieldNames as $name) {
-            $fieldValues[":{$name}"] = $this->data[$name];
+            $fieldValues[":{$name}"] = $this->getValue($name);
         }
         $placeHolders = implode(', ', array_keys($fieldValues));
         $names = implode(', ', $fieldNames);
         $sql = "insert into {$this->table} ($names) values ($placeHolders) returning *";
         $result = $database->executeQuery($sql, $fieldValues);
         $this->isNew = false;
-        $this->data = $result[0];
+        $this->setValues($result[0]);
     }
 
     protected function update(Database $database) {
