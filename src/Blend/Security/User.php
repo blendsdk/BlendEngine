@@ -11,7 +11,7 @@
 
 namespace Blend\Security;
 
-use Blend\Core\Model;
+use Blend\Model\Model;
 
 /**
  * Base User class
@@ -26,12 +26,14 @@ class User extends Model {
     private $securityToken;
 
     public function __construct() {
-        $this->data[self::USERNAME] = 'anonymous';
-        $this->data[self::PASSWORD] = null;
+        parent::__construct();
+        $this->field(self::USERNAME, self::LABEL_AUTO, null, array(
+            $this->validateNotBlank()
+        ));
     }
 
     public function getUsername() {
-        return $this->data[self::USERNAME];
+        return $this->getValue(self::USERNAME);
     }
 
     public function setSecurityToken($token) {
