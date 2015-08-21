@@ -79,6 +79,13 @@ abstract class Module {
         $this->application->addRoute($name, $route);
     }
 
+    protected function addSecuredRoute($name, $path, $controllerAction, $defaults = array()) {
+        $secured = array(
+            'secure' => true
+        );
+        $this->addSimpleRoute($name, $path, $controllerAction, array_replace($secured, $defaults));
+    }
+
     protected function addSimpleRoute($name, $path, $controllerAction, $defaults = array()) {
         $routeDefaults = array_replace($defaults, array(
             '_controller' => $controllerAction
