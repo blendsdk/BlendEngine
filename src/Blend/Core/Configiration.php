@@ -53,10 +53,26 @@ class Configiration {
 
     public function __construct($fname) {
         if (file_exists($fname)) {
-            $this->params = include($fname);
+            $this->params = $this->array_flat(include($fname));
         } else {
             throw new FileNotFoundException($fname, 500);
         }
+    }
+
+    protected function array_flat($array, $prefix = '') {
+        $result = array();
+
+        foreach ($array as $key => $value) {
+            $new_key = $prefix . (empty($prefix) ? '' : '.') . $key;
+
+            if (is_array($value)) {
+                $result = array_merge($result, $this->array_flat($value, $new_key));
+            } else {
+                $result[$new_key] = $value;
+            }
+        }
+
+        return $result;
     }
 
 }

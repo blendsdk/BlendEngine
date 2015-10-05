@@ -95,16 +95,14 @@ class MailerService {
         $this->transport_buffer = new \Swift_Transport_StreamBuffer(new \Swift_StreamFilters_StringReplacementFilterFactory());
         $this->smtpTransport = new \Swift_Transport_EsmtpTransport($this->transport_buffer, array($this->smtp_auth_handler), $this->eventDispatcher);
 
-        $defaultOptions = array(
-            'host' => 'localhost',
-            'port' => 25,
-            'username' => '',
-            'password' => '',
-            'encryption' => null,
-            'auth_mode' => null,
+        $options = array(
+            'host' => $this->application->getConfig('email.host', 'localhost'),
+            'port' => $this->application->getConfig('email.port', 25),
+            'username' => $this->application->getConfig('email.username', null),
+            'password' => $this->application->getConfig('email.password', null),
+            'encryption' => $this->application->getConfig('email.encryption', null),
+            'auth_mode' => $this->application->getConfig('email.auth_mode', null),
         );
-
-        $options = array_replace($defaultOptions, $this->application->getConfig('email', array()));
 
         $this->smtpTransport->setHost($options['host']);
         $this->smtpTransport->setPort($options['port']);

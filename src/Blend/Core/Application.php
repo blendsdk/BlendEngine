@@ -379,7 +379,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
         $requestContext = $this->getService(Services::REQUEST_CONTEXT);
 
-        $this->getDispatcher()->addSubscriber(new LocaleServiceListener($this, $this->getConfig('defaultLocale', 'en'), $requestContext));
+        $this->getDispatcher()->addSubscriber(new LocaleServiceListener($this, $this->getConfig('translation.defaultLocale', 'en'), $requestContext));
         $this->getDispatcher()->addSubscriber(new StringToResponseListener());
         $this->getDispatcher()->addSubscriber(new JsonToResponseListener());
         $this->getDispatcher()->addSubscriber(new SessionServiceListener());

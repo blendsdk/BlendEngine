@@ -26,16 +26,13 @@ class Database extends \PDO {
     public function __construct(Application $application) {
         $this->application = $application;
 
-        $defaultConfig = array(
-            'database' => 'blend',
-            'username' => 'postgres',
-            'password' => 'postgres',
-            'host' => 'localhost',
-            'port' => 5432,
-            'options' => array()
+        $config = array(
+            'database' => $this->application->getConfig('database.database', 'blend'),
+            'username' => $this->application->getConfig('database.username', 'postgres'),
+            'password' => $this->application->getConfig('database.password', 'postgres'),
+            'host' => $this->application->getConfig('database.host', 'localhost'),
+            'port' => $this->application->getConfig('database.port', 5432),
         );
-
-        $config = array_replace($defaultConfig, $this->application->getConfig('database', array()));
 
         $dsn = "pgsql:host={$config['host']};dbname={$config['database']};port={$config['port']}";
         parent::__construct($dsn, $config['username'], $config['password'], $config['options']);
