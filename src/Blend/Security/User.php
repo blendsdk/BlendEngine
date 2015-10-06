@@ -21,19 +21,18 @@ use Blend\Model\Model;
 class User extends Model {
 
     const USERNAME = 'username';
-    const PASSWORD = 'password';
 
     private $securityToken;
 
     public function __construct() {
         parent::__construct();
-        $this->field(self::USERNAME, self::LABEL_AUTO, null, array(
+        $this->field(self::USERNAME, 'label.username', self::AUTO_DEFAULT, array(
             $this->validateNotBlank()
         ));
     }
 
     public function getUsername() {
-        return $this->getValue(self::USERNAME);
+        return $this->fields[self::USERNAME][self::KEY_VALUE];
     }
 
     public function setSecurityToken($token) {

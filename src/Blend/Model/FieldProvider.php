@@ -28,6 +28,7 @@ abstract class FieldProvider extends ValidationProvider {
     const KEY_ATTRS = 4;
     const KEY_ERRORS = 5;
     const LABEL_AUTO = null;
+    const AUTO_DEFAULT = null;
 
     protected $fields;
 
