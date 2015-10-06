@@ -42,10 +42,24 @@ abstract class Form {
      */
     protected $submitted;
 
+    /**
+     * @var array
+     */
+    protected $errors;
+
     public function __construct($csrf_key_name, Model $model) {
         $this->submitted = false;
         $this->model = $model;
         $this->csrf_key = $csrf_key_name;
+        $this->errors = [];
+    }
+
+    public function addError($message) {
+        $this->errors[] = $message;
+    }
+
+    public function getErrors() {
+        return $this->errors;
     }
 
     public function getCSRF() {
@@ -89,11 +103,14 @@ abstract class Form {
         return $this->submitted;
     }
 
-    public function isValid() {
+    public function validate() {
         if ($this->submitted) {
-            return $this->model->isValid();
-        } else {
-            return false;
+            if ($this->model->isValid()) {
+                return true;
+            } else {
+                $this->errors = array_merge($this->errors, $this->model->getErrors());
+                return false;
+            }
         }
     }
 
