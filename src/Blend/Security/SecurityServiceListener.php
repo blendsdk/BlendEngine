@@ -29,9 +29,11 @@ use Symfony\Component\Routing\Route;
  */
 class SecurityServiceListener implements EventSubscriberInterface {
 
-    const SEC_SUTHENTICATED_USER = '_authenticated_user';
+    const SEC_AUTHENTICATED_USER = '_sec_authenticated_user';
+    const SEC_REFERER = '_sec_referer';
 
     private $application;
+    private $referrer;
 
     public function __construct(Application $application) {
         $this->application = $application;
@@ -64,11 +66,12 @@ class SecurityServiceListener implements EventSubscriberInterface {
     public function onKernelRequest(GetResponseEvent $event) {
         $session = $event->getRequest()->getSession();
 
-        if (!$session->has(self::SEC_SUTHENTICATED_USER)) {
-            $session->set(self::SEC_SUTHENTICATED_USER, new User());
+        if (!$session->has(self::SEC_AUTHENTICATED_USER)) {
+            $session->set(self::SEC_AUTHENTICATED_USER, new User());
         }
-        $user = $session->get(self::SEC_SUTHENTICATED_USER);
+        $user = $session->get(self::SEC_AUTHENTICATED_USER);
         if (!$user->isAuthenticated() && $this->needsAuthentication($event->getRequest())) {
+            $session->set(self::SEC_REFERER, $event->getRequest()->getUri());
             $event->setResponse(new RedirectResponse($this->getLoginPath()));
         } else {
             $this->application->setUser($user);
