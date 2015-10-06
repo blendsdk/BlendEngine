@@ -104,7 +104,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
     /**
      * Holds a reference to the current Request
-     * @var type
+     * @var Requests
      */
     protected $request;
 
@@ -182,7 +182,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return User
      */
     public function getUser() {
-        return $this->user;
+        return $this->request->getSession()->get(SecurityServiceListener::SEC_AUTHENTICATED_USER);
     }
 
     /**
@@ -192,7 +192,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     public function setUser(User $user) {
         $user->password = null;
-        $this->user = $user;
+        $this->request->getSession()->set(SecurityServiceListener::SEC_AUTHENTICATED_USER, $user);
     }
 
     /**
@@ -541,13 +541,82 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         }
     }
 
+    /**
+     * Geta configuration value
+     * @param type $name
+     * @param type $default
+     * @return type
+     */
     public function getConfig($name, $default = null) {
         return $this->getService(Services::CONFIG_SERVICE)->get($name, $default);
     }
 
+    /**
+     * Initiate logout by clearing the session
+     * @param type $redirectTo
+     * @return RedirectResponse
+     */
     public function logout($redirectTo = '/') {
         $this->request->getSession()->clear();
         return new RedirectResponse($redirectTo);
+    }
+
+    /**
+     * Redirect to the current page
+     * @return RedirectResponse
+     */
+    public function redirectSelf() {
+        return new RedirectResponse($this->request->getUri());
+    }
+
+    /**
+     * Redirect to a given route
+     * @param type $route
+     * @param type $parameters
+     * @param type $referenceType
+     * @return RedirectResponse
+     */
+    public function redirectToRoute($route, $parameters = array(), $referenceType = UrlGenerator::ABSOLUTE_PATH) {
+        return new RedirectResponse($this->generateUrl($route, $parameters, $referenceType));
+    }
+
+    /**
+     * Get flash messages saved in the current session. The messages can only
+     * be read once. After reading the messages the messages will be cleared.
+     *
+     * @param type $category
+     * @return array
+     */
+    public function getFlashMessages($category = null) {
+        $category = empty($category) ? $this->name : $category;
+        $messages = $this->request->getSession()->get($category);
+        if (!is_array($messages)) {
+            $messages = array();
+        } else {
+            $this->request->getSession()->remove($category);
+        }
+        return $messages;
+    }
+
+    /**
+     * Add a flsh message to the flash messages list
+     * @param type $message
+     * @param type $title
+     * @param type $options
+     * @param type $category
+     */
+    public function setFlashMessage($message, $title = null, $options = array(), $category = null) {
+        $category = empty($category) ? $this->name : $category;
+        $messages = $this->request->getSession()->get($category);
+        if (!is_array($messages)) {
+            $messages = array();
+        }
+        $messages[] = array(
+            'message' => $message,
+            'title' => $title,
+            'options' => $options
+        );
+        $this->request->getSession()->set($category, $messages);
     }
 
 }
