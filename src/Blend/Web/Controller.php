@@ -43,13 +43,23 @@ class Controller extends ControlerBase {
     }
 
     /**
-     * Renders a view using twig and retuns the results as string
+     * Renders a view using twig and retuns the results as string. The context
+     * automatically has the following variables set:
+     * - app: as Application container
+     * - currentUser: The current user object
+     * - request: The current Request object
+     * - userAuthenticated: Boolean value indicating if the user is authenticated
      * @param string $viewFile
      * @param array $context
      * @return string
      */
     public function renderView($viewFile, $context = array()) {
+        if (!is_array($context)) {
+            $context = array();
+        }
         $context['app'] = $this->application;
+        $context['currentUser'] = $this->application->getUser();
+        $context['userAuthenticated'] = $this->application->getUser()->isAuthenticated();
         $this->request->attributes->set('_route_params', $this->createRouteParams());
         $context['request'] = $this->request;
         return $this->renderer->render($this->checkSetViewsPath($viewFile), $context);
