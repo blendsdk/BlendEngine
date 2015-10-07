@@ -52,13 +52,12 @@ class ControllerResolver extends ControllerResolverBase {
     }
 
     protected function instantiateController($class) {
-        $refClass = new \ReflectionClass(get_class($this->module));
-        $controller = new $class($this->application, $this->module);
-        $controller->prepareAction($this->request);
+        $moduleRefClass = new \ReflectionClass(get_class($this->module));
+        $controller = new $class($this->application, $this->module, $this->request);
         if (empty($this->module->getPath())) {
-            $this->module->setPath(dirname($refClass->getFileName()));
+            $this->module->setPath(dirname($moduleRefClass->getFileName()));
         }
-        $this->application->getTranslator()->loadTranslations(dirname($refClass->getFileName()));
+        $this->application->getTranslator()->loadTranslations(dirname($moduleRefClass->getFileName()));
         return $controller;
     }
 
