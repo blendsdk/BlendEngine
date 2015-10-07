@@ -42,6 +42,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Blend\Data\DatabaseQueryException;
 
 /**
  * Base class for a BlendEngine application
@@ -408,16 +409,10 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     private function createLoggerService() {
         $logger = new Logger($this->environment);
-
-        if ($this->isProduction()) {
-            $logger->pushHandler(
-                    new StreamHandler("{$this->rootFolder}/var/logs/{$this->name}-{$this->environment}.log", Logger::WARNING)
-            );
-        } else {
-            $logger->pushHandler(
-                    new ChromePHPHandler(Logger::DEBUG)
-            );
-        }
+        $level = $this->isProduction() ? Logger::WARNING : Logger::DEBUG;
+        $logger->pushHandler(
+                new StreamHandler("{$this->rootFolder}/var/logs/{$this->name}-{$this->environment}.log", $level)
+        );
         $this->registerService(Services::LOGGER_SERVICE, $logger);
     }
 
@@ -463,7 +458,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         } catch (ResourceNotFoundException $e) {
             $response = $this->resourceNotFoundResponse($e->getMessage());
         } catch (\Exception $e) {
-            $response = $this->fatalExceptionResponse($e->getMessage(), $e);
+            $response = $this->fatalExceptionResponse($e);
         }
         $response->send();
 
@@ -475,12 +470,21 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @param type $message
      * @param type $exception
      */
-    protected function fatalExceptionResponse($message, $exception = null) {
-        $msg = $message;
+    protected function fatalExceptionResponse(\Exception $exception) {
+
         if ($this->isDevelopment()) {
-            $msg = $exception->getMessage();
+            $message = $exception->getMessage();
+        } else {
+            $message = "We are experiencing some technical difficulties. Please try again later.";
         }
-        $this->getLogger()->error($message);
+        if (!($exception instanceof DatabaseQueryException)) {
+            $this->getLogger()->error($message, array(
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'code' => $exception->getCode(),
+                'stack' => $exception->getTraceAsString()
+            ));
+        }
         return new Response($message, $this->isDevelopment() ? 200 : 500);
     }
 
