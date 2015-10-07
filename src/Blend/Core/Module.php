@@ -49,6 +49,7 @@ abstract class Module {
 
     public function __construct(Application $application) {
         $this->application = $application;
+        $this->initServices();
         $this->createRoutes();
     }
 
