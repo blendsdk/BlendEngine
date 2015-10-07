@@ -485,7 +485,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
                 'stack' => $exception->getTraceAsString()
             ));
         }
-        return new Response($message, $this->isDevelopment() ? 200 : 500);
+        return new Response($message, 500);
     }
 
     /**
