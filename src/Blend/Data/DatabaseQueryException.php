@@ -19,8 +19,8 @@ namespace Blend\Data;
 class DatabaseQueryException extends \Exception {
 
     public static function createFromStatement($pdoStatement) {
-        $info = implode("\n", $pdoStatement->errorInfo());
-        return new DatabaseQueryException($info, $pdoStatement->errorCode());
+        $errorInfo = $pdoStatement->errorInfo();
+        return new DatabaseQueryException($errorInfo[2], 500);
     }
 
 }

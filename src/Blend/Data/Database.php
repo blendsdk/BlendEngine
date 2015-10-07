@@ -35,16 +35,23 @@ class Database extends \PDO {
         );
 
         $dsn = "pgsql:host={$config['host']};dbname={$config['database']};port={$config['port']}";
-        parent::__construct($dsn, $config['username'], $config['password'], $config['options']);
+        parent::__construct($dsn, $config['username'], $config['password']);
     }
 
     public function executeQuery($sql, $params = array()) {
         $statement = $this->prepare($sql);
         $statement->execute($params);
+        if ($this->application->isDevelopment()) {
+            $this->application->getLogger()->debug($sql, $params);
+        }
         if (intval($statement->errorCode()) === 0) {
             return $statement->fetchAll(self::FETCH_ASSOC);
         } else {
-            throw DatabaseQueryException::createFromStatement($statement);
+            $exception = DatabaseQueryException::createFromStatement($statement);
+            $this->application->getLogger()->error($exception->getMessage(), array(
+                'arguments' => $params
+            ));
+            throw $exception;
         }
     }
 
