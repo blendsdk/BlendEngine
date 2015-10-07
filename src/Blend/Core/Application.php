@@ -478,7 +478,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
             $message = "We are experiencing some technical difficulties. Please try again later.";
         }
         if (!($exception instanceof DatabaseQueryException)) {
-            $this->getLogger()->error($message, array(
+            $this->getLogger()->error($exception->getMessage(), array(
                 'file' => $exception->getFile(),
                 'line' => $exception->getLine(),
                 'code' => $exception->getCode(),
