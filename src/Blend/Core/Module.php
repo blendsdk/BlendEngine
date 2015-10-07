@@ -53,6 +53,15 @@ abstract class Module {
     }
 
     /**
+     * This method is called by the ctor to provide an option to create/initialize
+     * module specific services. For example a database service
+     * @return type
+     */
+    protected function initServices() {
+        return null;
+    }
+
+    /**
      * Adds a new route to reditrect and old URL to a new URL
      * @param string $name
      * @param string $oldUrl
