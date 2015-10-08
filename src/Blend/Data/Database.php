@@ -11,7 +11,7 @@
 
 namespace Blend\Data;
 
-use Blend\Core\Application;
+use Monolog\Logger;
 
 /**
  * Encapsulates common database functionality. This class is available as
@@ -21,37 +21,92 @@ use Blend\Core\Application;
  */
 class Database extends \PDO {
 
-    private $application;
+    /**
+     * @var \Monolog\Logger
+     */
+    private $logger;
 
-    public function __construct(Application $application) {
-        $this->application = $application;
+    /**
+     * @var boolean;
+     */
+    private $debug;
 
-        $config = array(
-            'database' => $this->application->getConfig('database.database', 'blend'),
-            'username' => $this->application->getConfig('database.username', 'postgres'),
-            'password' => $this->application->getConfig('database.password', 'postgres'),
-            'host' => $this->application->getConfig('database.host', 'localhost'),
-            'port' => $this->application->getConfig('database.port', 5432),
-        );
+    /**
+     * @var string
+     */
+    private $database_name;
 
-        $dsn = "pgsql:host={$config['host']};dbname={$config['database']};port={$config['port']}";
+    /**
+     * @param array $config
+     * @param Logger $logger
+     * @param boolean $debug
+     */
+    public function __construct($config, Logger $logger = null, $debug = false) {
+        $this->logger = $logger;
+        $this->debug = $debug;
+        $this->database_name = $config['database'];
+        $dsn = "pgsql:host={$config['host']};dbname={$this->database_name};port={$config['port']}";
         parent::__construct($dsn, $config['username'], $config['password']);
     }
 
+    /**
+     * Retrives the name of the current database
+     * @return string
+     */
+    public function getDatabaseName() {
+        return $this->database_name;
+    }
+
+    /**
+     * Executes a SQL query script
+     * @param type $sql
+     * @return boolean
+     * @throws DatabaseQueryException
+     */
+    public function executeScript($sql) {
+        $this->debug($sql);
+        $result = $this->exec($sql);
+        if (intval($this->errorCode()) !== 0) {
+            $exception = DatabaseQueryException::createFromStatement($this);
+            $this->logError($exception->getMessage());
+            throw $exception;
+        } else {
+            return $result;
+        }
+    }
+
+    /**
+     * Executes a SQL query and returns a recordset as an associative array
+     * @param string $sql
+     * @param array $params
+     * @return array
+     * @throws DatabaseQueryException
+     */
     public function executeQuery($sql, $params = array()) {
         $statement = $this->prepare($sql);
         $statement->execute($params);
-        if ($this->application->isDevelopment()) {
-            $this->application->getLogger()->debug($sql, $params);
-        }
+        $this->debug($sql, $params);
+
         if (intval($statement->errorCode()) === 0) {
             return $statement->fetchAll(self::FETCH_ASSOC);
         } else {
             $exception = DatabaseQueryException::createFromStatement($statement);
-            $this->application->getLogger()->error($exception->getMessage(), array(
+            $this->logError($exception->getMessage(), array(
                 'arguments' => $params
             ));
             throw $exception;
+        }
+    }
+
+    private function debug($message, $context = array()) {
+        if ($this->debug === true && !is_null($this->logger)) {
+            $this->logger->debug($message, $context);
+        }
+    }
+
+    private function logError($message, $context = array()) {
+        if (!is_null($this->logger)) {
+            $this->logger->error($message, $context);
         }
     }
 
