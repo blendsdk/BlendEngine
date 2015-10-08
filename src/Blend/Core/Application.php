@@ -364,7 +364,16 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Creates the database service
      */
     private function createDatabaseService() {
-        $this->registerService(Services::DATABASE_SERVICE, new Database($this));
+
+        $config = array(
+            'database' => $this->getConfig('database.database', 'blend'),
+            'username' => $this->getConfig('database.username', 'postgres'),
+            'password' => $this->getConfig('database.password', 'postgres'),
+            'host' => $this->getConfig('database.host', 'localhost'),
+            'port' => $this->getConfig('database.port', 5432),
+        );
+
+        $this->registerService(Services::DATABASE_SERVICE, new Database($config, $this->getLogger(), $this->isDevelopment()));
     }
 
     /**
