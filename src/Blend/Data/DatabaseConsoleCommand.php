@@ -58,14 +58,30 @@ abstract class DatabaseConsoleCommand extends Command {
         $this->input = $input;
         $this->output = $output;
 
-        if ($this->setEnvironment()) {
-            if ($this->setDatabaseConnection()) {
+        if ($this->initEnvironment()) {
+            if ($this->initDatabaseConnection()) {
                 $this->executeDatabaseOperation($input, $output);
             }
         }
     }
 
-    private function setDatabaseConnection() {
+    /**
+     * Truncated all the tables in the Database
+     */
+    protected function truncateAllTables() {
+        $tables = $this->database->executeQuery("select * from information_schema.tables where table_catalog=:database and table_schema='public'", array(
+            ':database' => $this->database->getDatabaseName()
+        ));
+        foreach ($tables as $table) {
+            $this->database->executeQuery("truncate {$table['table_name']} cascade");
+        }
+    }
+
+    /**
+     * Initializes the database connection
+     * @return boolean
+     */
+    private function initDatabaseConnection() {
         $configFile = realpath($this->getConfigFolderLocation() . '/' . $this->getApplicationName() . "-{$this->env}-config.php");
         if (file_exists($configFile)) {
             $config = include($configFile);
@@ -83,7 +99,11 @@ abstract class DatabaseConsoleCommand extends Command {
         }
     }
 
-    private function setEnvironment() {
+    /**
+     * Initializes the environment variable
+     * @return boolean
+     */
+    private function initEnvironment() {
         $options = array(Environments::DEVELOPMENT, Environments::PRODUCTION);
         $env = $this->input->getOption('environment');
         if (in_array($env, $options)) {
@@ -95,6 +115,10 @@ abstract class DatabaseConsoleCommand extends Command {
         }
     }
 
+    /**
+     * Gets the current version of the database and creates the sys_db_version if needed
+     * @return strinf
+     */
     protected function getCurrentDatabaseVersion() {
         $sys_db_version = $this->database->executeQuery("select * from information_schema.tables where table_name='sys_db_version' and table_catalog=:database", array(
             ':database' => $this->database->getDatabaseName()
