@@ -87,7 +87,7 @@ abstract class DatabaseConsoleCommand extends Command {
             $config = include($configFile);
             $this->database = new Database($config['database']);
             try {
-                $version = $this->database->executeQuery("select version()");
+                $this->database->executeQuery("select version()");
                 $this->output->writeln("<info>Connected to Database</info>");
                 return true;
             } catch (DatabaseQueryException $e) {
