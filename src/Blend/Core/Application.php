@@ -596,12 +596,12 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return array
      */
     public function getFlashMessages($category = null) {
-        $category = empty($category) ? $this->name : $category;
-        $messages = $this->request->getSession()->get($category);
+        $flash = 'flash-' . empty($category) ? $this->name : $category;
+        $messages = $this->request->getSession()->get($flash);
         if (!is_array($messages)) {
             $messages = array();
         } else {
-            $this->request->getSession()->remove($category);
+            $this->request->getSession()->remove($flash);
         }
         return $messages;
     }
@@ -614,8 +614,8 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @param type $category
      */
     public function setFlashMessage($message, $title = null, $options = array(), $category = null) {
-        $category = empty($category) ? $this->name : $category;
-        $messages = $this->request->getSession()->get($category);
+        $flash = 'flash-' . empty($category) ? $this->name : $category;
+        $messages = $this->request->getSession()->get($flash);
         if (!is_array($messages)) {
             $messages = array();
         }
@@ -624,7 +624,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
             'title' => $title,
             'options' => $options
         );
-        $this->request->getSession()->set($category, $messages);
+        $this->request->getSession()->set($flash, $messages);
     }
 
 }
