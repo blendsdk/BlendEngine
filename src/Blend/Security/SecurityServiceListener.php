@@ -11,7 +11,7 @@
 
 namespace Blend\Security;
 
-use Blend\Security\User;
+use Blend\Security\AnonymousUser;
 use Blend\Core\Application;
 use Blend\Security\SecurityUrlMatcher;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -67,7 +67,7 @@ class SecurityServiceListener implements EventSubscriberInterface {
         $session = $event->getRequest()->getSession();
 
         if (!$session->has(self::SEC_AUTHENTICATED_USER)) {
-            $session->set(self::SEC_AUTHENTICATED_USER, new User());
+            $session->set(self::SEC_AUTHENTICATED_USER, new AnonymousUser());
         }
         $user = $session->get(self::SEC_AUTHENTICATED_USER);
         if (!$user->isAuthenticated() && $this->needsAuthentication($event->getRequest())) {
