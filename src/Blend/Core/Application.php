@@ -25,7 +25,7 @@ use Blend\Core\StaticResourceListener;
 use Blend\Core\LocaleServiceListener;
 use Blend\Data\Database;
 use Blend\Security\SecurityServiceListener;
-use Blend\Security\User;
+use Blend\Security\IUser;
 use Blend\Translation\Translator;
 use Blend\Mail\MailerService;
 use Blend\PDF\PDFPrinterService;
@@ -124,16 +124,11 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     }
 
     /**
-     * Retuns the application name either hashed or the plain name
-     * @param boolean $hashed, false by default
+     * Retuns the application namee
      * @return string
      */
-    public function getName($hashed = false) {
-        if ($hashed) {
-            return md5($this->name . date('Y'));
-        } else {
-            return $this->name;
-        }
+    public function getName() {
+        return $this->name;
     }
 
     /**
@@ -180,7 +175,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
     /**
      * Retrives the current user
-     * @return User
+     * @return IUser
      */
     public function getUser() {
         return $this->request->getSession()->get(SecurityServiceListener::SEC_AUTHENTICATED_USER);
@@ -191,7 +186,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * set by the SecurityServiceListener
      * @param User $user
      */
-    public function setUser(User $user) {
+    public function setUser(IUser $user) {
         $user->password = null;
         $this->request->getSession()->set(SecurityServiceListener::SEC_AUTHENTICATED_USER, $user);
     }
