@@ -11,10 +11,9 @@
 
 namespace Blend\Form;
 
-use Blend\Core\Application;
-use Symfony\Component\HttpFoundation\Request;
 use Blend\Form\FormException;
-use Blend\Model\Model;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
  * Description of Form
@@ -33,25 +32,34 @@ abstract class Form {
     protected $request;
 
     /**
-     * @var Model
-     */
-    protected $model;
-
-    /**
-     * @var Application
+     * @var boolean
      */
     protected $submitted;
+
+    /**
+     * @var boolean
+     */
+    protected $valid;
 
     /**
      * @var array
      */
     protected $errors;
 
-    public function __construct($csrf_key_name, Model $model) {
+    /**
+     * @var ParameterBag
+     */
+    protected $parameters;
+
+    protected abstract function validate();
+
+    public function __construct(Request $request) {
         $this->submitted = false;
-        $this->model = $model;
-        $this->csrf_key = $csrf_key_name;
+        $this->csrf_key = $request->attributes->get('csrf_key');
         $this->errors = [];
+        $this->request = $request;
+        $this->parameters = $this->request->request;
+        $this->handleRequest();
     }
 
     public function addError($message) {
@@ -63,11 +71,8 @@ abstract class Form {
     }
 
     public function getCSRF() {
-
-        return array(
-            'key' => $this->csrf_key,
-            'value' => $this->request->getSession()->get($this->csrf_key)
-        );
+        $value = $this->request->getSession()->get($this->csrf_key);
+        return "<input type=\"hidden\" name=\"{$this->csrf_key}\" value=\"{$value}\"/>";
     }
 
     protected function checkSubmitted() {
@@ -84,34 +89,33 @@ abstract class Form {
      *
      * @param Request $request
      * @throws FormException
-     * @return boolean true if the form can be processed further
      */
-    public function handleRequest(Request $request) {
-        $this->request = $request;
+    protected function handleRequest() {
         if ($this->checkSubmitted()) {
-            if ($request->getMethod() !== self::FORM_TYPE_POST) {
-                throw new FormException("Invalid request method. Expected {$this->method} got {$request->getMethod()}");
+            if ($this->request->getMethod() !== self::FORM_TYPE_POST) {
+                throw new FormException("Invalid request method. Expected {$this->method} got {$this->request->getMethod()}");
             } else {
-                $this->model->setValues($request->request->all());
+                $this->valid = $this->validate();
             }
         } else {
-            $request->getSession()->set($this->csrf_key, md5(uniqid()));
+            $this->request->getSession()->set($this->csrf_key, md5(uniqid()));
         }
+    }
+
+    /**
+     * Retuns an array of request paramters
+     * @return string[]
+     */
+    public function getRawValues() {
+        return $this->request->request->all();
+    }
+
+    public function isValid() {
+        return $this->valid;
     }
 
     public function isSubmitted() {
         return $this->submitted;
-    }
-
-    public function validate() {
-        if ($this->submitted) {
-            if ($this->model->isValid()) {
-                return true;
-            } else {
-                $this->errors = array_merge($this->errors, $this->model->getErrors());
-                return false;
-            }
-        }
     }
 
 }
