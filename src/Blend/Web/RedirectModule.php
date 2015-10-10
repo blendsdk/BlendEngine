@@ -17,8 +17,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * RedirectModule redirects a request trailing slash to the same URL without the
- * trailing slash
+ * RedirectModule redirects a request trailing slash to the same URL without
+ * the trailing slash.
+ * This module is automatically added to the Application instance
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
@@ -44,7 +45,7 @@ class RedirectModule extends Module {
      * Handles the trailing slash routes by redirect to the same URL without the
      * trailing slash
      * @param Request $request
-     * @return RedirectResponse\
+     * @return RedirectResponse
      */
     public function trailinglashHandler(Request $request) {
         $pathInfo = $request->getPathInfo();
