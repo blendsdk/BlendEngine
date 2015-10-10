@@ -11,7 +11,6 @@
 
 namespace Blend\Data;
 
-use Blend\Core\Application;
 use Blend\Data\Database;
 
 /**
@@ -23,18 +22,12 @@ use Blend\Data\Database;
 class DatabaseService {
 
     /**
-     * @var Application
-     */
-    protected $application;
-
-    /**
      * @var Database
      */
     protected $database;
 
-    public function __construct(Application $application) {
-        $this->application = $application;
-        $this->database = $application->getDatabase();
+    public function __construct(Database $database) {
+        $this->database = $database;
     }
 
 }
