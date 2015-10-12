@@ -98,12 +98,106 @@ class Database extends \PDO {
         }
     }
 
+    /**
+     * Inserts data into a table using an associative array
+     * @param string $table_name
+     * @param array $parameters
+     * @return array[][] recordset
+     */
+    public function insert($table_name, $parameters) {
+        $values = array();
+        $fields_names = implode(', ', array_keys($parameters));
+        foreach ($parameters as $field => $value) {
+            $values[$this->query_param($field)] = $this->parseValue($value);
+        }
+        $place_holders = implode(', ', array_keys($values));
+        $sql = "INSERT INTO {$table_name} ({$fields_names}) values({$place_holders}) RETURNING *";
+        return $this->executeQuery($sql, $values);
+    }
+
+    /**
+     * Updates a table using an associative array
+     * and optionally a where clause
+     * @param string $table_name
+     * @param array $values
+     * @param string $clause
+     * @param arrsy $clause_parameters
+     * @return array[][] recordset
+     */
+    public function update($table_name, $values, $clause, $clause_parameters = array()) {
+        $field_names = array();
+        $field_values = array();
+        $where_clause = '';
+        foreach ($values as $field => $value) {
+            $param = $this->query_param($field);
+            $field_names[] = "{$field} = {$param}";
+            $field_values[$param] = $this->parseValue($value);
+        }
+        $place_holders = implode(', ', $field_names);
+        if (!empty($clause)) {
+            $where_clause = " WHERE {$clause} ";
+            $field_values = array_merge($field_values, $clause_parameters);
+        }
+        $sql = "UPDATE {$table_name} SET {$place_holders} $where_clause  RETURNING *";
+        return $this->executeQuery($sql, $field_values);
+    }
+
+    /**
+     * Deletes records using an associative array
+     * @param string $table_name
+     * @param string $calue
+     * @param array $clause_parameters
+     * @return array[][] recordset
+     */
+    public function delete($table_name, $calue, $clause_parameters = array()) {
+        $where_clause = '';
+        if (!empty($calue)) {
+            $where_clause = " WHERE {$calue} ";
+        }
+        $sql = "DELETE FROM {$table_name} {$where_clause} RETURNING *";
+        return $this->executeQuery($sql, $clause_parameters);
+    }
+
+    /**
+     * Parses the PHP values to a corresponding database fromat
+     * @param mixed $value
+     * @return mixed
+     */
+    private function parseValue($value) {
+        if (is_bool($value)) {
+            return $value === true ? 'true' : 'false';
+        } else if (is_null($value)) {
+            return 'null';
+        } else {
+            return $value;
+        }
+    }
+
+    /**
+     * Creates a prepared statement parameter
+     * @param string $name
+     * @return string
+     */
+    private function query_param($name) {
+        return ":{$name}";
+    }
+
+    /**
+     * Logs a debug message if a logger is provided
+     * @param string $message
+     * @param array $context
+     */
     private function debug($message, $context = array()) {
         if ($this->debug === true && !is_null($this->logger)) {
             $this->logger->debug($message, $context);
         }
     }
 
+    /**
+     * Loggs an error message if a logger is provided
+     * @param string $message
+     * @param array $context
+     */
     private function logError($message, $context = array()) {
         if (!is_null($this->logger)) {
             $this->logger->error($message, $context);
