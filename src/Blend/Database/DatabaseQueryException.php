@@ -9,18 +9,18 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Security;
-
-use Blend\Database\DatabaseService;
+namespace Blend\Database;
 
 /**
- * Description of IUserManagerService
+ * DatabaseQueryException
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class UserManagerService extends DatabaseService {
+class DatabaseQueryException extends \Exception {
 
-    protected abstract function createUserInstance($parameters);
+    public static function createFromStatement($pdoStatement) {
+        $errorInfo = $pdoStatement->errorInfo();
+        return new DatabaseQueryException($errorInfo[2], 500);
+    }
 
-    public abstract function authenticate($parameters);
 }

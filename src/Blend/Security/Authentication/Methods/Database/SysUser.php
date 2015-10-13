@@ -1,9 +1,12 @@
 <?php
 
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is part of the BlendEngine framework.
+ *
+ * (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Blend\Security\Authentication\Methods\Database;
@@ -25,7 +28,6 @@ class SysUser implements IUser {
         $this->fields = array(
             'user_id' => true,
             'username' => true,
-            'password' => true,
             'user_email' => true,
             'user_isactive' => true,
             'user_date_created' => true,

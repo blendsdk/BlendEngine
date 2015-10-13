@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Data;
+namespace Blend\Database;
 
-use Blend\Data\Database;
+use Blend\Database\Database;
 
 /**
  * DatabaseSerice is an abstract class that can be used as a Data Access Layer

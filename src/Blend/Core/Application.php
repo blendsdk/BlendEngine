@@ -23,7 +23,7 @@ use Blend\Core\StringToResponseListener;
 use Blend\Core\SessionServiceListener;
 use Blend\Core\StaticResourceListener;
 use Blend\Core\LocaleServiceListener;
-use Blend\Data\Database;
+use Blend\Database\Database;
 use Blend\Security\SecurityServiceListener;
 use Blend\Security\IUser;
 use Blend\Translation\Translator;
@@ -42,7 +42,7 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
-use Blend\Data\DatabaseQueryException;
+use Blend\Database\DatabaseQueryException;
 
 /**
  * Base class for a BlendEngine application
@@ -301,7 +301,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
     /**
      * Retuns a reference to the Database object
-     * @return \Blend\Data\Database
+     * @return \Blend\Database\Database
      */
     public function getDatabase() {
         if (!isset($this->services[Services::DATABASE_SERVICE])) {

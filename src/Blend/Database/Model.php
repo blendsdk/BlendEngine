@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Data;
+namespace Blend\Database;
 
-use Blend\Data\Database;
+use Blend\Database\Database;
 use Blend\Model\Model as ModelBase;
 
 /**

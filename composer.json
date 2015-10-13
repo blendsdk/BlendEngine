@@ -31,7 +31,10 @@
     "autoload": {
         "psr-4": {
             "Blend\\": "src/Blend"
-        }
+        },
+        "files": [
+            "src/Blend/Core/Globals.php"
+        ]
     },
     "autoload-dev": {
         "psr-4": {

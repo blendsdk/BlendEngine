@@ -9,18 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Data;
+namespace Blend\Database;
+
+use Blend\Database\Statement;
 
 /**
- * DatabaseQueryException
+ * Base class for SelectStatement
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class DatabaseQueryException extends \Exception {
-
-    public static function createFromStatement($pdoStatement) {
-        $errorInfo = $pdoStatement->errorInfo();
-        return new DatabaseQueryException($errorInfo[2], 500);
-    }
+abstract class SelectStatement extends Statement {
 
 }

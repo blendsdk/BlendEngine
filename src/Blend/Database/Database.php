@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Data;
+namespace Blend\Database;
 
 use Monolog\Logger;
 
@@ -20,6 +20,9 @@ use Monolog\Logger;
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class Database extends \PDO {
+
+    const RETURN_ALL = 1;
+    const RETURN_FIRST = 2;
 
     /**
      * @var \Monolog\Logger
@@ -75,6 +78,11 @@ class Database extends \PDO {
         }
     }
 
+    public function executeStatement(Statement $statement, $result_type = self::RETURN_ALL) {
+        return $this->executeQuery($statement->getSQL(),
+                        $statement->getParameters(), $result_type);
+    }
+
     /**
      * Executes a SQL query and returns a recordset as an associative array
      * @param string $sql
@@ -82,16 +90,21 @@ class Database extends \PDO {
      * @return array
      * @throws DatabaseQueryException
      */
-    public function executeQuery($sql, $params = array()) {
+    public function executeQuery($sql, $params = array(), $result_type = self::RETURN_ALL) {
         $statement = $this->prepare($sql);
         $statement->execute($params);
         $this->debug($sql, $params);
 
         if (intval($statement->errorCode()) === 0) {
-            return $statement->fetchAll(self::FETCH_ASSOC);
+            if ($result_type === self::RETURN_ALL) {
+                return $statement->fetchAll(self::FETCH_ASSOC);
+            } else {
+                return $this->returnFirstRecord($statement->fetchAll(self::FETCH_ASSOC));
+            }
         } else {
             $exception = DatabaseQueryException::createFromStatement($statement);
-            $this->logError($exception->getMessage(), array(
+            $this->logError($exception->getMessage(),
+                    array(
                 'arguments' => $params
             ));
             throw $exception;
@@ -99,87 +112,16 @@ class Database extends \PDO {
     }
 
     /**
-     * Inserts data into a table using an associative array
-     * @param string $table_name
-     * @param array $parameters
-     * @return array[][] recordset
+     * Returns the first record from the recordset
+     * @param mixed $recordset
+     * @return array
      */
-    public function insert($table_name, $parameters) {
-        $values = array();
-        $fields_names = implode(', ', array_keys($parameters));
-        foreach ($parameters as $field => $value) {
-            $values[$this->query_param($field)] = $this->parseValue($value);
-        }
-        $place_holders = implode(', ', array_keys($values));
-        $sql = "INSERT INTO {$table_name} ({$fields_names}) values({$place_holders}) RETURNING *";
-        return $this->executeQuery($sql, $values);
-    }
-
-    /**
-     * Updates a table using an associative array
-     * and optionally a where clause
-     * @param string $table_name
-     * @param array $values
-     * @param string $clause
-     * @param arrsy $clause_parameters
-     * @return array[][] recordset
-     */
-    public function update($table_name, $values, $clause, $clause_parameters = array()) {
-        $field_names = array();
-        $field_values = array();
-        $where_clause = '';
-        foreach ($values as $field => $value) {
-            $param = $this->query_param($field);
-            $field_names[] = "{$field} = {$param}";
-            $field_values[$param] = $this->parseValue($value);
-        }
-        $place_holders = implode(', ', $field_names);
-        if (!empty($clause)) {
-            $where_clause = " WHERE {$clause} ";
-            $field_values = array_merge($field_values, $clause_parameters);
-        }
-        $sql = "UPDATE {$table_name} SET {$place_holders} $where_clause  RETURNING *";
-        return $this->executeQuery($sql, $field_values);
-    }
-
-    /**
-     * Deletes records using an associative array
-     * @param string $table_name
-     * @param string $calue
-     * @param array $clause_parameters
-     * @return array[][] recordset
-     */
-    public function delete($table_name, $calue, $clause_parameters = array()) {
-        $where_clause = '';
-        if (!empty($calue)) {
-            $where_clause = " WHERE {$calue} ";
-        }
-        $sql = "DELETE FROM {$table_name} {$where_clause} RETURNING *";
-        return $this->executeQuery($sql, $clause_parameters);
-    }
-
-    /**
-     * Parses the PHP values to a corresponding database fromat
-     * @param mixed $value
-     * @return mixed
-     */
-    private function parseValue($value) {
-        if (is_bool($value)) {
-            return $value === true ? 'true' : 'false';
-        } else if (is_null($value)) {
-            return 'null';
+    private function returnFirstRecord($recordset) {
+        if (is_array($recordset) && count($recordset) > 0) {
+            return $recordset[0];
         } else {
-            return $value;
+            return null;
         }
-    }
-
-    /**
-     * Creates a prepared statement parameter
-     * @param string $name
-     * @return string
-     */
-    private function query_param($name) {
-        return ":{$name}";
     }
 
     /**
