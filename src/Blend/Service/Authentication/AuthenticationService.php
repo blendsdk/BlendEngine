@@ -14,7 +14,7 @@ namespace Blend\Service\Authentication;
 use Blend\Service\Service;
 use Blend\Form\Form;
 use Blend\Core\Application;
-use Blend\Security\UserManagerService;
+use Blend\Service\UserManager\UserManagerService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
