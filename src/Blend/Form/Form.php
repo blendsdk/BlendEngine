@@ -50,7 +50,7 @@ abstract class Form {
 
     public function __construct(Request $request) {
         $this->submitted = false;
-        $this->csrf_key = $request->attributes->get('csrf_key');
+        $this->csrf_key = $request->attributes->get('_csrf_key_');
         $this->errors = [];
         $this->request = $request;
         $this->handleRequest();
@@ -64,9 +64,16 @@ abstract class Form {
         return $this->errors;
     }
 
-    public function getCSRF() {
-        $value = $this->request->getSession()->get($this->csrf_key);
-        return "<input type=\"hidden\" name=\"{$this->csrf_key}\" value=\"{$value}\"/>";
+    public function getCsrfInfo() {
+        return array(
+            'key' => $this->csrf_key,
+            'value' => $this->request->getSession()->get($this->csrf_key)
+        );
+    }
+
+    public function getCsrfHTMLUserInterface() {
+        $info = $this->getCsrfInfo();
+        return "<input type=\"hidden\" name=\"{$info['key']}\" value=\"{$info['value']}\"/>";
     }
 
     protected function checkSubmitted() {
