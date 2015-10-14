@@ -21,6 +21,10 @@ use Symfony\Component\Routing\Route;
  */
 abstract class Module {
 
+    const ROUTE_LOGIN = 'ROUTE_LOGIN';
+    const ROUTE_SECURED_ENTRY_POINT = 'ROUTE_SECURED_ENTRY_POINT';
+    const ROUTE_AFTER_LOGOUT = 'ROUTE_AFTER_LOGOUT';
+
     /**
      * @var Blend\Core\Application
      */
@@ -83,10 +87,19 @@ abstract class Module {
      */
     protected function addRoute($name, Route $route) {
         $route->setDefault('_module_', $this);
+        $route->setDefault('_route_name_', $name);
+        $route->setDefault('_csrf_key_', null);
         if (is_null($route->getDefault('_locale'))) {
             $route->setDefault('_locale', $this->application->getLocale());
         }
         $this->application->addRoute($name, $route);
+    }
+
+    protected function addAnonymousOnlyRoute($name, $path, $controllerAction, $defaults = array()) {
+        $anonymous = array(
+            'anonymous-only' => true,
+        );
+        $this->addSimpleRoute($name, $path, $controllerAction, array_replace($anonymous, $defaults));
     }
 
     protected function addSecuredRoute($name, $path, $controllerAction, $defaults = array()) {
