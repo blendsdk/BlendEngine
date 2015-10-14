@@ -48,6 +48,10 @@ class SysUser implements IUser {
         return $this->values['username'];
     }
 
+    public function getEmail() {
+        return $this->values['user_email'];
+    }
+
     public function isAuthenticated() {
         return empty($this->values['user_id']) === false;
     }
