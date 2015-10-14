@@ -13,14 +13,14 @@ namespace Blend\Security;
 
 use Blend\Security\AnonymousUser;
 use Blend\Core\Application;
-use Blend\Security\SecurityUrlMatcher;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Route;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Blend\Security\IUser;
+use Blend\Core\Module;
 
 /**
  * SecurityServiceListener
@@ -41,6 +41,42 @@ class SecurityServiceListener implements EventSubscriberInterface {
     }
 
     /**
+     * Clears the session cache for this for and redirects the request to after_logout_path
+     * @return RedirectResponse
+     */
+    public function logoutUser() {
+        return $this->application->logout($this->getAfterLogoutPath());
+    }
+
+    private function getCurrentRoute($request) {
+        return $this->application->getUrlMatcher()->matchRequest($request);
+    }
+
+    public function onKernelRequest(GetResponseEvent $event) {
+        $request = $event->getRequest();
+        $session = $request->getSession();
+        $user = $this->getCurrentUser($session);
+        $route = $this->application->getRoutes()->get($request->attributes->get('_route'));
+
+        $this->application->setUser($user);
+
+        if ($user->isAuthenticated()) {
+            if ($route->getDefault('anonymous-only') || $route->getDefault('_route_name_') === Module::ROUTE_LOGIN) {
+                $referer = $session->get(self::SEC_REFERER);
+                if (is_null($referer) || $referer === $this->getLoginPath()) {
+                    $referer = $this->getEntryPointPath();
+                }
+                $event->setResponse(new RedirectResponse($referer));
+            }
+        } else {
+            if ($route->getDefault('secure')) {
+                $session->set(self::SEC_REFERER, $request->getUri());
+                $event->setResponse(new RedirectResponse($this->getLoginPath()));
+            }
+        }
+    }
+
+    /**
      * Creates a login route (config: logout_path)
      */
     private function createLogoutRoute() {
@@ -52,47 +88,19 @@ class SecurityServiceListener implements EventSubscriberInterface {
     }
 
     /**
-     * Clears the session cache for this for and redirects the request to after_logout_path
-     * @return RedirectResponse
+     * Gets the current user registered in the Session
+     * @param Session $session
+     * @return IUser
      */
-    public function logoutUser() {
-        return $this->application->logout($this->getAfterLogoutPath());
-    }
-
-    /**
-     * Chechs the current user's authentication and redirects to login_path
-     * if needed
-     */
-    public function onKernelRequest(GetResponseEvent $event) {
-        $session = $event->getRequest()->getSession();
-
+    private function getCurrentUser($session) {
+        $user = null;
         if (!$session->has(self::SEC_AUTHENTICATED_USER)) {
-            $session->set(self::SEC_AUTHENTICATED_USER, new AnonymousUser());
-        }
-        $user = $session->get(self::SEC_AUTHENTICATED_USER);
-        if (!$user->isAuthenticated() && $this->needsAuthentication($event->getRequest())) {
-            $session->set(self::SEC_REFERER, $event->getRequest()->getUri());
-            $event->setResponse(new RedirectResponse($this->getLoginPath()));
+            $user = new AnonymousUser();
+            $session->set(self::SEC_AUTHENTICATED_USER, $user);
         } else {
-            $this->application->setUser($user);
+            $user = $session->get(self::SEC_AUTHENTICATED_USER);
         }
-    }
-
-    /**
-     * Checks if the current request is needed authentication
-     * @param Request $request
-     * @return type
-     */
-    private function needsAuthentication(Request $request) {
-        $routes = new RouteCollection();
-        foreach ($this->application->getRoutes()->all() as $name => $route) {
-            if ($route->getDefault('secure')) {
-                $routes->add($name, $route);
-            }
-        }
-        $urlMatcher = new SecurityUrlMatcher($routes, $this->application->getRequestContext());
-        $urlMatcher->getContext()->fromRequest($request);
-        return $urlMatcher->match($request->getPathInfo());
+        return $user;
     }
 
     public static function getSubscribedEvents() {
@@ -101,20 +109,26 @@ class SecurityServiceListener implements EventSubscriberInterface {
         );
     }
 
-    private function getAfterLogoutPath() {
-        if ($this->application->getRoutes()->get('after_logout')) {
-            return $this->application->generateUrl('after_logout');
+    private function getSecurityPath($name, $default = null) {
+        if ($this->application->getRoutes()->get($name)) {
+            return $this->application->generateUrl($name);
+        } else if (!empty($default)) {
+            return $this->getSecurityPath($default);
         } else {
-            return '/';
+            throw new \LogicException("Missing the \"{$name}\" Route.");
         }
     }
 
     private function getLoginPath() {
-        if ($this->application->getRoutes()->get('login')) {
-            return $this->application->generateUrl('login');
-        } else {
-            return '/login';
-        }
+        return $this->getSecurityPath(Module::ROUTE_LOGIN);
+    }
+
+    private function getAfterLogoutPath() {
+        return $this->getSecurityPath(Module::ROUTE_AFTER_LOGOUT, Module::ROUTE_LOGIN);
+    }
+
+    private function getEntryPointPath() {
+        return $this->getSecurityPath(Module::ROUTE_SECURED_ENTRY_POINT);
     }
 
 }
