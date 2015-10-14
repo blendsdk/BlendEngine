@@ -11,22 +11,51 @@
 
 namespace Blend\Service;
 
+use Blend\Form\Form;
+use Blend\Core\FlashProvider;
 use Blend\Core\Application;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Base class for all Application level services Service
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class Service {
+abstract class Service extends FlashProvider {
+
+    /**
+     * @var Form
+     */
+    protected $form;
+
+    /**
+     * @var Request
+     */
+    protected $request;
 
     /**
      * @var Application
      */
     protected $application;
 
+    protected abstract function createForm(Request $request);
+
     public function __construct(Application $application) {
+        $this->form = null;
         $this->application = $application;
+    }
+
+    /**
+     * @return Form;
+     */
+    public function getForm() {
+        return $this->form;
+    }
+
+    public function validateRequest(Request $request) {
+        $this->form = $this->createForm($request);
+        $this->setFlashBagFromRequest($request);
+        return $this->form->isSubmitted();
     }
 
 }

@@ -11,16 +11,16 @@
 
 namespace Blend\Form;
 
+use Blend\Core\FlashProvider;
 use Blend\Form\FormException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\ParameterBag;
 
 /**
- * Description of Form
+ * Base class for all Forms
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class Form {
+abstract class Form extends FlashProvider {
 
     const FORM_TYPE_POST = 'POST';
 
@@ -41,11 +41,6 @@ abstract class Form {
      */
     protected $valid;
 
-    /**
-     * @var array
-     */
-    protected $errors;
-
     protected abstract function validate();
 
     public function __construct(Request $request) {
@@ -53,15 +48,8 @@ abstract class Form {
         $this->csrf_key = $request->attributes->get('_csrf_key_');
         $this->errors = [];
         $this->request = $request;
+        $this->setFlashBagFromRequest($request);
         $this->handleRequest();
-    }
-
-    public function addError($message) {
-        $this->errors[] = $message;
-    }
-
-    public function getErrors() {
-        return $this->errors;
     }
 
     public function getCsrfInfo() {

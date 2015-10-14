@@ -12,11 +12,9 @@
 namespace Blend\Service\Authentication;
 
 use Blend\Service\Service;
-use Blend\Form\Form;
 use Blend\Core\Application;
 use Blend\Service\UserManager\UserManagerService;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
 /**
  * Base class for all AuthenticationServices
@@ -26,49 +24,15 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 abstract class AuthenticationService extends Service {
 
     /**
-     * @var Form
-     */
-    protected $form;
-
-    /**
      * @var UserManagerService
      */
     protected $ummService;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var FlashBagInterface
-     */
-    protected $flashBag;
-
-    protected abstract function createForm(Request $request);
 
     protected abstract function getUser();
 
     public function __construct(Application $application, UserManagerService $ummService) {
         parent::__construct($application);
         $this->ummService = $ummService;
-    }
-
-    /**
-     * @return Form;
-     */
-    public function getForm() {
-        return $this->form;
-    }
-
-    public function getErrors() {
-        return $this->flashBag->get(__CLASS__);
-    }
-
-    public function validateRequest(Request $request) {
-        $this->form = $this->createForm($request);
-        $this->flashBag = $request->getSession()->getFlashBag();
-        return $this->form->isSubmitted();
     }
 
     public function authenticate() {
