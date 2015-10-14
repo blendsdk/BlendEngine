@@ -46,11 +46,6 @@ abstract class Form {
      */
     protected $errors;
 
-    /**
-     * @var ParameterBag
-     */
-    protected $parameters;
-
     protected abstract function validate();
 
     public function __construct(Request $request) {
@@ -58,7 +53,6 @@ abstract class Form {
         $this->csrf_key = $request->attributes->get('csrf_key');
         $this->errors = [];
         $this->request = $request;
-        $this->parameters = $this->request->request;
         $this->handleRequest();
     }
 
