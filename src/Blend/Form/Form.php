@@ -41,6 +41,11 @@ abstract class Form extends FlashProvider {
      */
     protected $valid;
 
+    /**
+     * @var string
+     */
+    private $sess_value_key;
+
     protected abstract function validate();
 
     public function __construct(Request $request) {
@@ -48,6 +53,7 @@ abstract class Form extends FlashProvider {
         $this->csrf_key = $request->attributes->get('_csrf_key_');
         $this->errors = [];
         $this->request = $request;
+        $this->sess_value_key = 'FORM-' . $request->getPathInfo();
         $this->setFlashBagFromRequest($request);
         $this->handleRequest();
     }
@@ -84,7 +90,14 @@ abstract class Form extends FlashProvider {
             if ($this->request->getMethod() !== self::FORM_TYPE_POST) {
                 throw new FormException("Invalid request method. Expected {$this->method} got {$this->request->getMethod()}");
             } else {
-                $this->valid = $this->validate();
+                $this->validate();
+                if ($this->hasErrors()) {
+                    $this->valid = false;
+                    $this->request->getSession()->set($this->sess_value_key, $this->request->request->all());
+                } else {
+                    $this->request->getSession()->remove($this->sess_value_key);
+                    $this->valid = true;
+                }
             }
         } else {
             $this->request->getSession()->set($this->csrf_key, md5(uniqid()));
@@ -95,8 +108,8 @@ abstract class Form extends FlashProvider {
      * Retuns an array of request paramters
      * @return string[]
      */
-    public function getRawValues() {
-        return $this->request->request->all();
+    public function getPreviousValues() {
+        return $this->request->getSession()->get($this->sess_value_key);
     }
 
     public function isValid() {
