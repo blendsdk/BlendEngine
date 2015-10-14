@@ -17,23 +17,21 @@ use Blend\Database\Database;
 
 class UserManagerService extends UserManagerServiceBase {
 
-    protected $userClass;
+    static $USER_CLASS = 'Blend\Security\Authentication\Methods\Database\SysUser';
 
-    public function __construct(Database $database, $userClass = 'Blend\Security\Authentication\Methods\Database\SysUser') {
+    public function __construct(Database $database) {
         parent::__construct($database);
-        $this->userClass = $userClass;
     }
 
     public function authenticate($token) {
         $stmt = new SelectUserByTokenHashStatement();
         $stmt->setToken($token);
-        $result = $this->database->executeStatement($stmt,
-                Database::RETURN_FIRST);
+        $result = $this->database->executeStatement($stmt, Database::RETURN_FIRST);
         return is_null($result) ? $result : $this->createUserInstance($result);
     }
 
     protected function createUserInstance($record) {
-        return (new \ReflectionClass($this->userClass))->newInstance($record);
+        return (new \ReflectionClass(UserManagerService::$USER_CLASS))->newInstance($record);
     }
 
 }
