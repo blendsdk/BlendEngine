@@ -25,15 +25,30 @@ abstract class FlashProvider {
      * @var FlashBagInterface
      */
     protected $flashBag;
+
+    /**
+     * @var string
+     */
     private $flashCategory;
+
+    /**
+     * @var number
+     */
+    private $errorCount;
+
+    public function hasErrors() {
+        return $this->errorCount !== 0;
+    }
 
     protected function setFlashBagFromRequest(Request $request) {
         $this->flashBag = $request->getSession()->getFlashBag();
         $this->flashCategory = $request->attributes->get('_csrf_key_');
+        $this->errorCount = 0;
     }
 
     protected function addError($message, $category = null) {
         $this->flashBag->add(is_null($category) ? $this->flashCategory : $category, $message);
+        $this->errorCount++;
     }
 
     /**
@@ -41,6 +56,7 @@ abstract class FlashProvider {
      * @return mixed
      */
     public function getErrors($category = null) {
+        $this->errorCount = 0;
         return $this->flashBag->get(is_null($category) ? $this->flashCategory : $category);
     }
 
