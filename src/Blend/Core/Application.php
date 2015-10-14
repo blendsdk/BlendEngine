@@ -39,9 +39,10 @@ use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Blend\Database\DatabaseQueryException;
 
 /**
@@ -105,7 +106,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
     /**
      * Holds a reference to the current Request
-     * @var Requests
+     * @var Request
      */
     protected $request;
 
@@ -250,6 +251,10 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         return $this->services[Services::URL_GENERATOR_SERVICE];
     }
 
+    public function trans($id, array $parameters = array(), $domain = null, $locale = null) {
+        return $this->getTranslator()->trans($id, $parameters, $domain, $locale);
+    }
+
     /**
      * Generates a url using the UrlGenerator
      * @return UrlGenerator
@@ -312,7 +317,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
     /**
      * Retuns a reference to the Translator object
-     * @return Translator;
+     * @return Blend\Translation;
      */
     public function getTranslator() {
         return $this->getService(Services::TRANSLATION_SERVICE);
@@ -586,45 +591,6 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     public function redirectToRoute($route, $parameters = array(), $referenceType = UrlGenerator::ABSOLUTE_PATH) {
         return new RedirectResponse($this->generateUrl($route, $parameters, $referenceType));
-    }
-
-    /**
-     * Get flash messages saved in the current session. The messages can only
-     * be read once. After reading the messages the messages will be cleared.
-     *
-     * @param type $category
-     * @return array
-     */
-    public function getFlashMessages($category = null) {
-        $flash = 'flash-' . empty($category) ? $this->name : $category;
-        $messages = $this->request->getSession()->get($flash);
-        if (!is_array($messages)) {
-            $messages = array();
-        } else {
-            $this->request->getSession()->remove($flash);
-        }
-        return $messages;
-    }
-
-    /**
-     * Add a flsh message to the flash messages list
-     * @param type $message
-     * @param type $title
-     * @param type $options
-     * @param type $category
-     */
-    public function setFlashMessage($message, $title = null, $options = array(), $category = null) {
-        $flash = 'flash-' . empty($category) ? $this->name : $category;
-        $messages = $this->request->getSession()->get($flash);
-        if (!is_array($messages)) {
-            $messages = array();
-        }
-        $messages[] = array(
-            'message' => $message,
-            'title' => $title,
-            'options' => $options
-        );
-        $this->request->getSession()->set($flash, $messages);
     }
 
 }
