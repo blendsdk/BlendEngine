@@ -24,8 +24,9 @@ abstract class InsertStatement extends Statement {
 
     protected abstract function getInsertColumns();
 
-    public function __construct() {
+    public function __construct($table_name) {
         parent::__construct();
+        $this->table_name = $table_name;
         $this->insert_columns = $this->getInsertColumns();
     }
 
