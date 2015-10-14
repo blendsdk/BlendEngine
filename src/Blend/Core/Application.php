@@ -13,7 +13,6 @@ namespace Blend\Core;
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\ChromePHPHandler;
 use Blend\Core\Environments;
 use Blend\Core\Services;
 use Blend\Core\Configiration;
@@ -443,9 +442,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * Sets the request attributes extracted from a matched route
      */
     protected function setRequestAttributes(Request $request) {
-        $urlMatcher = new UrlMatcher($this->routes, $this->getRequestContext());
-        $urlMatcher->getContext()->fromRequest($request);
-        $request->attributes->add($urlMatcher->match($request->getPathInfo()));
+        $request->attributes->add($this->getUrlMatcher()->matchRequest($request));
     }
 
     /**
