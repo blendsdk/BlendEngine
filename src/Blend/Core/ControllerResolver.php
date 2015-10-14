@@ -48,7 +48,7 @@ class ControllerResolver extends ControllerResolverBase {
         $this->module = $request->attributes->get('_module_');
         $this->request = $request;
         $request->attributes->remove('_module_');
-        $request->attributes->set('csrf_key', sha1($this->application->getName() . date('Y')));
+        $request->attributes->set('_csrf_key_', sha1($this->application->getName() . date('Y')));
         return parent::getController($request);
     }
 
