@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Blend\Service\Authentication\TokenAuthentication\TokenAuthenticationForm;
 
 /**
- * Description of TokenAuthenticationService
+ * Base class for token based authentication
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

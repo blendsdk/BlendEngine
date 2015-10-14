@@ -13,10 +13,10 @@ namespace Blend\Service\Authentication\TokenAuthentication;
 
 use Blend\Core\Application;
 use Blend\Service\Authentication\TokenAuthentication\TokenAuthenticationService;
-use Blend\Security\Authentication\Methods\Database\UserManagerService;
+use Blend\Service\UserManager\Database\UserManagerService;
 
 /**
- * Description of DatabaseTokenAuthenticationService
+ * The DatabaseTokenAuthenticationService
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

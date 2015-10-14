@@ -14,7 +14,7 @@ namespace Blend\Service\Authentication\TokenAuthentication;
 use Blend\Form\Form;
 
 /**
- * Description of TokenAuthenticationForm
+ * The TokenAuthenticationForm
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
