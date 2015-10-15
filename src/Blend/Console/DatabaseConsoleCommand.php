@@ -9,14 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Database;
+namespace Blend\Console;
 
-use Blend\Core\Environments;
 use Blend\Database\Database;
-use DatabaseQueryException;
-use Symfony\Component\Console\Command\Command;
+use Blend\Database\DatabaseQueryException;
+use Blend\Console\ConsoleCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -24,19 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class DatabaseConsoleCommand extends Command {
-
-    protected $env;
-
-    /**
-     * @var InputInterface
-     */
-    protected $input;
-
-    /**
-     * @var OutputInterface
-     */
-    protected $output;
+abstract class DatabaseConsoleCommand extends ConsoleCommand {
 
     /**
      * @var Database;
@@ -45,23 +31,9 @@ abstract class DatabaseConsoleCommand extends Command {
 
     protected abstract function executeDatabaseOperation(InputInterface $input, OutputInterface $output);
 
-    protected abstract function getApplicationName();
-
-    protected abstract function getConfigFolderLocation();
-
-    protected function configure() {
-        $this->addOption('environment', null, InputOption::VALUE_OPTIONAL, 'Configuration environment (' . Environments::PRODUCTION . ' or ' . Environments::DEVELOPMENT . ')', Environments::PRODUCTION);
-    }
-
-    protected function execute(InputInterface $input, OutputInterface $output) {
-
-        $this->input = $input;
-        $this->output = $output;
-
-        if ($this->initEnvironment()) {
-            if ($this->initDatabaseConnection()) {
-                $this->executeDatabaseOperation($input, $output);
-            }
+    protected function executeInternal(InputInterface $input, OutputInterface $output) {
+        if ($this->initDatabaseConnection()) {
+            $this->executeDatabaseOperation($input, $output);
         }
     }
 
@@ -95,22 +67,6 @@ abstract class DatabaseConsoleCommand extends Command {
             }
         } else {
             $this->output->writeln("<error>Unable to find the config file {$configFile}</error>");
-            return false;
-        }
-    }
-
-    /**
-     * Initializes the environment variable
-     * @return boolean
-     */
-    private function initEnvironment() {
-        $options = array(Environments::DEVELOPMENT, Environments::PRODUCTION);
-        $env = $this->input->getOption('environment');
-        if (in_array($env, $options)) {
-            $this->env = $env;
-            return true;
-        } else {
-            $this->output->writeln('<error>Invalid environment option!</error>');
             return false;
         }
     }

@@ -9,10 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Database;
+namespace Blend\Console;
 
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -60,9 +59,7 @@ PHP;
         parent::configure();
         $this->setName('database:schemahelper')
                 ->setDescription('Generate Schema helper files')
-                ->addArgument('table', InputArgument::OPTIONAL,
-                        'LIKE select criteria to select the table names: %( = ALL)',
-                        '%');
+                ->addArgument('table', InputArgument::OPTIONAL, 'LIKE select criteria to select the table names: %( = ALL)', '%');
     }
 
     protected function createOutputFolder() {
@@ -82,8 +79,7 @@ PHP;
 SQL;
 
         return $this->database->executeQuery(
-                        $sql,
-                        array(
+                        $sql, array(
                     ':database' => $this->database->getDatabaseName(),
                     ':table' => $search
         ));
@@ -134,8 +130,7 @@ SQL;
             $this->output->writeln("<info> Generating {$table_name}<info>");
 
             foreach ($columns as $column) {
-                $field = str_replace_template($this->fieldTemplate,
-                        array(
+                $field = str_replace_template($this->fieldTemplate, array(
                     '%data_type%' => $column['data_type'],
                     '%description%' => $column['description'],
                     '%const_name%' => $column['const_name'],
@@ -144,16 +139,14 @@ SQL;
                 $fields[] = "\n$field";
             }
 
-            $class = str_replace_template($this->classTemplate,
-                    array(
+            $class = str_replace_template($this->classTemplate, array(
                 '%namespace%' => $this->getNamespace(),
                 '%table_name%' => $table_name,
                 '%classname%' => $class_name,
                 '%fields%' => implode("\n", $fields)
             ));
 
-            file_put_contents("{$this->getOutputFolder()}/{$class_name}.php",
-                    $class);
+            file_put_contents("{$this->getOutputFolder()}/{$class_name}.php", $class);
         }
     }
 
