@@ -39,7 +39,7 @@ abstract class AuthenticationService extends Service {
         if ($this->form->isSubmitted()) {
             $user = $this->getUser();
             if (is_null($user)) {
-                $this->flashBag->add(__CLASS__, 'error.invalid.username.password');
+                $this->addError('error.invalid.username.password');
                 return false;
             } else {
                 $this->application->setUser($user);
