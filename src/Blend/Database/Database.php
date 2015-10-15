@@ -78,9 +78,8 @@ class Database extends \PDO {
         }
     }
 
-    public function executeStatement(Statement $statement, $result_type = self::RETURN_ALL) {
-        return $this->executeQuery($statement->getSQL(),
-                        $statement->getParameters(), $result_type);
+    public function executeStatement(Statement $statement, $result_type = Database::RETURN_ALL) {
+        return $this->executeQuery($statement->getSQL(), $statement->getParameters(), $result_type);
     }
 
     /**
@@ -90,7 +89,7 @@ class Database extends \PDO {
      * @return array
      * @throws DatabaseQueryException
      */
-    public function executeQuery($sql, $params = array(), $result_type = self::RETURN_ALL) {
+    public function executeQuery($sql, $params = array(), $result_type = Database::RETURN_ALL) {
         $statement = $this->prepare($sql);
         $statement->execute($params);
         $this->debug($sql, $params);
@@ -103,8 +102,7 @@ class Database extends \PDO {
             }
         } else {
             $exception = DatabaseQueryException::createFromStatement($statement);
-            $this->logError($exception->getMessage(),
-                    array(
+            $this->logError($exception->getMessage(), array(
                 'arguments' => $params
             ));
             throw $exception;
