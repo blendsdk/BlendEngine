@@ -526,7 +526,16 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @param Response $response
      */
     public function terminate(Request $request, Response $response) {
-        $this->getHttpKernel()->terminate($request, $response);
+        try {
+            $this->getHttpKernel()->terminate($request, $response);
+        } catch (\Exception $exception) {
+            $this->getLogger()->error($exception->getMessage(), array(
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+                'code' => $exception->getCode(),
+                'stack' => $exception->getTraceAsString()
+            ));
+        }
     }
 
     /**
