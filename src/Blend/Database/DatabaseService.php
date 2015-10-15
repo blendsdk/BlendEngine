@@ -21,6 +21,9 @@ use Blend\Database\Database;
  */
 class DatabaseService {
 
+    const RETURN_ALL = 1;
+    const RETURN_FIRST = 2;
+
     /**
      * @var Database
      */
