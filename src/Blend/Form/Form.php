@@ -120,4 +120,23 @@ abstract class Form extends FlashProvider {
         return $this->submitted;
     }
 
+    protected function assertSameValue($key1, $key2, $error) {
+        $value1 = $this->getField($key1);
+        $value2 = $this->getField($key2);
+        if ($value1 !== $value2) {
+            $this->addError($error);
+        }
+    }
+
+    protected function assertNotBlank($key, $error) {
+        $value = $this->getField($key);
+        if (empty($value)) {
+            $this->addError($error);
+        }
+    }
+
+    protected function getField($key, $default = null) {
+        return $this->request->get($key, $default);
+    }
+
 }
