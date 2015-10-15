@@ -34,7 +34,7 @@ abstract class Statement {
     }
 
     protected function setParameterValue($name, $value) {
-        $this->stmt_params[$name] = $this->parseValue($value);
+        $this->stmt_params[$this->param($name)] = $this->parseValue($value);
     }
 
     public function getSQL() {
