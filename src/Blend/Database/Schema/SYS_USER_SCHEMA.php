@@ -30,11 +30,6 @@ class SYS_USER_SCHEMA {
     const USER_EMAIL = 'user_email';
 
     /**
-     * @var boolean Column is Nullable. Defaults to true
-     */
-    const USER_ISACTIVE = 'user_isactive';
-
-    /**
      * @var timestamp_without_time_zone Column is Nullable. Defaults to now()
      */
     const USER_DATE_CREATED = 'user_date_created';
