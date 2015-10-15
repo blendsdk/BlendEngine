@@ -75,7 +75,7 @@ abstract class ConsoleCommand extends Command {
         }
     }
 
-    protected function renderFile($_viewFile_, $_data_ = null, $_return_ = false) {
+    protected function renderFile($_viewFile_, $_data_ = null, $_return_ = true) {
         if (is_array($_data_))
             extract($_data_, EXTR_PREFIX_SAME, 'data');
         else

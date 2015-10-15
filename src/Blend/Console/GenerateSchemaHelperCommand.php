@@ -22,48 +22,15 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class GenerateSchemaHelperCommand extends DatabaseConsoleCommand {
 
-    /**
-     * @var var_char The test field
-     */
-    const test = 'test';
-
     protected abstract function getNamespace();
 
     protected abstract function getOutputFolder();
 
-    protected $fieldTemplate = <<<PHP
-    /**
-     * @var %data_type% %description%
-     */
-    const %const_name% = '%column_name%';
-PHP;
-    protected $classTemplate = <<<PHP
-<?php
-
-namespace %namespace%;
-
-class %classname% {
-
-    /**
-     * @var string The %table_name% table name
-     */
-    const TABLE_NAME = '%table_name%';
-%fields%
-
-}
-PHP;
-
     protected function configure() {
-        $ns_default = ucfirst($this->getApplicationName()) . '\Database\Schema';
-        $out_default = realpath($this->getConfigFolderLocation() . '/../src/') . '/Database/Schema';
         parent::configure();
         $this->setName('database:schemahelper')
                 ->setDescription('Generate Schema helper files')
                 ->addArgument('table', InputArgument::OPTIONAL, 'LIKE select criteria to select the table names: %( = ALL)', '%');
-    }
-
-    protected function createOutputFolder() {
-        @mkdir($this->getOutputFolder(), 0777, true);
     }
 
     protected function getTables($search) {
@@ -104,49 +71,93 @@ SQL;
                     . '. Defaults to '
                     . (empty($column['column_default']) ? 'NULL' : $column['column_default']);
             $column['data_type'] = str_replace(' ', '_', $column['data_type']);
-            $column['const_name'] = strtoupper($column['column_name']);
+            $column['column_name_upr'] = strtoupper($column['column_name']);
+            $column['column_name_getter_name'] = $this->ucWords($column['column_name'], 'get');
+            $column['column_name_setter_name'] = $this->ucWords($column['column_name'], 'set');
             $columns[$index] = $column;
         }
         return $columns;
     }
 
-    protected function render($template, $data = array()) {
-        return str_replace(array_keys($data), array_values($data), $template);
+    protected function createSchemaFile($table_name, $columns) {
+
+        $table_const = array(
+            'column_name' => $table_name,
+            'column_name_upr' => 'TABLE_NAME',
+            'data_type' => 'string',
+            'description' => "Schema for the {$table_name} table"
+        );
+
+        $class_name = strtoupper($table_name) . '_SCHEMA';
+        $class = $this->renderFile(dirname(__FILE__) . '/templates/table_schema.php', array(
+            'namespace' => $this->getNamespace() . '\Schema',
+            'class_name' => $class_name,
+            'table_name' => $table_name,
+            'columns' => array_merge(array($table_const),$columns)
+        ));
+
+        $folder = "{$this->getOutputFolder()}/Schema";
+        @mkdir($folder, 0777, true);
+        $class_file = "{$folder}/{$class_name}.php";
+        file_put_contents($class_file, $class);
+    }
+
+    protected function createModelFile($class_name, $base_namespace) {
+
+        $namespace = $this->getNamespace() . '\Model';
+        $class = $this->renderFile(dirname(__FILE__) . '/templates/model.php', array(
+            'namespace' => $namespace,
+            'class_name' => $class_name,
+            'base_namespace' => $base_namespace
+        ));
+
+        $folder = "{$this->getOutputFolder()}/Model";
+        @mkdir($folder, 0777, true);
+        $class_file = "{$folder}/{$class_name}.php";
+        if (!file_exists($class_file)) {
+            file_put_contents($class_file, $class);
+        }
+    }
+
+    protected function createModelBaseFile($table_name, $columns) {
+
+        $class_name = $this->ucWords($table_name);
+        $namespace = $this->getNamespace() . '\Model\Base';
+        $class = $this->renderFile(dirname(__FILE__) . '/templates/model_base.php', array(
+            'namespace' => $namespace,
+            'class_name' => "{$class_name}",
+            'table_name' => $table_name,
+            'columns' => $columns,
+            'schema_class_name' => strtoupper($table_name) . '_SCHEMA',
+            'schema_namespace' => $this->getNamespace() . '\Schema'
+        ));
+
+        $folder = "{$this->getOutputFolder()}/Model/Base";
+        @mkdir($folder, 0777, true);
+        $class_file = "{$folder}/{$class_name}.php";
+        file_put_contents($class_file, $class);
+
+        $this->createModelFile($class_name, $namespace);
+    }
+
+    protected function ucWords($string, $prefix = '', $postfix = '') {
+        $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
+        return "{$prefix}{$str}{$postfix}";
     }
 
     protected function executeDatabaseOperation(InputInterface $input, OutputInterface $output) {
 
         $tables = $this->getTables($input->getArgument('table'));
         $this->output->writeln("<info>" . count($tables) . " table(s) found!<info>");
-        $this->createOutputFolder();
 
         foreach ($tables as $table) {
 
-            $fields = array();
             $table_name = $table['table_name'];
-            $class_name = strtoupper($table_name) . '_SCHEMA';
             $columns = $this->getTableColumns($table_name);
-
             $this->output->writeln("<info> Generating {$table_name}<info>");
 
-            foreach ($columns as $column) {
-                $field = str_replace_template($this->fieldTemplate, array(
-                    '%data_type%' => $column['data_type'],
-                    '%description%' => $column['description'],
-                    '%const_name%' => $column['const_name'],
-                    '%column_name%' => $column['column_name']
-                ));
-                $fields[] = "\n$field";
-            }
-
-            $class = str_replace_template($this->classTemplate, array(
-                '%namespace%' => $this->getNamespace(),
-                '%table_name%' => $table_name,
-                '%classname%' => $class_name,
-                '%fields%' => implode("\n", $fields)
-            ));
-
-            file_put_contents("{$this->getOutputFolder()}/{$class_name}.php", $class);
+            $this->createSchemaFile($table_name, $columns);
+            $this->createModelBaseFile($table_name, $columns);
         }
     }
 
