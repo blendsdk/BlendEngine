@@ -11,9 +11,11 @@
 
 namespace Blend\Service\UserManager\Database;
 
-use Blend\Service\UserManager\UserManagerService as UserManagerServiceBase;
-use Blend\Service\UserManager\Database\SysUser;
 use Blend\Database\Database;
+use Blend\Service\UserManager\Database\SysUser;
+use Blend\Service\UserManager\UserManagerService as UserManagerServiceBase;
+use Blend\Service\UserManager\Database\SelectUserByTokenHashStatement;
+use Blend\Service\UserManager\Database\SelectUserByEmailStatement;
 
 class UserManagerService extends UserManagerServiceBase {
 
@@ -21,6 +23,13 @@ class UserManagerService extends UserManagerServiceBase {
 
     public function __construct(Database $database) {
         parent::__construct($database);
+    }
+
+    public function findUserByEmail($email) {
+        $stmt = new SelectUserByEmailStatement();
+        $stmt->setEmail($email);
+        $result = $this->database->executeStatement($stmt, Database::RETURN_FIRST);
+        return is_null($result) ? $result : $this->createUserInstance($result);
     }
 
     public function authenticate($token) {
