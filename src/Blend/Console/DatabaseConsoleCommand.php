@@ -31,6 +31,52 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
 
     protected abstract function executeDatabaseOperation(InputInterface $input, OutputInterface $output);
 
+    protected function getTables($search) {
+        $sql = <<<SQL
+            select
+                    *
+            from
+                    information_schema.tables
+            where
+                    table_name like :table and
+                    table_catalog = :database and
+                    table_schema='public'
+SQL;
+
+        return $this->database->executeQuery(
+                        $sql, array(
+                    ':database' => $this->database->getDatabaseName(),
+                    ':table' => $search
+        ));
+    }
+
+        protected function getTableColumns($table_name) {
+        $sql = <<<SQL
+            select
+                    *
+            from
+                    information_schema.columns
+            where
+                            table_catalog = '{$this->database->getDatabaseName()}' and
+                            table_schema = 'public' and
+                            table_name  = '{$table_name}'
+SQL;
+
+        $columns = $this->database->executeQuery($sql);
+        foreach ($columns as $index => $column) {
+            $column['description'] = 'Column is '
+                    . ($column['is_nullable'] ? 'Nullable' : 'Not Nullable')
+                    . '. Defaults to '
+                    . (empty($column['column_default']) ? 'NULL' : $column['column_default']);
+            $column['data_type'] = str_replace(' ', '_', $column['data_type']);
+            $column['column_name_upr'] = strtoupper($column['column_name']);
+            $column['column_name_getter_name'] = $this->ucWords($column['column_name'], 'get');
+            $column['column_name_setter_name'] = $this->ucWords($column['column_name'], 'set');
+            $columns[$index] = $column;
+        }
+        return $columns;
+    }
+
     protected function executeInternal(InputInterface $input, OutputInterface $output) {
         if ($this->initDatabaseConnection()) {
             $this->executeDatabaseOperation($input, $output);

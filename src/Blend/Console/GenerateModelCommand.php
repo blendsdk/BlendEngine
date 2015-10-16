@@ -16,11 +16,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Description of GenerateSchemaHelperCommand
+ * Description of GenerateModelCommand
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class GenerateSchemaHelperCommand extends DatabaseConsoleCommand {
+abstract class GenerateModelCommand extends DatabaseConsoleCommand {
 
     protected abstract function getNamespace();
 
@@ -28,55 +28,9 @@ abstract class GenerateSchemaHelperCommand extends DatabaseConsoleCommand {
 
     protected function configure() {
         parent::configure();
-        $this->setName('database:schemahelper')
-                ->setDescription('Generate Schema helper files')
+        $this->setName('database:model')
+                ->setDescription('Generate Schema and Model classes')
                 ->addArgument('table', InputArgument::OPTIONAL, 'LIKE select criteria to select the table names: %( = ALL)', '%');
-    }
-
-    protected function getTables($search) {
-        $sql = <<<SQL
-            select
-                    *
-            from
-                    information_schema.tables
-            where
-                    table_name like :table and
-                    table_catalog = :database and
-                    table_schema='public'
-SQL;
-
-        return $this->database->executeQuery(
-                        $sql, array(
-                    ':database' => $this->database->getDatabaseName(),
-                    ':table' => $search
-        ));
-    }
-
-    protected function getTableColumns($table_name) {
-        $sql = <<<SQL
-            select
-                    *
-            from
-                    information_schema.columns
-            where
-                            table_catalog = '{$this->database->getDatabaseName()}' and
-                            table_schema = 'public' and
-                            table_name  = '{$table_name}'
-SQL;
-
-        $columns = $this->database->executeQuery($sql);
-        foreach ($columns as $index => $column) {
-            $column['description'] = 'Column is '
-                    . ($column['is_nullable'] ? 'Nullable' : 'Not Nullable')
-                    . '. Defaults to '
-                    . (empty($column['column_default']) ? 'NULL' : $column['column_default']);
-            $column['data_type'] = str_replace(' ', '_', $column['data_type']);
-            $column['column_name_upr'] = strtoupper($column['column_name']);
-            $column['column_name_getter_name'] = $this->ucWords($column['column_name'], 'get');
-            $column['column_name_setter_name'] = $this->ucWords($column['column_name'], 'set');
-            $columns[$index] = $column;
-        }
-        return $columns;
     }
 
     protected function createSchemaFile($table_name, $columns) {
@@ -93,7 +47,7 @@ SQL;
             'namespace' => $this->getNamespace() . '\Schema',
             'class_name' => $class_name,
             'table_name' => $table_name,
-            'columns' => array_merge(array($table_const),$columns)
+            'columns' => array_merge(array($table_const), $columns)
         ));
 
         $folder = "{$this->getOutputFolder()}/Schema";
@@ -138,11 +92,6 @@ SQL;
         file_put_contents($class_file, $class);
 
         $this->createModelFile($class_name, $namespace);
-    }
-
-    protected function ucWords($string, $prefix = '', $postfix = '') {
-        $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
-        return "{$prefix}{$str}{$postfix}";
     }
 
     protected function executeDatabaseOperation(InputInterface $input, OutputInterface $output) {

@@ -89,4 +89,9 @@ abstract class ConsoleCommand extends Command {
             require($_viewFile_);
     }
 
+    protected function ucWords($string, $prefix = '', $postfix = '') {
+        $str = str_replace(' ', '', ucwords(str_replace('_', ' ', $string)));
+        return "{$prefix}{$str}{$postfix}";
+    }
+
 }
