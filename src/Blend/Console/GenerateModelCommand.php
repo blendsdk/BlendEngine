@@ -33,7 +33,7 @@ abstract class GenerateModelCommand extends DatabaseConsoleCommand {
                 ->addArgument('table', InputArgument::OPTIONAL, 'LIKE select criteria to select the table names: %( = ALL)', '%');
     }
 
-    protected function createSchemaFile($table_name, $columns) {
+    protected function createSchemaFile($table_name, $columns, $primary_key = array()) {
 
         $table_const = array(
             'column_name' => $table_name,
@@ -42,12 +42,17 @@ abstract class GenerateModelCommand extends DatabaseConsoleCommand {
             'description' => "Schema for the {$table_name} table"
         );
 
+        foreach($primary_key as $idx => $key) {
+            $primary_key[$idx] = "'{$key}'";
+        }
+
         $class_name = strtoupper($table_name) . '_SCHEMA';
         $class = $this->renderFile(dirname(__FILE__) . '/templates/table_schema.php', array(
             'namespace' => $this->getNamespace() . '\Schema',
             'class_name' => $class_name,
             'table_name' => $table_name,
-            'columns' => array_merge(array($table_const), $columns)
+            'columns' => array_merge(array($table_const), $columns),
+            'primary_key' => $primary_key
         ));
 
         $folder = "{$this->getOutputFolder()}/Schema";
@@ -105,7 +110,7 @@ abstract class GenerateModelCommand extends DatabaseConsoleCommand {
             $columns = $this->getTableColumns($table_name);
             $this->output->writeln("<info> Generating {$table_name}<info>");
 
-            $this->createSchemaFile($table_name, $columns);
+            $this->createSchemaFile($table_name, $columns, $table['primary']);
             $this->createModelBaseFile($table_name, $columns);
         }
     }

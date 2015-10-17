@@ -3,6 +3,8 @@
 namespace <?php echo $namespace ?>;
 
 class <?php echo $class_name; ?> {
+
+    const PRIMARY_KEY = array(<?php echo implode(', ',$primary_key) ?>);
 <?php foreach ($columns as $column): ?>
 
     /**

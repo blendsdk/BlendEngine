@@ -31,6 +31,66 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
 
     protected abstract function executeDatabaseOperation(InputInterface $input, OutputInterface $output);
 
+    protected function getConstraintsColumns($constraint) {
+        $sql = <<<SQL
+            select
+                    *
+            from
+                    information_schema.constraint_column_usage
+            where
+                    table_catalog = :database and
+                    table_name = :table and
+                    constraint_name = :name and
+                    table_schema='public'
+SQL;
+
+        $columns = $this->database->executeQuery(
+                $sql, array(
+            ':database' => $this->database->getDatabaseName(),
+            ':table' => $constraint['table_name'],
+            ':name' => $constraint['constraint_name']
+        ));
+
+        $result = array();
+        foreach ($columns as $col) {
+            $result[] = $col['column_name'];
+        }
+        return $result;
+    }
+
+    protected function getTableConstraints($table_table) {
+        $sql = <<<SQL
+            select
+                    *
+            from
+                    information_schema.constraint_table_usage
+            where
+                    table_catalog = :database and
+                    table_name = :table and
+                    table_schema='public'
+SQL;
+        $rset = $this->database->executeQuery(
+                $sql, array(
+            ':database' => $this->database->getDatabaseName(),
+            ':table' => $table_table
+        ));
+
+        $result = array();
+
+        foreach ($rset as $idx => $rec) {
+            $name = $rec['constraint_name'];
+            $type = 'key';
+            if (stripos($name, '_pkey') !== false) {
+                $type = 'primary';
+            } else if (stripos($name, '_fkey') !== false) {
+                $type = 'foreign';
+            }
+            $rec['columns'] = $this->getConstraintsColumns($rec);
+            $result[$type][] = $rec;
+        }
+        return $result;
+    }
+
     protected function getTables($search) {
         $sql = <<<SQL
             select
@@ -43,14 +103,26 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
                     table_schema='public'
 SQL;
 
-        return $this->database->executeQuery(
+        $rset =  $this->database->executeQuery(
                         $sql, array(
                     ':database' => $this->database->getDatabaseName(),
                     ':table' => $search
         ));
+
+        foreach($rset as $idx => $rec) {
+            $constraints = $this->getTableConstraints($rec['table_name']);
+            if(isset($constraints['primary'])) {
+                $rec['primary'] = $constraints['primary'][0]['columns'];
+            } else {
+                $rec['primary'] = array();
+            }
+            $rset[$idx] = $rec;
+        }
+
+        return $rset;
     }
 
-        protected function getTableColumns($table_name) {
+    protected function getTableColumns($table_name) {
         $sql = <<<SQL
             select
                     *
