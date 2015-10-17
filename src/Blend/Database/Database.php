@@ -98,7 +98,7 @@ class Database extends \PDO {
             if ($result_type === self::RETURN_ALL) {
                 return $statement->fetchAll(self::FETCH_ASSOC);
             } else {
-                return $this->returnFirstRecord($statement->fetchAll(self::FETCH_ASSOC));
+                return $statement->fetch(self::FETCH_ASSOC);
             }
         } else {
             $exception = DatabaseQueryException::createFromStatement($statement);
@@ -106,19 +106,6 @@ class Database extends \PDO {
                 'arguments' => $params
             ));
             throw $exception;
-        }
-    }
-
-    /**
-     * Returns the first record from the recordset
-     * @param mixed $recordset
-     * @return array
-     */
-    private function returnFirstRecord($recordset) {
-        if (is_array($recordset) && count($recordset) > 0) {
-            return $recordset[0];
-        } else {
-            return null;
         }
     }
 
