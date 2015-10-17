@@ -12,7 +12,6 @@
 namespace Blend\Database;
 
 use Blend\Database\Database;
-use Blend\Model\Model as ModelBase;
 
 /**
  * Base class for a database model
