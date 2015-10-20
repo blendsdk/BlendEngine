@@ -58,4 +58,11 @@ abstract class Service extends FlashProvider {
         return $this->form->isSubmitted();
     }
 
+    protected function addError($message, $category = null) {
+        parent::addError($message, $category);
+        if($this->form !== null) {
+            $this->form->saveFormData();
+        }
+    }
+
 }
