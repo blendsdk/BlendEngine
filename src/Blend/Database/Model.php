@@ -49,7 +49,7 @@ class Model {
 
     protected function setValue($field, $value) {
         if (isset($this->initial[$field])) {
-            $this->values[$field] = $value;
+            $this->values[$field] = $this->php2pg($value);
         }
         return $this;
     }
@@ -69,6 +69,15 @@ class Model {
                 $this->initial[$field] = $value;
                 $this->unsaved = false;
             }
+        }
+        return $this;
+    }
+
+    protected function php2pg($value) {
+        if (is_bool($value)) {
+            return $value === true ? 'TRUE' : 'FALSE';
+        } else {
+            return $value;
         }
     }
 
