@@ -25,6 +25,16 @@ use Symfony\Component\Translation\Loader\XliffFileLoader;
 class Translator extends BaseTranslator {
 
     protected $application;
+    protected $missingTransFile;
+
+    public function trans($id, array $parameters = array(), $domain = null, $locale = null) {
+        $value = parent::trans($id, $parameters, $domain, $locale);
+        if (!is_null($this->missingTransFile) && $id === $value) {
+            file_put_contents($this->missingTransFile, "$id\n", FILE_APPEND);
+        }
+
+        return $value;
+    }
 
     public function __construct(Application $application) {
         $this->application = $application;
@@ -32,6 +42,11 @@ class Translator extends BaseTranslator {
         parent::__construct(null, new MessageSelector(), $cacheDir);
         $this->addLoader('array', new ArrayLoader());
         $this->addLoader('xliff', new XliffFileLoader());
+        if ($this->application->isDevelopment()) {
+            $this->missingTransFile = $this->application->getRootFolder('/var/missing_translations.txt');
+        } else {
+            $this->missingTransFile = null;
+        }
     }
 
     public function getLocale() {
