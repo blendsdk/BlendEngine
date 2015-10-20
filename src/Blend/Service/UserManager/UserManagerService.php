@@ -20,7 +20,5 @@ use Blend\Database\DatabaseService;
  */
 abstract class UserManagerService extends DatabaseService {
 
-    protected abstract function createUserInstance($parameters);
-
     public abstract function authenticate($parameters);
 }
