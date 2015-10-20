@@ -18,76 +18,57 @@ use Blend\Database\Database;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Model extends ModelBase {
+class Model {
 
-    protected $identifier = 'id';
-    protected $table = null;
-    protected $modified = array();
-    protected $isNew;
+    protected $initial;
+    protected $values;
+    private $unsaved;
 
-    public function __construct($data = array(), $isNew = true) {
-        parent::__construct();
-        $this->isNew = $isNew;
+    public function __construct(array $record = array()) {
+        $this->values = array();
+        $this->unsaved = count($record) === 0;
+        $this->loadRecord($record);
     }
 
-    public function setValue($id, $value) {
-        if ($this->hasField($id)) {
-            $cur = $this->fields[$id][self::KEY_VALUE];
-        }
-        if (parent::setValue($id, $value)) {
-            if ($this->isNew === false) {
-                $this->modified[$id] = array($cur, $value);
-            }
-        }
+    /**
+     * Provides is this Model is still new (un-saved and just in memory) or it
+     * contains a record from the database
+     * @return boolean
+     */
+    public function isUnSaved() {
+        return $this->unsaved;
     }
 
-    public function __set($name, $value) {
-        $this->setValue($name, $value);
-    }
-
-    public function __get($name) {
-        return $this->getValue($name);
-    }
-
-    protected function insert(Database $database) {
-        $fieldNames = array_keys($this->fields);
-        $fieldValues = array();
-        foreach ($fieldNames as $name) {
-            $fieldValues[":{$name}"] = $this->getValue($name);
-        }
-        $placeHolders = implode(', ', array_keys($fieldValues));
-        $names = implode(', ', $fieldNames);
-        $sql = "insert into {$this->table} ($names) values ($placeHolders) returning *";
-        $result = $database->executeQuery($sql, $fieldValues);
-        $this->isNew = false;
-        $this->setValues($result[0]);
-    }
-
-    protected function update(Database $database) {
-        $placeHolders = array();
-        $ids = is_array($this->identifier) ? $this->identifier : array($this->identifier);
-        $idClause = array();
-        foreach ($ids as $idx => $field) {
-            $fieldValues[':identifier' . $idx] = $this->data[$field];
-            $idClause[] = "{$field} = :identifier{$idx}";
-        }
-        foreach ($this->modified as $name => $value) {
-            $placeHolders[] = "{$name} = :{$name}";
-            $fieldValues[":{$name}"] = $value[1];
-        }
-        $sets = implode(', ', $placeHolders);
-        $idc = implode(' and ', $idClause);
-        $sql = "update {$this->table} set {$sets} where $idc returning *";
-        $result = $database->executeQuery($sql, $fieldValues);
-        $this->modified = array();
-        $this->data = $result[0];
-    }
-
-    function save(Database $database) {
-        if ($this->isNew) {
-            $this->insert($database);
+    protected function getValue($field, $default = null) {
+        if (isset($this->values[$field])) {
+            return $this->values[$field];
         } else {
-            $this->update($database);
+            return null;
+        }
+    }
+
+    protected function setValue($field, $value) {
+        if (isset($this->initial[$field])) {
+            $this->values[$field] = $value;
+        }
+        return $this;
+    }
+
+    public function getInitial() {
+        return $this->initial;
+    }
+
+    public function getData() {
+        return $this->values;
+    }
+
+    function loadRecord(array $record = array()) {
+        foreach ($record as $field => $value) {
+            if (isset($this->initial[$field])) {
+                $this->values[$field] = $value;
+                $this->initial[$field] = $value;
+                $this->unsaved = false;
+            }
         }
     }
 

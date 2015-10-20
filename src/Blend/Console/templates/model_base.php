@@ -1,37 +1,41 @@
 <?php echo "<?php\n" ?>
 
-namespace <?php echo $namespace ?>;
+namespace <?php echo $table->getModelBaseNamespace() ?>;
 
-use <?php echo $schema_namespace . "\\" . $schema_class_name; ?> as SC;
+use Blend\Database\Model;
+use <?php echo $table->getSchemaNamespace() . "\\" . $table->getSchemaClassName(); ?> as SC;
 
-class <?php echo $class_name; ?> {
-
-    protected $fields;
-    protected $values;
+abstract class <?php echo $table->getClassName(); ?> extends Model {
 
     public function __construct($record = array()) {
         $this->values = array();
-        $this->fields = array(
-<?php foreach ($columns as $column): ?>
-            SC::<?php echo $column['column_name_upr']?> => true,
+        $this->initial = array(
+<?php foreach ($table->getColumns() as $column): ?>
+            SC::<?php echo $column->getColumnName(true)?> => true,
 <?php endforeach; ?>
         );
-        foreach ($record as $key => $value) {
-            if (isset($this->fields[$key])) {
-                $this->values[$key] = $value;
-            }
-        }
+        parent::__construct($record);
     }
-<?php foreach ($columns as $column): ?>
+<?php foreach ($table->getColumns() as $column): ?>
 
     /**
-     * Getter for the <?php echo $column['column_name']; ?> column
-     * @param mixed $default, defaults to null
-     * @return <?php echo $column['data_type'] ?>
+     * Getter for the <?php echo $column->getColumnName(); ?> column
+     * @param mixed $default defaults to null
+     * @return <?php echo $column->getDataType(); ?>
 
      */
-    public function <?php echo $column['column_name_getter_name']; ?>($default = null) {
-        return isset($this->values[SC::<?php echo $column['column_name_upr']?>]) ? $this->values[SC::<?php echo $column['column_name_upr']?>] : $default;
+    public function <?php echo $column->getColumnFunctionName('get'); ?>($default = null) {
+        return $this->getValue(SC::<?php echo $column->getColumnName(true);?>, $default);
+    }
+
+    /**
+     * Setter for the <?php echo $column->getColumnName(); ?> column
+     * @param mixed $value
+     * @return <?php echo $table->getClassName(); ?>
+
+     */
+    public function <?php echo $column->getColumnFunctionName('set'); ?>($value) {
+        return $this->setValue(SC::<?php echo $column->getColumnName(true);?>, $value);
     }
 <?php endforeach; ?>
 

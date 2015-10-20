@@ -21,9 +21,6 @@ use Monolog\Logger;
  */
 class Database extends \PDO {
 
-    const RETURN_ALL = 1;
-    const RETURN_FIRST = 2;
-
     /**
      * @var \Monolog\Logger
      */
@@ -78,10 +75,6 @@ class Database extends \PDO {
         }
     }
 
-    public function executeStatement(Statement $statement, $result_type = Database::RETURN_ALL) {
-        return $this->executeQuery($statement->getSQL(), $statement->getParameters(), $result_type);
-    }
-
     /**
      * Executes a SQL query and returns a recordset as an associative array
      * @param string $sql
@@ -89,17 +82,13 @@ class Database extends \PDO {
      * @return array
      * @throws DatabaseQueryException
      */
-    public function executeQuery($sql, $params = array(), $result_type = Database::RETURN_ALL) {
+    public function executeQuery($sql, $params = array()) {
         $statement = $this->prepare($sql);
         $statement->execute($params);
         $this->debug($sql, $params);
 
         if (intval($statement->errorCode()) === 0) {
-            if ($result_type === self::RETURN_ALL) {
-                return $statement->fetchAll(self::FETCH_ASSOC);
-            } else {
-                return $statement->fetch(self::FETCH_ASSOC);
-            }
+            return $statement->fetchAll(self::FETCH_ASSOC);
         } else {
             $exception = DatabaseQueryException::createFromStatement($statement);
             $this->logError($exception->getMessage(), array(
@@ -114,7 +103,7 @@ class Database extends \PDO {
      * @param string $message
      * @param array $context
      */
-    private function debug($message, $context = array()) {
+    public function debug($message, $context = array()) {
         if ($this->debug === true && !is_null($this->logger)) {
             $this->logger->debug($message, $context);
         }

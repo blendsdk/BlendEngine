@@ -1,17 +1,20 @@
 <?php echo "<?php\n" ?>
 
-namespace <?php echo $namespace ?>;
+namespace <?php echo $table->getSchemaNamespace() ?>;
 
-class <?php echo $class_name; ?> {
-
-    const PRIMARY_KEY = array(<?php echo implode(', ',$primary_key) ?>);
-<?php foreach ($columns as $column): ?>
+class <?php echo $table->getSchemaClassName(); ?> {
 
     /**
-     * @var <?php echo $column['data_type'] ?> <?php echo $column['description'] ?>
+     * @var string the <?php echo $table->getTableName(); ?> schema
+     */
+    const TABLE_NAME = '<?php echo $table->getTableName(); ?>';
+<?php foreach ($table->getColumns() as $column): ?>
+
+    /**
+     * @var <?php echo $column->getDataType() ?> <?php echo $column->getDescription() ?>
 
      */
-    const <?php echo $column['column_name_upr']; ?> = '<?php echo $column['column_name']; ?>';
+    const <?php echo $column->getColumnName(true); ?> = '<?php echo $column->getColumnName(); ?>';
 <?php endforeach; ?>
 
 }

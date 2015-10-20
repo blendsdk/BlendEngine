@@ -16,6 +16,8 @@ use Blend\Database\DatabaseQueryException;
 use Blend\Console\ConsoleCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Blend\Database\PostgreSQL\Table;
+use Blend\Database\PostgreSQL\Column;
 
 /**
  * Base class for a Console command that need to do operations on the database
@@ -31,122 +33,68 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
 
     protected abstract function executeDatabaseOperation(InputInterface $input, OutputInterface $output);
 
-    protected function getConstraintsColumns($constraint) {
-        $sql = <<<SQL
-            select
-                    *
-            from
-                    information_schema.constraint_column_usage
-            where
-                    table_catalog = :database and
-                    table_name = :table and
-                    constraint_name = :name and
-                    table_schema='public'
-SQL;
-
-        $columns = $this->database->executeQuery(
-                $sql, array(
-            ':database' => $this->database->getDatabaseName(),
-            ':table' => $constraint['table_name'],
-            ':name' => $constraint['constraint_name']
-        ));
-
-        $result = array();
-        foreach ($columns as $col) {
-            $result[] = $col['column_name'];
+    /**
+     * @param type $table_schema
+     * @return Tables[]
+     */
+    protected function loadTables($table_schema = 'public') {
+        $tablesQuery = "select * from information_schema.tables where table_schema = :table_schema and table_catalog = :table_catalog";
+        $tableQueryParams = array(
+            ':table_schema' => $table_schema,
+            ':table_catalog' => $this->database->getDatabaseName()
+        );
+        $tables = array();
+        $list = $this->database->executeQuery($tablesQuery, $tableQueryParams);
+        foreach ($list as $index => $record) {
+            $table = new Table($record);
+            $this->loadColumns($table);
+            $this->loadConstraints($table);
+            $tables[$table->getTableName()] = $table;
         }
-        return $result;
+        return $tables;
     }
 
-    protected function getTableConstraints($table_table) {
-        $sql = <<<SQL
-            select
-                    *
-            from
-                    information_schema.constraint_table_usage
-            where
-                    table_catalog = :database and
-                    table_name = :table and
-                    table_schema='public'
-SQL;
-        $rset = $this->database->executeQuery(
-                $sql, array(
-            ':database' => $this->database->getDatabaseName(),
-            ':table' => $table_table
-        ));
 
-        $result = array();
-
-        foreach ($rset as $idx => $rec) {
-            $name = $rec['constraint_name'];
-            $type = 'key';
-            if (stripos($name, '_pkey') !== false) {
-                $type = 'primary';
-            } else if (stripos($name, '_fkey') !== false) {
-                $type = 'foreign';
+    private function loadConstraints(Table $table) {
+        $tableConstQuery = "select * from information_schema.table_constraints where constraint_type in ('UNIQUE','PRIMARY KEY','FOREIGN KEY') and table_schema = :table_schema and table_catalog = :table_catalog and table_name = :table_name";
+        $tableConstQueryParams = array(
+            ':table_schema' => $table->getTableSchema(),
+            ':table_catalog' => $table->getTableCatalog(),
+            ':table_name' => $table->getTableName()
+        );
+        $tableConsts = $this->database->executeQuery($tableConstQuery, $tableConstQueryParams);
+        foreach ($tableConsts as $tableConst) {
+            $a_name =  $tableConst['constraint_name'];
+            $a_tname = $table->getTableName();
+            if (stripos($tableConst['constraint_name'], $table->getTableName()) === 0) {
+                $constColumnQuery = "select * from information_schema.constraint_column_usage where table_schema = :table_schema and table_catalog = :table_catalog and table_name = :table_name and constraint_name = :constraint_name";
+                $constColumnParams = array(
+                    ':table_schema' => $tableConst['table_schema'],
+                    ':table_catalog' => $tableConst['table_catalog'],
+                    ':table_name' => $tableConst['table_name'],
+                    ':constraint_name' => $tableConst['constraint_name'],
+                );
+                $constColumns = $this->database->executeQuery($constColumnQuery, $constColumnParams);
+                foreach ($constColumns as $constColumn) {
+                    $table->addKeyColumn($constColumn);
+                }
             }
-            $rec['columns'] = $this->getConstraintsColumns($rec);
-            $result[$type][] = $rec;
         }
-        return $result;
     }
 
-    protected function getTables($search) {
-        $sql = <<<SQL
-            select
-                    *
-            from
-                    information_schema.tables
-            where
-                    table_name like :table and
-                    table_catalog = :database and
-                    table_schema='public'
-SQL;
-
-        $rset =  $this->database->executeQuery(
-                        $sql, array(
-                    ':database' => $this->database->getDatabaseName(),
-                    ':table' => $search
-        ));
-
-        foreach($rset as $idx => $rec) {
-            $constraints = $this->getTableConstraints($rec['table_name']);
-            if(isset($constraints['primary'])) {
-                $rec['primary'] = $constraints['primary'][0]['columns'];
-            } else {
-                $rec['primary'] = array();
-            }
-            $rset[$idx] = $rec;
+    private function loadColumns(Table $table) {
+        $columnsQuery = "select * from information_schema.columns where table_schema = :table_schema and table_catalog = :table_catalog and table_name = :table_name";
+        $columnsQueryParams = array(
+            ':table_schema' => $table->getTableSchema(),
+            ':table_catalog' => $table->getTableCatalog(),
+            ':table_name' => $table->getTableName()
+        );
+        $columns = $this->database->executeQuery($columnsQuery, $columnsQueryParams);
+        foreach ($columns as $record) {
+            $column = new Column($record);
+            $table->addColumn($column);
         }
-
-        return $rset;
-    }
-
-    protected function getTableColumns($table_name) {
-        $sql = <<<SQL
-            select
-                    *
-            from
-                    information_schema.columns
-            where
-                            table_catalog = '{$this->database->getDatabaseName()}' and
-                            table_schema = 'public' and
-                            table_name  = '{$table_name}'
-SQL;
-
-        $columns = $this->database->executeQuery($sql);
-        foreach ($columns as $index => $column) {
-            $column['description'] = 'Column is '
-                    . ($column['is_nullable'] ? 'Nullable' : 'Not Nullable')
-                    . '. Defaults to '
-                    . (empty($column['column_default']) ? 'NULL' : $column['column_default']);
-            $column['data_type'] = str_replace(' ', '_', $column['data_type']);
-            $column['column_name_upr'] = strtoupper($column['column_name']);
-            $column['column_name_getter_name'] = $this->ucWords($column['column_name'], 'get');
-            $column['column_name_setter_name'] = $this->ucWords($column['column_name'], 'set');
-            $columns[$index] = $column;
-        }
-        return $columns;
+        return $table;
     }
 
     protected function executeInternal(InputInterface $input, OutputInterface $output) {

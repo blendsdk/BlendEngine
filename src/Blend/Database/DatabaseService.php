@@ -12,6 +12,11 @@
 namespace Blend\Database;
 
 use Blend\Database\Database;
+use Blend\Database\Model;
+use Blend\Database\InsertStatementException;
+use Blend\Database\UpdateStatementException;
+use Blend\Database\SelectStatementException;
+use Blend\Database\DeleteStatementException;
 
 /**
  * DatabaseSerice is an abstract class that can be used as a Data Access Layer
@@ -21,9 +26,6 @@ use Blend\Database\Database;
  */
 class DatabaseService {
 
-    const RETURN_ALL = 1;
-    const RETURN_FIRST = 2;
-
     /**
      * @var Database
      */
@@ -31,6 +33,179 @@ class DatabaseService {
 
     public function __construct(Database $database) {
         $this->database = $database;
+    }
+
+    /**
+     * Saves an object Model in the database
+     * @param string $table_name
+     * @param Model $object
+     * @return Model
+     */
+    protected function saveObject($table_name, Model $object) {
+        if ($object->isUnSaved()) {
+            return $object->loadRecord($this->insertRecord($table_name, $object->getData()));
+        } else {
+            return $object->loadRecord($this->updateRecord($table_name, $object->getData(), $object->getInitial(), 1));
+        }
+    }
+
+    protected function deleteObject($table_name, Model $object) {
+        if (!$object->isUnSaved()) {
+            $this->deleteByParams($table_name, $object->getInitial(), 1);
+            return $object;
+        } else {
+            throw new DeleteStatementException("Unable to delete an unsaved (in memory) record model");
+        }
+    }
+
+    /**
+     * Updates a recrod in the database
+     * @param string $table_name
+     * @param array $fields
+     * @param array $criteria
+     * @return array
+     */
+    protected function updateRecord($table_name, $fields, $criteria, $expectedRecords = null) {
+        $args = $this->makeUPDATEArgs('p_', $criteria);
+        $params = array_merge($fields, $this->renameArrayKeys('p_', $criteria));
+        $sql = "UPDATE {$table_name} SET {$this->makeSetParams($fields, ', ')} WHERE {$this->makeSetParams($args, ' AND ', true)} RETURNING *";
+        $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
+        if (is_array($result)) {
+            if (is_null($expectedRecords)) {
+                return $result;
+            } else if (count($result) === $expectedRecords) {
+                return $expectedRecords === 1 ? $result[0] : $result;
+            } else {
+                $errorMessage = "Invalid number of records updated. Excepcted: {$expectedRecords}, updated:" . count($result);
+                $this->database->debug($errorMessage, $result);
+                throw new UpdateStatementException($errorMessage);
+            }
+        } else {
+            $errorMessage = "The result set is an invalid recordset!";
+            $this->database->debug($errorMessage, $result);
+            throw new UpdateStatementException($errorMessage);
+        }
+    }
+
+    /**
+     * Inserts a record into the database
+     * @param string $table_name
+     * @param array $params
+     * @return array the newly created record from the database
+     */
+    protected function insertRecord($table_name, $params = array()) {
+        $fields = implode(', ', array_keys($params));
+        $sets = implode(', ', array_keys($this->renameArrayKeys(':', $params)));
+        $sql = "INSERT INTO {$table_name} ($fields) values ({$sets}) RETURNING *";
+        $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
+        if (is_array($result) && count($result) === 1) {
+            return $result[0];
+        } else {
+            $errorMessage = "The result set is an invalid recordset!";
+            $this->database->debug($errorMessage, $result);
+            throw new InsertStatementException($errorMessage);
+        }
+    }
+
+    /**
+     * @param string $table_name
+     * @param mixed $params
+     * @param string $classType
+     * @return Model
+     */
+    protected function getObjectByParams($table_name, $params) {
+        $sql = "SELECT * FROM {$table_name} WHERE {$this->makeSetParams($params)}";
+        $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
+        if (is_array($result) && count($result) === 1) {
+            return $result[0];
+        } else {
+            $errorMessage = "The result set is an invalid recordset! Excpected 1 record, got " . count($result);
+            $this->database->debug($errorMessage, $result);
+            throw new SelectStatementException($errorMessage);
+        }
+    }
+
+    /**
+     * @param string $table_name
+     * @param moxed $params
+     * @param string $classType
+     * @return Model
+     */
+    protected function deleteByParams($table_name, $params, $expectedRecords = null) {
+        $sql = "DELETE FROM {$table_name} WHERE {$this->makeSetParams($params)} RETURNING *";
+        $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
+        if (is_array($result)) {
+            if (is_null($expectedRecords)) {
+                return $result;
+            } else if (count($result) === $expectedRecords) {
+                return $expectedRecords === 1 ? $result[0] : $result;
+            } else {
+                $errorMessage = "Invalid number of records deleted. Excepcted: {$expectedRecords}, deleted:" . count($result);
+                $this->database->debug($errorMessage, $result);
+                throw new DeleteStatementException($errorMessage);
+            }
+        } else {
+            $errorMessage = "The result set is an invalid recordset!";
+            $this->database->debug($errorMessage, $result);
+            throw new DeleteStatementException($errorMessage);
+        }
+    }
+
+    /**
+     * Creates the arguments for an update clause
+     * @param string $prefix
+     * @param array $data
+     * @return array
+     */
+    protected function makeUPDATEArgs($prefix, $data) {
+        $result = array();
+        foreach ($data as $k => $v) {
+            $result[$k] = "{$prefix}$k";
+        }
+        return $result;
+    }
+
+    /**
+     * Renames the keys of an array
+     * @param string $prefix
+     * @param data $data
+     * @return array
+     */
+    protected function renameArrayKeys($prefix, $data) {
+        $result = array();
+        foreach ($data as $k => $v) {
+            $result[$prefix . $k] = $v;
+        }
+        return $result;
+    }
+
+    /**
+     * Create query parameters to be used in a executeQuery call
+     * @param array $list
+     * @return array
+     */
+    protected function makeQueryParams($list) {
+        $result = array();
+        foreach ($list as $key => $value) {
+            $k = ":{$key}";
+            $result[$k] = $value;
+        }
+        return $result;
+    }
+
+    /**
+     * Create field = :field set seperated by a $glue.
+     * @param array $list
+     * @param string $glue
+     * @param boolean $useValue
+     * @return string
+     */
+    protected function makeSetParams($list, $glue = ' AND ', $useValue = false) {
+        $result = array();
+        foreach ($list as $key => $value) {
+            $result[] = "{$key} = " . ($useValue ? ":{$value}" : ":{$key}");
+        }
+        return implode($glue, $result);
     }
 
 }

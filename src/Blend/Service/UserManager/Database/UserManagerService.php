@@ -44,6 +44,7 @@ class UserManagerService extends UserManagerServiceBase {
         return is_null($result) ? $result : $this->createUserInstance($result);
     }
 
+
     public function findUserByEmail($email) {
         $stmt = new SelectUserByEmailStatement();
         $stmt->setEmail($email);
