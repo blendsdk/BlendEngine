@@ -15,7 +15,6 @@ use Blend\Database\Database;
 use Blend\Database\Model;
 use Blend\Database\InsertStatementException;
 use Blend\Database\UpdateStatementException;
-use Blend\Database\SelectStatementException;
 use Blend\Database\DeleteStatementException;
 
 /**
@@ -119,9 +118,7 @@ class DatabaseService {
         if (is_array($result) && count($result) === 1) {
             return $result[0];
         } else {
-            $errorMessage = "The result set is an invalid recordset! Excpected 1 record, got " . count($result);
-            $this->database->debug($errorMessage, $result);
-            throw new SelectStatementException($errorMessage);
+            return null;
         }
     }
 
