@@ -40,7 +40,7 @@ class DatabaseService {
      * @param Model $object
      * @return Model
      */
-    protected function saveObject($table_name, Model $object) {
+    protected function saveObject($table_name, Model &$object) {
         if ($object->isUnSaved()) {
             return $object->loadRecord($this->insertRecord($table_name, $object->getData()));
         } else {
@@ -112,11 +112,11 @@ class DatabaseService {
      * @param string $classType
      * @return Model
      */
-    protected function getObjectByParams($table_name, $params) {
+    protected function getObjectByParams($table_name, $params, $recordClass) {
         $sql = "SELECT * FROM {$table_name} WHERE {$this->makeSetParams($params)}";
         $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
         if (is_array($result) && count($result) === 1) {
-            return $result[0];
+            return new $recordClass($result[0]);
         } else {
             return null;
         }
