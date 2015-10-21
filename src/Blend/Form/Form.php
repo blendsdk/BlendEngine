@@ -58,6 +58,10 @@ abstract class Form extends FlashProvider {
         $this->handleRequest();
     }
 
+    /**
+     * Gets the CSRF info as an array to be used later.
+     * @return array
+     */
     public function getCsrfInfo() {
         return array(
             'key' => $this->csrf_key,
@@ -65,11 +69,19 @@ abstract class Form extends FlashProvider {
         );
     }
 
+    /**
+     * Creates an HTML hidden input tag with the CSRF value
+     * @return string
+     */
     public function getCsrfHTMLUserInterface() {
         $info = $this->getCsrfInfo();
         return "<input type=\"hidden\" name=\"{$info['key']}\" value=\"{$info['value']}\"/>";
     }
 
+    /**
+     * Check if the form is submitted correctly
+     * @return boolean
+     */
     protected function checkSubmitted() {
         $csrf = $this->request->get($this->csrf_key, null);
         $check = $this->request->getSession()->get($this->csrf_key);
@@ -101,10 +113,16 @@ abstract class Form extends FlashProvider {
         }
     }
 
+    /**
+     * Saves the current form data in the session to be used later
+     */
     public function saveFormData() {
         $this->request->getSession()->set($this->sess_value_key, $this->request->request->all());
     }
 
+    /**
+     * Clears the form data from the session
+     */
     protected function clearSavedData() {
         $this->request->getSession()->remove($this->sess_value_key);
     }
@@ -119,14 +137,28 @@ abstract class Form extends FlashProvider {
         return $values;
     }
 
+    /**
+     * Check if the vorm is valid
+     * @return boolean
+     */
     public function isValid() {
         return $this->valid;
     }
 
+    /**
+     * Chech if the form is submitted
+     * @return boolean
+     */
     public function isSubmitted() {
         return $this->submitted;
     }
 
+    /**
+     * Assert two form field to have the save value
+     * @param type $key1
+     * @param type $key2
+     * @param type $error
+     */
     protected function assertSameValue($key1, $key2, $error) {
         $value1 = $this->getField($key1);
         $value2 = $this->getField($key2);
@@ -135,6 +167,11 @@ abstract class Form extends FlashProvider {
         }
     }
 
+    /**
+     * Assert the field value for not blank
+     * @param string $key
+     * @param string $error
+     */
     protected function assertNotBlank($key, $error) {
         $value = $this->getField($key);
         if (empty($value)) {
@@ -142,6 +179,20 @@ abstract class Form extends FlashProvider {
         }
     }
 
+    /**
+     * Returns all the fields of this form
+     * @return type
+     */
+    public function getAllFields() {
+        return $this->request->request->all();
+    }
+
+    /**
+     * Geta field value from this form
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
     protected function getField($key, $default = null) {
         return $this->request->get($key, $default);
     }

@@ -46,21 +46,43 @@ abstract class Service extends FlashProvider {
     }
 
     /**
+     * Wrapper funcrion for $this->application->getTranslator()->trans
+     * @param string $id
+     * @param mixed $params
+     * @return strinf
+     */
+    protected function trans($id, $params = array()) {
+        return $this->application->getTranslator()->trans($id, $params);
+    }
+
+    /**
+     * Gets the main form of this service
      * @return Form;
      */
     public function getForm() {
         return $this->form;
     }
 
+    /**
+     * Validates the current request by creating the request form and
+     * also setting the flash messages
+     * @param Request $request
+     * @return type
+     */
     public function validateRequest(Request $request) {
         $this->form = $this->createForm($request);
         $this->setFlashBagFromRequest($request);
         return $this->form->isSubmitted();
     }
 
+    /**
+     * Adds an error to the flashbag and saved the ccurrent form data
+     * @param string $message
+     * @param string $category
+     */
     protected function addError($message, $category = null) {
         parent::addError($message, $category);
-        if($this->form !== null) {
+        if ($this->form !== null) {
             $this->form->saveFormData();
         }
     }
