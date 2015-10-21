@@ -459,6 +459,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
 
             if (null === $request) {
                 $request = Request::createFromGlobals();
+                $this->getRequestContext()->fromRequest($request);
             }
             $response = $this->handle($request);
         } catch (ResourceNotFoundException $e) {
