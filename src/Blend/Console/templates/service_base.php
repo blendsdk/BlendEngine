@@ -7,7 +7,10 @@ use Blend\Database\DatabaseService;
 use <?php echo $table->getModelNamespace()?>\<?php echo $table->getModelClassName(); ?>;
 use <?php echo $table->getSchemaNamespace(); ?>\<?php echo $table->getSchemaClassName() ?> as SC;
 
-class <?php echo $table->getServiceClassName(); ?> extends DatabaseService {
+/**
+ * @abstract
+ */
+abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseService {
 
     protected $recordClass;
 

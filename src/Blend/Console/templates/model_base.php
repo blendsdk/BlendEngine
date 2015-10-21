@@ -5,6 +5,9 @@ namespace <?php echo $table->getModelBaseNamespace() ?>;
 use Blend\Database\Model;
 use <?php echo $table->getSchemaNamespace() . "\\" . $table->getSchemaClassName(); ?> as SC;
 
+/**
+ * @abstract
+ */
 abstract class <?php echo $table->getClassName(); ?> extends Model {
 
     public function __construct($record = array()) {
