@@ -72,7 +72,11 @@ abstract class Service extends FlashProvider {
     public function validateRequest(Request $request) {
         $this->form = $this->createForm($request);
         $this->setFlashBagFromRequest($request);
-        return $this->form->isSubmitted();
+        if ($this->form) {
+            return $this->form->isSubmitted();
+        } else {
+            return false;
+        }
     }
 
     /**
