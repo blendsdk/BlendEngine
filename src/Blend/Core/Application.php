@@ -144,7 +144,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return type
      */
     public function getLocale() {
-        return $this->locale;
+        return is_null($this->locale) ? $this->getConfig('translation.defaultLocale') : $this->locale;
     }
 
     /**
@@ -153,7 +153,13 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @param type $locale
      */
     public function setLocale($locale) {
-        $this->locale = $locale;
+        $default = $this->getConfig('translation.defaultLocale');
+        $allowedLocales = $this->getConfig('translation.locales', array($default));
+        if (!in_array($locale, $allowedLocales)) {
+            $this->locale = $default;
+        } else {
+            $this->locale = $locale;
+        }
     }
 
     /**
@@ -189,6 +195,34 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     public function setUser(IUser $user) {
         $user->password = null;
         $this->request->getSession()->set(SecurityServiceListener::SEC_AUTHENTICATED_USER, $user);
+    }
+
+    /**
+     * Gets a session variable
+     * @param string $key
+     * @param mixed $default defaults to null
+     * @return mixed
+     *
+     */
+    public function getData($key, $default = null) {
+        if ($this->request) {
+            return $this->request->getSession()->get($key, $default);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Sets a session variable
+     * @param string $key
+     * @param mixed $value
+     */
+    public function setData($key, $value) {
+        if ($this->request !== null) {
+            $this->request->getSession()->set($key, $value);
+        } else {
+            throw BlendEngineException::newInstance($this, 'The Session object is not preset yet!');
+        }
     }
 
     /**
