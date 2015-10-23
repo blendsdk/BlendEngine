@@ -28,6 +28,7 @@ class Configiration {
      * @var \ArrayAccess
      */
     private $params;
+    private $level;
 
     /**
      * Retuns a parameters value of null of the parameter does not exist
@@ -52,6 +53,7 @@ class Configiration {
     }
 
     public function __construct($fname) {
+        $this->level = 0;
         if (file_exists($fname)) {
             $this->params = $this->array_flat(include($fname));
         } else {
@@ -65,8 +67,10 @@ class Configiration {
         foreach ($array as $key => $value) {
             $new_key = $prefix . (empty($prefix) ? '' : '.') . $key;
 
-            if (is_array($value)) {
+            if (is_array($value) && $this->level < 1) {
+                $this->level++;
                 $result = array_merge($result, $this->array_flat($value, $new_key));
+                $this->level--;
             } else {
                 $result[$new_key] = $value;
             }
