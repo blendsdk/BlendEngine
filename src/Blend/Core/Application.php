@@ -580,6 +580,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     protected function registerService($name, $service) {
         $this->services[$name] = $service;
+        return $service;
     }
 
     /**
