@@ -35,11 +35,10 @@ abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseServ
      * @return <?php echo $table->getModelClassName(); ?> The object that was saved
      */
     public function <?php echo 'save'?>(<?php echo $table->getModelClassName()?> &$object) {
-        return $this->saveObject(SC::TABLE_NAME,$object);
+        return $this->saveObject(SC::TABLE_NAME, $object);
     }
 
-
-<?php foreach ($table->getKeys() as $keyName => $columns): ?>
+<?php foreach ($table->getLocalKeys() as $keyName => $columns): ?>
     /**
      * @return <?php echo $table->getModelClassName(); ?>
 
@@ -58,6 +57,15 @@ abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseServ
         $params = array(<?php echo $table->getKeyQueryParams($keyName)?>);
         return $this->deleteByParams(SC::TABLE_NAME, $params, $this->recordClass);
     }
-
 <?php endforeach; ?>
+<?php foreach ($table->getForeignKeys() as $keyName => $columns): ?>
+    /**
+     * @return <?php echo $table->getModelClassName(); ?>[]
+     */
+    public function <?php echo $table->getKeyFunctionName($keyName,'getManyBy');?>(<?php echo $table->getKeyGetterArgs($keyName);?>, $context = array()) {
+        $params = array_merge(array(<?php echo $table->getKeyQueryParams($keyName)?>), $context);
+        return $this->getManyObjectsByParams(SC::TABLE_NAME, $params, $this->recordClass);
+    }
+<?php endforeach; ?>
+
 }

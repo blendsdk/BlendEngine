@@ -23,6 +23,7 @@ class Table extends Record {
 
     protected $columns;
     protected $keys;
+    protected $keysByType;
     protected $schema_namespace;
     protected $model_base_namespace;
     protected $model_namespace;
@@ -33,10 +34,37 @@ class Table extends Record {
         parent::__construct($record);
         $this->columns = array();
         $this->keys = array();
+        $this->keysByType = array();
     }
 
-    public function getKeys() {
-        return $this->keys;
+    public function getForeignKeys() {
+        $result = array();
+        $keys = array();
+        if (isset($this->keysByType['FOREIGN KEY'])) {
+            $keys = array_merge($keys, $this->keysByType['FOREIGN KEY']);
+        }
+
+        foreach ($keys as $key) {
+            $result[$key] = $this->keys[$key];
+        }
+        return $result;
+    }
+
+    public function getLocalKeys() {
+        $result = array();
+        $keys = array();
+        if (isset($this->keysByType['PRIMARY KEY'])) {
+            $keys = array_merge($keys, $this->keysByType['PRIMARY KEY']);
+        }
+
+        if (isset($this->keysByType['UNIQUE'])) {
+            $keys = array_merge($keys, $this->keysByType['UNIQUE']);
+        }
+
+        foreach ($keys as $key) {
+            $result[$key] = $this->keys[$key];
+        }
+        return $result;
     }
 
     public function getKeyQueryParams($keyname) {
@@ -124,11 +152,12 @@ class Table extends Record {
         return $this->columns;
     }
 
-    public function addKeyColumn(array $keyColumn) {
+    public function addKeyColumn(array $keyColumn, $constraint_type) {
         $name = $keyColumn['constraint_name'];
         if (stripos($name, '_pkey') !== false) {
             $name = 'primary';
         }
+        $this->keysByType[$constraint_type][] = $name;
         $this->keys[$name][] = $this->columns[$keyColumn['column_name']];
     }
 

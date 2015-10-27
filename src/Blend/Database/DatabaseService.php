@@ -124,6 +124,27 @@ class DatabaseService {
 
     /**
      * @param string $table_name
+     * @param mixed $params
+     * @param string $classType
+     * @return Model[]
+     */
+    protected function getManyObjectsByParams($table_name, $params, $recordClass) {
+        $sql = "SELECT * FROM {$table_name} WHERE {$this->makeSetParams($params)}";
+        $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
+        if (is_array($result)) {
+            $set = array();
+            foreach($result as $record) {
+                $set[] = new $recordClass($record);
+            }
+            return $set;
+        } else {
+            return array();
+        }
+    }
+
+
+    /**
+     * @param string $table_name
      * @param moxed $params
      * @param string $classType
      * @return Model

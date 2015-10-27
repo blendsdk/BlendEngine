@@ -54,7 +54,6 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
         return $tables;
     }
 
-
     private function loadConstraints(Table $table) {
         $tableConstQuery = "select * from information_schema.table_constraints where constraint_type in ('UNIQUE','PRIMARY KEY','FOREIGN KEY') and table_schema = :table_schema and table_catalog = :table_catalog and table_name = :table_name";
         $tableConstQueryParams = array(
@@ -64,20 +63,16 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
         );
         $tableConsts = $this->database->executeQuery($tableConstQuery, $tableConstQueryParams);
         foreach ($tableConsts as $tableConst) {
-            $a_name =  $tableConst['constraint_name'];
-            $a_tname = $table->getTableName();
-            if (stripos($tableConst['constraint_name'], $table->getTableName()) === 0) {
-                $constColumnQuery = "select * from information_schema.constraint_column_usage where table_schema = :table_schema and table_catalog = :table_catalog and table_name = :table_name and constraint_name = :constraint_name";
-                $constColumnParams = array(
-                    ':table_schema' => $tableConst['table_schema'],
-                    ':table_catalog' => $tableConst['table_catalog'],
-                    ':table_name' => $tableConst['table_name'],
-                    ':constraint_name' => $tableConst['constraint_name'],
-                );
-                $constColumns = $this->database->executeQuery($constColumnQuery, $constColumnParams);
-                foreach ($constColumns as $constColumn) {
-                    $table->addKeyColumn($constColumn);
-                }
+            $constColumnQuery = "select * from information_schema.constraint_column_usage where table_schema = :table_schema and table_catalog = :table_catalog and constraint_name = :constraint_name";
+            $constColumnParams = array(
+                ':table_schema' => $tableConst['table_schema'],
+                ':table_catalog' => $tableConst['table_catalog'],
+                //':table_name' => $tableConst['table_name'],
+                ':constraint_name' => $tableConst['constraint_name'],
+            );
+            $constColumns = $this->database->executeQuery($constColumnQuery, $constColumnParams);
+            foreach ($constColumns as $constColumn) {
+                $table->addKeyColumn($constColumn, $tableConst['constraint_type']);
             }
         }
     }
