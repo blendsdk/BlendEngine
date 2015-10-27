@@ -32,6 +32,12 @@ abstract class GenerateModelCommand extends DatabaseConsoleCommand {
 
     protected abstract function getCommandNamespace();
 
+    protected abstract function getApplicationFolder();
+
+    protected abstract function getApplicationNamespace();
+
+    protected abstract function getApplicationClassName();
+
     protected function configure() {
         parent::configure();
         $this->setName('database:model')
@@ -105,42 +111,84 @@ abstract class GenerateModelCommand extends DatabaseConsoleCommand {
     }
 
     protected function createInitDbCommand($tables) {
+        $baseClassName = "DatabaseInitDbCommandBase";
+        $className = 'DatabaseInitDbCommand';
+
+        $baseClassFileName = "{$this->getCommandFolder()}/{$baseClassName}.php";
+        $classFileName = "{$this->getCommandFolder()}/{$className}.php";
+        $baseTemplateFile = "initdb_base.php";
+        $classTemplateFile = "initdb.php";
+        $baseNamespace = $this->getCommandNamespace();
+        $classNamespace = $this->getCommandNamespace();
+        $baseContext = array(
+            'application_name' => $this->getApplicationName(),
+            'config_folder' => $this->getOutputFolder()
+        );
+        $classContext = array();
+
+        $this->renderServicesAndProperties($tables, $baseNamespace, $classNamespace, $baseClassFileName, $classFileName, $baseTemplateFile, $classTemplateFile, $baseContext, $classContext);
+    }
+
+    protected function renderServicesAndProperties($tables, $baseNamespace, $classNamespace, $baseClassFileName, $classFileName, $baseTemplateFile, $classTemplateFile, $baseContext = array(), $classContext = array()) {
         $services = array();
         $models = array();
         $properties = array();
 
-        $baseFilename = "{$this->getCommandFolder()}/DatabaseInitDbCommandBase.php";
-        $cmdFilename = "{$this->getCommandFolder()}/DatabaseInitDbCommand.php";
-
         foreach ($tables as $table) {
             $models[] = "{$table->getModelNamespace()}\\{$table->getModelClassName()}";
             $services[] = "{$table->getServiceNamespace()}\\{$table->getServiceClassName()}";
+            $prop_name = $this->createPropertyName($table->getTableName(), 'Service');
             $properties[] = array(
                 'name' => $this->createPropertyName($table->getTableName(), 'Service'),
-                'type' => $table->getServiceClassName()
+                'type' => $table->getServiceClassName(),
+                'const_name' => $table->getTableName(true) . '_SERVICE',
+                'table' => $table
             );
         }
 
         sort($models);
         sort($services);
 
-        $baseClass = $this->renderFile(dirname(__FILE__) . '/templates/initdb_base.php', array(
-            'namespace' => $this->getCommandNamespace(),
+        $baseContext = array_merge($baseContext, array(
+            'namespace' => $baseNamespace,
             'usages' => $services,
-            'properties' => $properties,
-            'application_name' => $this->getApplicationName(),
-            'config_folder' => $this->getOutputFolder()
+            'properties' => $properties
         ));
-        file_put_contents($baseFilename, $baseClass);
 
-        if (!file_exists($cmdFilename)) {
-            $cmdClass = $this->renderFile(dirname(__FILE__) . '/templates/initdb.php', array(
-                'namespace' => $this->getCommandNamespace(),
+        $baseClass = $this->renderFile(dirname(__FILE__) . '/templates/' . $baseTemplateFile, $baseContext);
+        file_put_contents($baseClassFileName, $baseClass);
+
+        if (!file_exists($classFileName)) {
+            $classContext = array_merge($classContext, array(
+                'namespace' => $classNamespace,
                 'usages' => $models,
             ));
+            $cmdClass = $this->renderFile(dirname(__FILE__) . '/templates/' . $classTemplateFile, $classContext);
 
-            file_put_contents($cmdFilename, $cmdClass);
+            file_put_contents($classFileName, $cmdClass);
         }
+    }
+
+    protected function createApplicationClasses($tables) {
+
+        $baseClassName = "{$this->getApplicationClassName()}Base";
+        $className = $this->getApplicationClassName();
+
+        $baseClassFileName = "{$this->getApplicationFolder()}/{$baseClassName}.php";
+        $classFileName = "{$this->getApplicationFolder()}/{$className}.php";
+        $baseTemplateFile = "application_base.php";
+        $classTemplateFile = "application.php";
+        $baseNamespace = $this->getApplicationNamespace();
+        $classNamespace = $this->getApplicationNamespace();
+        $baseContext = array(
+            'class_name' => $baseClassName
+        );
+        $classContext = array(
+            'class_name' => $className,
+            'base_class_name' => $baseClassName
+        );
+
+        $this->renderServicesAndProperties($tables, $baseNamespace, $classNamespace, $baseClassFileName, $classFileName, $baseTemplateFile, $classTemplateFile, $baseContext, $classContext);
     }
 
     protected function executeDatabaseOperation(InputInterface $input, OutputInterface $output) {
@@ -157,6 +205,7 @@ abstract class GenerateModelCommand extends DatabaseConsoleCommand {
         }
 
         $this->createInitDbCommand($tables);
+        $this->createApplicationClasses($tables);
     }
 
     private function createPropertyName($name, $postfix) {
