@@ -137,6 +137,10 @@ abstract class Form extends FlashProvider {
         return $values;
     }
 
+    public function reset() {
+        $this->clearSavedData();
+    }
+
     /**
      * Check if the vorm is valid
      * @return boolean
