@@ -33,6 +33,22 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
 
     protected abstract function executeDatabaseOperation(InputInterface $input, OutputInterface $output);
 
+    protected function addViewKeyColumns(Table $view) {
+
+    }
+
+    protected function addViewKeyColumn(Table $view, array $columnList, $many = false) {
+        $keyname = $view->getTableName() . '_' . uniqid();
+        $columns = array();
+        foreach ($columnList as $name) {
+            $keyColumn = array(
+                'column_name' => $name,
+                'constraint_name' => $keyname,
+            );
+            $view->addKeyColumn($keyColumn, $many === true ? 'FOREIGN KEY' : 'VIEW' );
+        }
+    }
+
     /**
      * @param type $table_schema
      * @return Tables[]
@@ -49,6 +65,9 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
             $table = new Table($record);
             $this->loadColumns($table);
             $this->loadConstraints($table);
+            if ($record['table_type'] === 'VIEW') {
+                $this->addViewKeyColumns($table);
+            }
             $tables[$table->getTableName()] = $table;
         }
         return $tables;
@@ -67,7 +86,6 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
             $constColumnParams = array(
                 ':table_schema' => $tableConst['table_schema'],
                 ':table_catalog' => $tableConst['table_catalog'],
-                //':table_name' => $tableConst['table_name'],
                 ':constraint_name' => $tableConst['constraint_name'],
             );
             $constColumns = $this->database->executeQuery($constColumnQuery, $constColumnParams);
@@ -102,7 +120,7 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
      * Truncated all the tables in the Database
      */
     protected function truncateAllTables() {
-        $tables = $this->database->executeQuery("select * from information_schema.tables where table_catalog=:database and table_schema='public'", array(
+        $tables = $this->database->executeQuery("select * from information_schema.tables where table_catalog=:database and table_schema='public' and table_type='BASE TABLE'", array(
             ':database' => $this->database->getDatabaseName()
         ));
         foreach ($tables as $table) {
@@ -121,7 +139,6 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
             $this->database = new Database($config['database']);
             try {
                 $this->database->executeQuery("select version()");
-                $this->output->writeln("<info>Connected to Database</info>");
                 return true;
             } catch (DatabaseQueryException $e) {
                 $this->output->writeln("<error>{$e->getMessage()}</error>");

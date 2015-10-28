@@ -18,6 +18,7 @@ abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseServ
         parent::__construct($database);
         $this->recordClass = is_null($recordClass) ? <?php echo $table->getModelClassName(); ?>::class : $recordClass;
     }
+<?php if($table->writable()):?>
 
     /**
      * Deletes a <?php echo $table->getTableName() ?> record from the database
@@ -37,8 +38,9 @@ abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseServ
     public function <?php echo 'save'?>(<?php echo $table->getModelClassName()?> &$object) {
         return $this->saveObject(SC::TABLE_NAME, $object);
     }
-
+<?php endif; ?>
 <?php foreach ($table->getLocalKeys() as $keyName => $columns): ?>
+
     /**
      * @return <?php echo $table->getModelClassName(); ?>
 
@@ -59,6 +61,7 @@ abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseServ
     }
 <?php endforeach; ?>
 <?php foreach ($table->getForeignKeys() as $keyName => $columns): ?>
+
     /**
      * @return <?php echo $table->getModelClassName(); ?>[]
      */

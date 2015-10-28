@@ -54,6 +54,8 @@ abstract class ConsoleCommand extends Command {
         $this->input = $input;
         $this->output = $output;
 
+        $output->writeln("<info>Executing {$this->getName()}</info>");
+
         if ($this->initEnvironment()) {
             $this->executeInternal($input, $output);
         }

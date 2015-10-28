@@ -37,6 +37,10 @@ class Table extends Record {
         $this->keysByType = array();
     }
 
+    public function writable() {
+        return $this->data['table_type'] === 'BASE TABLE';
+    }
+
     public function getForeignKeys() {
         $result = array();
         $keys = array();
@@ -53,12 +57,11 @@ class Table extends Record {
     public function getLocalKeys() {
         $result = array();
         $keys = array();
-        if (isset($this->keysByType['PRIMARY KEY'])) {
-            $keys = array_merge($keys, $this->keysByType['PRIMARY KEY']);
-        }
-
-        if (isset($this->keysByType['UNIQUE'])) {
-            $keys = array_merge($keys, $this->keysByType['UNIQUE']);
+        $keytypes = array('PRIMARY KEY', 'UNIQUE', 'VIEW');
+        foreach ($keytypes as $type) {
+            if (isset($this->keysByType[$type])) {
+                $keys = array_merge($keys, $this->keysByType[$type]);
+            }
         }
 
         foreach ($keys as $key) {
@@ -152,7 +155,7 @@ class Table extends Record {
         return $this->columns;
     }
 
-    public function addKeyColumn(array $keyColumn, $constraint_type) {
+    public function addKeyColumn($keyColumn, $constraint_type) {
         $name = $keyColumn['constraint_name'];
         if (stripos($name, '_pkey') !== false) {
             $name = 'primary';
