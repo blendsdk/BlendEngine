@@ -46,6 +46,13 @@ abstract class Service extends FlashProvider {
     }
 
     /**
+     * @return \Monolog\Logger
+     */
+    protected function getLogger() {
+        return $this->application->getLogger();
+    }
+
+    /**
      * Wrapper funcrion for $this->application->getTranslator()->trans
      * @param string $id
      * @param mixed $params
