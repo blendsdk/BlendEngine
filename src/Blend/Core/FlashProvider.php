@@ -29,28 +29,52 @@ abstract class FlashProvider {
     /**
      * @var string
      */
-    private $flashCategory;
+    private $error_category;
 
-    public function hasErrors($category = null) {
-        $data = $this->flashBag->peek(is_null($category) ? $this->flashCategory : $category);
-        return count($data) !== 0;
-    }
+    /**
+     * @var string
+     */
+    private $message_category;
 
     protected function setFlashBagFromRequest(Request $request) {
         $this->flashBag = $request->getSession()->getFlashBag();
-        $this->flashCategory = $request->attributes->get('_csrf_key_');
+        $key = $request->attributes->get('_csrf_key_');
+        $this->error_category = 'error_' . $key;
+        $this->message_category = 'message_' . $key;
     }
 
-    protected function addError($message, $category = null) {
-        $this->flashBag->add(is_null($category) ? $this->flashCategory : $category, $message);
+    public function hasMessages() {
+        $data = $this->flashBag->peek($this->message_category);
+        return count($data) !== 0;
+    }
+
+    protected function addMessage($message) {
+        $this->flashBag->add($this->message_category, $message);
     }
 
     /**
      * Retrives the list of error is the flashbag
      * @return mixed
      */
-    public function getErrors($category = null) {
-        return $this->flashBag->get(is_null($category) ? $this->flashCategory : $category);
+    public function getMessages() {
+        return $this->flashBag->get($this->message_category);
+    }
+
+    public function hasErrors() {
+        $data = $this->flashBag->peek($this->error_category);
+        return count($data) !== 0;
+    }
+
+    protected function addError($message) {
+        $this->flashBag->add($this->error_category, $message);
+    }
+
+    /**
+     * Retrives the list of error is the flashbag
+     * @return mixed
+     */
+    public function getErrors() {
+        return $this->flashBag->get($this->error_category);
     }
 
 }

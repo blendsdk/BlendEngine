@@ -84,8 +84,8 @@ abstract class Service extends FlashProvider {
      * @param string $message
      * @param string $category
      */
-    protected function addError($message, $category = null) {
-        parent::addError($message, $category);
+    protected function addError($message) {
+        parent::addError($message);
         if ($this->form !== null) {
             $this->form->saveFormData();
         }
