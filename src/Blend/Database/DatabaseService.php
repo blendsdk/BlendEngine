@@ -13,6 +13,7 @@ namespace Blend\Database;
 
 use Blend\Database\Database;
 use Blend\Database\Model;
+use Blend\Database\QueryResult;
 use Blend\Database\InsertStatementException;
 use Blend\Database\UpdateStatementException;
 use Blend\Database\DeleteStatementException;
@@ -65,6 +66,9 @@ class DatabaseService {
      * @return array
      */
     protected function updateRecord($table_name, $fields, $criteria, $expectedRecords = null) {
+        if(isset($criteria['date_changed'])) {
+            $fields['date_changed'] = date('c');
+        }
         $args = $this->makeUPDATEArgs('p_', $criteria);
         $params = array_merge($fields, $this->renameArrayKeys('p_', $criteria));
         $sql = "UPDATE {$table_name} SET {$this->makeSetParams($fields, ', ')} WHERE {$this->makeSetParams($args, ' AND ', true)} RETURNING *";
@@ -151,11 +155,12 @@ class DatabaseService {
      */
     protected function deleteByParams($table_name, $params, $expectedRecords = null) {
         $sql = "DELETE FROM {$table_name} WHERE {$this->makeSetParams($params)} RETURNING *";
-        $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
+        $queryResult = new QueryResult();
+        $result = $this->database->executeQuery($sql, $this->makeQueryParams($params),$queryResult);
         if (is_array($result)) {
             if (is_null($expectedRecords)) {
                 return $result;
-            } else if (count($result) === $expectedRecords) {
+            } else if ($queryResult->getAffectedRecords() === $expectedRecords) {
                 return $expectedRecords === 1 ? $result[0] : $result;
             } else {
                 $errorMessage = "Invalid number of records deleted. Excepcted: {$expectedRecords}, deleted:" . count($result);
