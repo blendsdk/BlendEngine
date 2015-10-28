@@ -46,12 +46,18 @@ abstract class Form extends FlashProvider {
      */
     private $sess_value_key;
 
+    /**
+     * @var array;
+     */
+    private $record;
+
     protected abstract function validate();
 
     public function __construct(Request $request) {
         $this->submitted = false;
         $this->csrf_key = $request->attributes->get('_csrf_key_');
         $this->errors = [];
+        $this->record = [];
         $this->request = $request;
         $this->sess_value_key = md5('FORM-' . $request->getPathInfo() . date('Y'));
         $this->setFlashBagFromRequest($request);
@@ -132,9 +138,17 @@ abstract class Form extends FlashProvider {
      * @return string[]
      */
     public function getPreviousValues() {
-        $values = $this->request->getSession()->get($this->sess_value_key);
+        $values = $this->request->getSession()->get($this->sess_value_key, array());
         $this->clearSavedData();
-        return $values;
+        return array_replace($this->record, $values);
+    }
+
+    protected function setRecordField($key, $value) {
+        $this->record[$key] = $value;
+    }
+
+    public function setRecord(array $data) {
+        $this->record = $data;
     }
 
     public function reset() {
