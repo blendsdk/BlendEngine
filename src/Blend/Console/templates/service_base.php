@@ -57,7 +57,7 @@ abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseServ
      */
     public function <?php echo $table->getKeyFunctionName($keyName,'deleteBy');?>(<?php echo $table->getKeyGetterArgs($keyName);?>) {
         $params = array(<?php echo $table->getKeyQueryParams($keyName)?>);
-        return $this->deleteByParams(SC::TABLE_NAME, $params, $this->recordClass);
+        return $this->deleteByParams(SC::TABLE_NAME, $params, 1);
     }
 <?php endforeach; ?>
 <?php foreach ($table->getForeignKeys() as $keyName => $columns): ?>
