@@ -11,6 +11,7 @@
 
 namespace Blend\Database;
 
+use Blend\Database\QueryResult;
 use Monolog\Logger;
 
 /**
@@ -82,12 +83,15 @@ class Database extends \PDO {
      * @return array
      * @throws DatabaseQueryException
      */
-    public function executeQuery($sql, $params = array()) {
+    public function executeQuery($sql, $params = array(), QueryResult $queryResult = null) {
         $statement = $this->prepare($sql);
         $statement->execute($params);
         $this->debug($sql, $params);
 
         if (intval($statement->errorCode()) === 0) {
+            if(!is_null($queryResult)) {
+                $queryResult->populate($statement);
+            }
             return $statement->fetchAll(self::FETCH_ASSOC);
         } else {
             $exception = DatabaseQueryException::createFromStatement($statement);
