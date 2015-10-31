@@ -33,22 +33,6 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
 
     protected abstract function executeDatabaseOperation(InputInterface $input, OutputInterface $output);
 
-    protected function addViewKeyColumns(Table $view) {
-
-    }
-
-    protected function addViewKeyColumn(Table $view, array $columnList, $many = false) {
-        $keyname = $view->getTableName() . '_' . uniqid();
-        $columns = array();
-        foreach ($columnList as $name) {
-            $keyColumn = array(
-                'column_name' => $name,
-                'constraint_name' => $keyname,
-            );
-            $view->addKeyColumn($keyColumn, $many === true ? 'FOREIGN KEY' : 'VIEW' );
-        }
-    }
-
     /**
      * @param type $table_schema
      * @return Tables[]
@@ -63,14 +47,15 @@ abstract class DatabaseConsoleCommand extends ConsoleCommand {
         $list = $this->database->executeQuery($tablesQuery, $tableQueryParams);
         foreach ($list as $index => $record) {
             $table = new Table($record);
-            $this->loadColumns($table);
-            $this->loadConstraints($table);
-            if ($record['table_type'] === 'VIEW') {
-                $this->addViewKeyColumns($table);
-            }
+            $this->loadTable($table);
             $tables[$table->getTableName()] = $table;
         }
         return $tables;
+    }
+
+    protected function loadTable(Table $table) {
+        $this->loadColumns($table);
+        $this->loadConstraints($table);
     }
 
     private function loadConstraints(Table $table) {
