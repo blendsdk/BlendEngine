@@ -38,6 +38,25 @@ abstract class GenerateModelCommand extends DatabaseConsoleCommand {
 
     protected abstract function getApplicationClassName();
 
+    protected abstract function addCustomGetters(Table $table);
+
+    protected function loadTable(Table $table) {
+        parent::loadTable($table);
+        $this->addCustomGetters($table);
+    }
+
+    protected function addCustomGetter(Table $table, array $columnList, $many = false) {
+        $keyname = $table->getTableName() . '_' . uniqid();
+        $columns = array();
+        foreach ($columnList as $name) {
+            $keyColumn = array(
+                'column_name' => $name,
+                'constraint_name' => $keyname,
+            );
+            $table->addKeyColumn($keyColumn, $many === true ? 'FOREIGN KEY' : 'VIEW' );
+        }
+    }
+
     protected function configure() {
         parent::configure();
         $this->setName('database:model')
