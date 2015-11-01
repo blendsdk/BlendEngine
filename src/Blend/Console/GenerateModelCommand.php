@@ -11,11 +11,9 @@
 
 namespace Blend\Console;
 
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Blend\Database\PostgreSQL\Table;
-use Blend\Database\PostgreSQL\Column;
 
 /**
  * Description of GenerateModelCommand
