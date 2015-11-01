@@ -66,7 +66,7 @@ class DatabaseService {
      * @return array
      */
     protected function updateRecord($table_name, $fields, $criteria, $expectedRecords = null) {
-        if(isset($criteria['date_changed'])) {
+        if (isset($criteria['date_changed'])) {
             $fields['date_changed'] = date('c');
         }
         $args = $this->makeUPDATEArgs('p_', $criteria);
@@ -136,16 +136,19 @@ class DatabaseService {
         $sql = "SELECT * FROM {$table_name} WHERE {$this->makeSetParams($params)}";
         $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
         if (is_array($result)) {
-            $set = array();
-            foreach($result as $record) {
-                $set[] = new $recordClass($record);
-            }
-            return $set;
+            return $this->convertRecordSetToObjectSet($result, $recordClass);
         } else {
             return array();
         }
     }
 
+    protected function convertRecordSetToObjectSet($recordSet, $recordClass) {
+        $set = array();
+        foreach ($recordSet as $record) {
+            $set[] = new $recordClass($record);
+        }
+        return $set;
+    }
 
     /**
      * @param string $table_name
@@ -156,7 +159,7 @@ class DatabaseService {
     protected function deleteByParams($table_name, $params, $expectedRecords = null) {
         $sql = "DELETE FROM {$table_name} WHERE {$this->makeSetParams($params)} RETURNING *";
         $queryResult = new QueryResult();
-        $result = $this->database->executeQuery($sql, $this->makeQueryParams($params),$queryResult);
+        $result = $this->database->executeQuery($sql, $this->makeQueryParams($params), $queryResult);
         if (is_array($result)) {
             if (is_null($expectedRecords)) {
                 return $result;
