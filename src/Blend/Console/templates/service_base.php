@@ -69,6 +69,16 @@ abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseServ
         $params = array_merge(array(<?php echo $table->getKeyQueryParams($keyName)?>), is_null($context) ? array() : $context);
         return $this->getManyObjectsByParams(SC::TABLE_NAME, $params, $this->recordClass, $handler);
     }
+
+    /**
+     * Deletes  <?php echo $table->getTableName() ?> records from the database
+     * and returns the deleted record object
+     * @return <?php echo $table->getModelClassName(); ?> The record that was deleted
+     */
+    public function <?php echo $table->getKeyFunctionName($keyName,'deleteManyBy');?>(<?php echo $table->getKeyGetterArgs($keyName);?>) {
+        $params = array(<?php echo $table->getKeyQueryParams($keyName)?>);
+        return $this->deleteByParams(SC::TABLE_NAME, $params);
+    }
 <?php endforeach; ?>
 
 }
