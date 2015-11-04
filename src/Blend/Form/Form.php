@@ -140,7 +140,12 @@ abstract class Form extends FlashProvider {
     public function getPreviousValues() {
         $values = $this->request->getSession()->get($this->sess_value_key, array());
         $this->clearSavedData();
-        return array_replace($this->record, $values);
+        $result = array_replace_recursive(array_replace_recursive($this->getDefaultValues(), $values),$this->record);
+        return $result;
+    }
+
+    protected function getDefaultValues() {
+        return array();
     }
 
     protected function setRecordField($key, $value) {
@@ -186,13 +191,25 @@ abstract class Form extends FlashProvider {
     }
 
     /**
-     * Assert the field value for not blank
+     * Assert the field value for not being blank
      * @param string $key
      * @param string $error
      */
     protected function assertNotBlank($key, $error) {
         $value = $this->getField($key);
         if (empty($value)) {
+            $this->addError($error);
+        }
+    }
+
+    /**
+     *  Asset the field value for not being an empty array
+     * @param type $key
+     * @param type $error
+     */
+    protected function assertArrayNotEmpty($key, $error) {
+        $value = $this->getField($key);
+        if (empty($value) || !is_array($value) || (is_array($value) && count($value) === 0)) {
             $this->addError($error);
         }
     }
