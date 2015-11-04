@@ -65,9 +65,9 @@ abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseServ
     /**
      * @return <?php echo $table->getModelClassName(); ?>[]
      */
-    public function <?php echo $table->getKeyFunctionName($keyName,'getManyBy');?>(<?php echo $table->getKeyGetterArgs($keyName);?>, $context = array()) {
-        $params = array_merge(array(<?php echo $table->getKeyQueryParams($keyName)?>), $context);
-        return $this->getManyObjectsByParams(SC::TABLE_NAME, $params, $this->recordClass);
+    public function <?php echo $table->getKeyFunctionName($keyName,'getManyBy');?>(<?php echo $table->getKeyGetterArgs($keyName);?>, $context = array(), callable $handler = null) {
+        $params = array_merge(array(<?php echo $table->getKeyQueryParams($keyName)?>), is_null($context) ? array() : $context);
+        return $this->getManyObjectsByParams(SC::TABLE_NAME, $params, $this->recordClass, $handler);
     }
 <?php endforeach; ?>
 

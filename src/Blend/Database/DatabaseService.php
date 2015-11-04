@@ -132,20 +132,25 @@ class DatabaseService {
      * @param string $classType
      * @return Model[]
      */
-    protected function getManyObjectsByParams($table_name, $params, $recordClass) {
+    protected function getManyObjectsByParams($table_name, $params, $recordClass, callable $handler = null) {
         $sql = "SELECT * FROM {$table_name} WHERE {$this->makeSetParams($params)}";
         $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
         if (is_array($result)) {
-            return $this->convertRecordSetToObjectSet($result, $recordClass);
+            return $this->convertRecordSetToObjectSet($result, $recordClass, $handler);
         } else {
             return array();
         }
     }
 
-    protected function convertRecordSetToObjectSet($recordSet, $recordClass) {
+    protected function convertRecordSetToObjectSet($recordSet, $recordClass, callable $handler = null) {
         $set = array();
         foreach ($recordSet as $record) {
-            $set[] = new $recordClass($record);
+            $object = new $recordClass($record);
+            if (is_null($handler)) {
+                $set[] = $object;
+            } else {
+                $set[] = call_user_func($handler, $object);
+            }
         }
         return $set;
     }
@@ -226,7 +231,7 @@ class DatabaseService {
      * @param boolean $useValue
      * @return string
      */
-    protected function makeSetParams($list, $glue = ' AND ', $useValue = false) {
+    protected function makeSetParams(array $list, $glue = ' AND ', $useValue = false) {
         $result = array();
         foreach ($list as $key => $value) {
             $result[] = "{$key} = " . ($useValue ? ":{$value}" : ":{$key}");
