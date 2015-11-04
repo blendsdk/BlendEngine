@@ -45,6 +45,7 @@ abstract class Module {
      */
     public function setPath($path) {
         $this->path = $path;
+        $this->application->getTranslator()->loadTranslations($path);
     }
 
     public function getPath($append = '') {
@@ -55,6 +56,10 @@ abstract class Module {
         $this->application = $application;
         $this->initServices();
         $this->createRoutes();
+        $moduleRefClass = new \ReflectionClass(get_class($this));
+        if (empty($this->getPath())) {
+            $this->setPath(dirname($moduleRefClass->getFileName()));
+        }
     }
 
     /**
