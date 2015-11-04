@@ -11,8 +11,8 @@
 
 namespace Blend\Web;
 
-use Blend\Web\RedirectModule;
 use Blend\Core\Services;
+use Blend\Web\RedirectModule;
 use Blend\Core\Application as BaseApplication;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
