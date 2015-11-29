@@ -48,6 +48,20 @@ abstract class FlashProvider {
         return count($data) !== 0;
     }
 
+    protected function setFlashVariable($name, $value) {
+        $this->flashBag->get($name); // this will clear it first
+        $this->flashBag->add($name, $value);
+    }
+
+    protected function getFlashVariable($name, $default = null) {
+        $res = $this->flashBag->get($name);
+        if (count($res) === 0) {
+            return $default;
+        } else {
+            return $res[0];
+        }
+    }
+
     protected function addMessage($message) {
         $this->flashBag->add($this->message_category, $message);
     }
