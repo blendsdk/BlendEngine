@@ -41,12 +41,16 @@ if (!function_exists('array_reindex')) {
      * @param callable $indexer
      * @return array
      */
-    function array_reindex(array $array, callable $indexer) {
+    function array_reindex(array $array, callable $indexer, $single = false) {
         $result = array();
         foreach ($array as $item) {
             $key = call_user_func($indexer, $item);
             if (!empty($key)) {
-                $result[$key][] = $item;
+                if (!$single) {
+                    $result[$key][] = $item;
+                } else {
+                    $result[$key] = $item;
+                }
             }
         }
         return $result;
