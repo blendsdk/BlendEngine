@@ -16,6 +16,7 @@ use Blend\Web\RedirectModule;
 use Blend\Core\Application as BaseApplication;
 use Symfony\Bridge\Twig\Extension\RoutingExtension;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Blend\Web\Twig\Filters\BlendEngineExtension;
 
 /**
  * Base class for all web application. This class provides the twig renderer as
@@ -46,6 +47,7 @@ abstract class Application extends BaseApplication {
         ));
         $twig->addExtension(new TranslationExtension($this->getTranslator()));
         $twig->addExtension(new RoutingExtension($this->getUrlGenerator()));
+        $twig->addExtension(new BlendEngineExtension());
         $this->registerService(Services::TWIG_RENDERER, $twig);
     }
 
