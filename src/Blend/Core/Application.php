@@ -41,7 +41,6 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\Generator\UrlGenerator;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Blend\Database\DatabaseQueryException;
 
 /**
@@ -633,6 +632,39 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      */
     public function redirectToRoute($route, $parameters = array(), $referenceType = UrlGenerator::ABSOLUTE_PATH) {
         return new RedirectResponse($this->generateUrl($route, $parameters, $referenceType));
+    }
+
+    /**
+     * Retrives a temporary file name to be used by the caller
+     * @param string $extension
+     * @param string $prefix
+     * @return string
+     */
+    public function getTempFileName($extension = 'tmp', $prefix = null) {
+        $tempFolder = "{$this->rootFolder}/var/tmp";
+        if (!is_dir($tempFolder) && !is_file($tempFolder)) {
+            mkdir($tempFolder, 0777, true);
+        }
+        if (empty($prefix)) {
+            $prefix = $this->name;
+        }
+        if (empty($extension)) {
+            $extension = 'tmp';
+        }
+        $prefix = uniqid($prefix . '-');
+        return "{$tempFolder}/{$prefix}.{$extension}";
+    }
+
+    public function getStorageFolder($append = '') {
+        $storageFolder = "{$this->rootFolder}/var/storage";
+        if (!is_dir($storageFolder) && !is_file($storageFolder)) {
+            mkdir($storageFolder, 0777, true);
+        }
+        $folder = "{$storageFolder}" . (!empty($append) ? '/' . $append : '');
+        if (!is_dir($folder) && !is_file($folder)) {
+            mkdir($folder, 0777, true);
+        }
+        return $folder;
     }
 
 }
