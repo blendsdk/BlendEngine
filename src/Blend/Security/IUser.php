@@ -23,4 +23,6 @@ interface IUser {
     public function getUsername();
 
     public function isAuthenticated();
+
+    public function hasRole($role);
 }

@@ -24,6 +24,8 @@ abstract class Module {
     const ROUTE_LOGIN = 'ROUTE_LOGIN';
     const ROUTE_SECURED_ENTRY_POINT = 'ROUTE_SECURED_ENTRY_POINT';
     const ROUTE_AFTER_LOGOUT = 'ROUTE_AFTER_LOGOUT';
+    const ROLE_USER = 'ROLE_USER';
+    const ROLE_ADMIN = 'ROLE_ADMIN';
 
     /**
      * @var Blend\Core\Application

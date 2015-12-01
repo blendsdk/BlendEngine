@@ -10,7 +10,7 @@ class SYS_USER_SCHEMA {
     const TABLE_NAME = 'sys_user';
 
     /**
-     * @var integer Column is Nullable. Defaults to nextval('sys_user_user_id_seq'::regclass)
+     * @var uuid Column is Nullable. Defaults to uuid_generate_v4()
      */
     const USER_ID = 'user_id';
 
@@ -43,5 +43,10 @@ class SYS_USER_SCHEMA {
      * @var boolean Column is Nullable. Defaults to true
      */
     const USER_IS_ACTIVE = 'user_is_active';
+
+    /**
+     * @var character_varying Column is Nullable. Defaults to 'ROLE_USER'::character varying
+     */
+    const USER_ROLE = 'user_role';
 
 }

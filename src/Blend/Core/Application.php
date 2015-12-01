@@ -28,6 +28,7 @@ use Blend\Security\IUser;
 use Blend\Translation\Translator;
 use Blend\Mail\MailerService;
 use Blend\PDF\PDFPrinterService;
+use Blend\Core\RoleBasedAccessListener;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -426,6 +427,7 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
         $this->getDispatcher()->addSubscriber(new JsonToResponseListener());
         $this->getDispatcher()->addSubscriber(new SessionServiceListener());
         $this->getDispatcher()->addSubscriber(new SecurityServiceListener($this));
+        $this->getDispatcher()->addSubscriber(new RoleBasedAccessListener($this));
         $this->getDispatcher()->addSubscriber(new StaticResourceListener($this->rootFolder . '/web'));
     }
 

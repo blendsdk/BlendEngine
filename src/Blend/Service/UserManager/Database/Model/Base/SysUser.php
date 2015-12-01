@@ -5,6 +5,9 @@ namespace Blend\Service\UserManager\Database\Model\Base;
 use Blend\Database\Model;
 use Blend\Service\UserManager\Database\Schema\SYS_USER_SCHEMA as SC;
 
+/**
+ * @abstract
+ */
 abstract class SysUser extends Model {
 
     public function __construct($record = array()) {
@@ -17,6 +20,7 @@ abstract class SysUser extends Model {
             SC::USER_DATE_CREATED => true,
             SC::USER_DATE_CHANGED => true,
             SC::USER_IS_ACTIVE => true,
+            SC::USER_ROLE => true,
         );
         parent::__construct($record);
     }
@@ -24,7 +28,7 @@ abstract class SysUser extends Model {
     /**
      * Getter for the user_id column
      * @param mixed $default defaults to null
-     * @return integer
+     * @return uuid
      */
     public function getUserID($default = null) {
         return $this->getValue(SC::USER_ID, $default);
@@ -145,6 +149,24 @@ abstract class SysUser extends Model {
      */
     public function setUserIsActive($value) {
         return $this->setValue(SC::USER_IS_ACTIVE, $value);
+    }
+
+    /**
+     * Getter for the user_role column
+     * @param mixed $default defaults to null
+     * @return character_varying
+     */
+    public function getUserRole($default = null) {
+        return $this->getValue(SC::USER_ROLE, $default);
+    }
+
+    /**
+     * Setter for the user_role column
+     * @param mixed $value
+     * @return SysUser
+     */
+    public function setUserRole($value) {
+        return $this->setValue(SC::USER_ROLE, $value);
     }
 
 }

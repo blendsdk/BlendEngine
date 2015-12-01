@@ -32,4 +32,8 @@ class AnonymousUser implements IUser {
         return false;
     }
 
+    public function hasRole($role) {
+        return false;
+    }
+
 }
