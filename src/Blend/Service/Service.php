@@ -75,6 +75,7 @@ abstract class Service extends FlashProvider {
      * @param Request $request
      */
     protected function prepareValidation(Request $request) {
+        $this->request = $request;
         $this->form = $this->createForm($request);
         $this->setFlashBagFromRequest($request);
     }
