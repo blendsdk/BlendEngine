@@ -70,8 +70,8 @@ class DatabaseService {
             $fields['date_changed'] = date('c');
         }
         $args = $this->makeUPDATEArgs('p_', $criteria);
-        $params = array_merge($fields, $this->renameArrayKeys('p_', $criteria));
-        $sql = "UPDATE {$table_name} SET {$this->makeSetParams($fields, ', ')} WHERE {$this->makeSetParams($args, ' AND ', true)} RETURNING *";
+        $sql = "UPDATE {$table_name} SET {$this->makeSetParams($fields, ', ')} WHERE {$this->makeSetParams($args, ' AND ', true, $criteria)} RETURNING *";
+        $params = array_merge($fields, $this->renameArrayKeys('p_', array_remove_nulls($criteria)));
         $result = $this->database->executeQuery($sql, $this->makeQueryParams($params));
         if (is_array($result)) {
             if (is_null($expectedRecords)) {
@@ -231,10 +231,18 @@ class DatabaseService {
      * @param boolean $useValue
      * @return string
      */
-    protected function makeSetParams(array $list, $glue = ' AND ', $useValue = false) {
+    protected function makeSetParams(array $list, $glue = ' AND ', $useValue = false, $criteria = null) {
         $result = array();
         foreach ($list as $key => $value) {
-            $result[] = "{$key} = " . ($useValue ? ":{$value}" : ":{$key}");
+            if ($useValue) {
+                if (is_array($criteria) && array_key_exists($key, $criteria) && is_null($criteria[$key])) {
+                    $result[] = "{$key} IS NULL";
+                } else {
+                    $result[] = "{$key} = :{$value}";
+                }
+            } else {
+                $result[] = "{$key} = :{$key}";
+            }
         }
         return implode($glue, $result);
     }
