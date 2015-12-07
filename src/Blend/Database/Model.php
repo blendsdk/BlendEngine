@@ -20,6 +20,8 @@ use Blend\Database\Database;
  */
 class Model {
 
+    const DB_FORMAT = 'Y-m-d H:i:s';
+
     protected $initial;
     protected $values;
     private $unsaved;
@@ -48,7 +50,7 @@ class Model {
     }
 
     protected function setValue($field, $value) {
-        if (isset($this->initial[$field])) {
+        if (array_key_exists($field, $this->initial)) {
             $this->values[$field] = $this->php2pg($value);
         }
         return $this;
