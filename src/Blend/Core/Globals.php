@@ -57,3 +57,35 @@ if (!function_exists('array_reindex')) {
     }
 
 }
+
+if (!function_exists('array_remove_nulls')) {
+
+    /**
+     * Removes the null elements from an array
+     * @param array $array
+     * @return type
+     */
+    function array_remove_nulls(array $array) {
+        return array_filter($array, function($v, $k) {
+            return $v !== null;
+        }, ARRAY_FILTER_USE_BOTH);
+    }
+
+}
+
+if (!function_exists('postgresql_datetime')) {
+
+    /**
+     * Returns the current timestamp accepatble by PostgreSQL
+     * @param boolean $notime if set to true the time will be 00:00:00
+     * @return type
+     */
+    function postgresql_datetime($notime = false) {
+        if ($notime === true) {
+            return date('Y-m-d 00:00:00');
+        } else {
+            return date('Y-m-d H:i:s');
+        }
+    }
+
+}
