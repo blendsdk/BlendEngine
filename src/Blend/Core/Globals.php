@@ -73,19 +73,16 @@ if (!function_exists('array_remove_nulls')) {
 
 }
 
-if (!function_exists('postgresql_datetime')) {
+if (!function_exists('postgresql_datetime_stamp')) {
 
     /**
      * Returns the current timestamp accepatble by PostgreSQL
      * @param boolean $notime if set to true the time will be 00:00:00
      * @return type
      */
-    function postgresql_datetime($notime = false) {
-        if ($notime === true) {
-            return date('Y-m-d 00:00:00');
-        } else {
-            return date('Y-m-d H:i:s');
-        }
+    function postgresql_datetime_stamp($date = null, $notime = false) {
+        $format = $notime === true ? 'Y-m-d 00:00:00' : 'Y-m-d H:i:s';
+        return date($format);
     }
 
 }

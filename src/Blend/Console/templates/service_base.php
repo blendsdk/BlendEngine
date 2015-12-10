@@ -18,6 +18,10 @@ abstract class <?php echo $table->getServiceClassName(); ?> extends DatabaseServ
         parent::__construct($database);
         $this->recordClass = is_null($recordClass) ? <?php echo $table->getModelClassName(); ?>::class : $recordClass;
     }
+
+    public function getAll(callable $handler = null) {
+        return $this->getAllObjects(SC::TABLE_NAME, $this->recordClass, $handler);
+    }
 <?php if($table->writable()):?>
 
     /**

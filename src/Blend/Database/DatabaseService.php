@@ -127,6 +127,23 @@ class DatabaseService {
     }
 
     /**
+     * Retrives all records
+     * @param string $table_name
+     * @param string $recordClass
+     * @param \Blend\Database\callable $handler
+     * @return Model[]
+     */
+    protected function getAllObjects($table_name, $recordClass, callable $handler = null) {
+        $sql = "SELECT * FROM {$table_name}";
+        $result = $this->database->executeQuery($sql);
+        if (is_array($result)) {
+            return $this->convertRecordSetToObjectSet($result, $recordClass, $handler);
+        } else {
+            return array();
+        }
+    }
+
+    /**
      * @param string $table_name
      * @param mixed $params
      * @param string $classType

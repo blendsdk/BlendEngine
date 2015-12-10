@@ -20,8 +20,6 @@ use Blend\Database\Database;
  */
 class Model {
 
-    const DB_FORMAT = 'Y-m-d H:i:s';
-
     protected $initial;
     protected $values;
     private $unsaved;
@@ -66,7 +64,7 @@ class Model {
 
     function loadRecord(array $record = array()) {
         foreach ($record as $field => $value) {
-            if (isset($this->initial[$field])) {
+            if (array_key_exists($field, $this->initial)) {
                 $this->values[$field] = $value;
                 $this->initial[$field] = $value;
                 $this->unsaved = false;

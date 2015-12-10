@@ -22,6 +22,9 @@ use Monolog\Logger;
  */
 class Database extends \PDO {
 
+    const DATE_FORMAT = 'Y-m-d H:i:s';
+    const DATE_FORMAT_NO_TIME = 'Y-m-d 00:00:00';
+
     /**
      * @var \Monolog\Logger
      */
@@ -89,7 +92,7 @@ class Database extends \PDO {
         $this->debug($sql, $params);
 
         if (intval($statement->errorCode()) === 0) {
-            if(!is_null($queryResult)) {
+            if (!is_null($queryResult)) {
                 $queryResult->populate($statement);
             }
             return $statement->fetchAll(self::FETCH_ASSOC);
