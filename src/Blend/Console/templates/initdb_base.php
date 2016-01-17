@@ -22,7 +22,7 @@ abstract class DatabaseInitDbCommandBase extends DatabaseConsoleCommand {
     protected $<?php echo $property['name']?>;
 
 <?php endforeach; ?>
-    protected abstract function buildDatabase();
+    protected abstract function buildDatabase(OutputInterface $output);
 
     protected function configure() {
         parent::configure();
@@ -40,7 +40,7 @@ abstract class DatabaseInitDbCommandBase extends DatabaseConsoleCommand {
 
     protected function executeDatabaseOperation(InputInterface $input, OutputInterface $output) {
         $this->initServices();
-        $this->buildDatabase();
+        $this->buildDatabase($output);
     }
 
     protected function initServices() {
