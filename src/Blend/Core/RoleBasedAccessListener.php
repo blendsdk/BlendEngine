@@ -1,20 +1,11 @@
 <?php
 
-/*
- * This file is part of the Silex framework.
- *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
- */
-
 namespace Blend\Core;
 
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Blend\Web\Application;
+use Blend\Web\Application as WebApplication;
 use Blend\Core\Module;
 
 /**
@@ -31,7 +22,7 @@ class RoleBasedAccessListener implements EventSubscriberInterface {
      */
     protected $application;
 
-    public function __construct(Application $application) {
+    public function __construct(WebApplication $application) {
         $this->application = $application;
     }
 
