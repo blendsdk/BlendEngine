@@ -58,8 +58,8 @@ abstract class Service extends FlashProvider {
      * @param mixed $params
      * @return strinf
      */
-    protected function trans($id, $params = array()) {
-        return $this->application->getTranslator()->trans($id, $params);
+    protected function trans($id, $params = array(), $domain = null) {
+        return $this->application->getTranslator()->trans($id, $params, $domain);
     }
 
     /**
