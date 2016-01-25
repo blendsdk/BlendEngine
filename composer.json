@@ -1,0 +1,24 @@
+{
+    "minimum-stability": "dev",
+    "name": "blendsdk/blendengine",
+    "description": "Generic Backoffice Application Framework",
+    "keywords": [],
+    "homepage": "https://github.com/blendsdk/BlendEngine",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Gevik Babakhani",
+            "email": "gevik@blendjs.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9",
+        "symfony/console": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Blend\\": "src/Framework",
+            "Blend\\Console\\": "src/Console"
+        }
+    }
+}
