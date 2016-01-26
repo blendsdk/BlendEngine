@@ -11,14 +11,21 @@
             "email": "gevik@blendjs.com"
         }
     ],
+    "require-dev": {
+        "phpunit/phpunit": "5.1.*"
+    },
     "require": {
         "php": ">=5.5.9",
-        "symfony/console": "^3.0"
+        "symfony/console": "^3.0",
+        "symfony/filesystem": "^3.0"
     },
     "autoload": {
         "psr-4": {
-            "Blend\\": "src/Framework",
-            "Blend\\Console\\": "src/Console"
-        }
+            "Blend\\": "src",
+            "Blend\\Tests\\": "tests"
+        },
+        "files": [
+            "src/Globals.php"
+        ]
     }
 }
