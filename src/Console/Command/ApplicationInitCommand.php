@@ -8,14 +8,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class ApplicationInitCommand extends CommandBase {
 
-  protected function configure() {
+    protected function configure() {
 
-      $this
-          ->setName('application:init')
-          ->setDescription('Initializes the app folder as a Blend application ('.$this->getAppFolder().')');
-  }
+        $this
+                ->setName('application:init')
+                ->setDescription('Initializes the app folder as a Blend application (' . $this->getAppFolder() . ')');
+    }
 
-  protected function execute(InputInterface $input, OutputInterface $output) {
-  }
+    protected function execute(InputInterface $input, OutputInterface $output) {
+
+    }
 
 }
