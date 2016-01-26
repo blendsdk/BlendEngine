@@ -7,7 +7,7 @@ use Blend\Component\Filesystem;
 /**
  * Test class for Filesystem
  *
- * @author gevikb@blendjs.com
+ * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class FilesystemTests extends \PHPUnit_Framework_TestCase {
 

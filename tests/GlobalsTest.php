@@ -5,7 +5,7 @@ namespace Blend\Tests\Filesystem;
 /**
  * Test class for Globals
  *
- * @author gevik@blendjs.com
+ * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class GlobalsTest extends \PHPUnit_Framework_TestCase {
 
