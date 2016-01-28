@@ -2,6 +2,9 @@
 
 namespace Blend\Tests\DependencyInjection\Stubs;
 
+use Blend\Tests\DependencyInjection\Stubs\Bar;
+use Blend\Tests\DependencyInjection\Stubs\IBazInterface;
+
 class Foo {
 
     /**
@@ -9,8 +12,14 @@ class Foo {
      */
     public $bar;
 
-    public function __construct(Bar $bar) {
+    /**
+     * @param IBazInterface $baz
+     */
+    public $baz;
+
+    public function __construct(Bar $bar, IBazInterface $baz) {
         $this->bar = $bar;
+        $this->baz = $baz;
     }
 
 }
