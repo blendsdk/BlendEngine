@@ -1,8 +1,8 @@
 <?php
 
-namespace Blend\Tests;
+namespace Blend\Tests\Filesystem;
 
-use Blend\Component\Filesystem;
+use Blend\Component\Filesystem\Filesystem;
 
 /**
  * Test class for Filesystem

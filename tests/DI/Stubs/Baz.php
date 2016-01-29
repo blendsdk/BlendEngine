@@ -6,9 +6,9 @@
  * and open the template in the editor.
  */
 
-namespace Blend\Tests\DependencyInjection\Stubs;
+namespace Blend\Tests\DI\Stubs;
 
-use Blend\Tests\DependencyInjection\Stubs\IBazInterface;
+use Blend\Tests\DI\Stubs\IBazInterface;
 
 /**
  * Description of Baz

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\DependencyInjection;
+namespace Blend\Component\DI;
 
 use ReflectionClass;
 use Blend\Component\InvalidConfigException;

@@ -1,8 +1,8 @@
 <?php
 
-namespace Blend\Tests;
+namespace Blend\Tests\Configuration;
 
-use Blend\Component\Configiration;
+use Blend\Component\Configuration\Configuration;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
@@ -20,7 +20,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testTestFileTest1() {
-        $conf = new Configiration($this->fixturesFolder . '/test1.php');
+        $conf = new Configuration($this->fixturesFolder . '/test1.php');
         $this->assertTrue($conf->has('section1.stringValue'));
         $this->assertTrue($conf->has('section1.numberValue'));
         $this->assertTrue($conf->has('section1.arrayValue'));
@@ -33,7 +33,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase {
      * @expectedException \Symfony\Component\Filesystem\Exception\FileNotFoundException
      */
     public function testTestFileMissing() {
-        $conf = new Configiration($this->fixturesFolder . '/aaaa.php');
+        $conf = new Configuration($this->fixturesFolder . '/aaaa.php');
     }
 
 }

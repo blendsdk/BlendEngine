@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component;
+namespace Blend\Component\Filesystem;
 
 use Symfony\Component\Filesystem\Filesystem as FilesystemBase;
 

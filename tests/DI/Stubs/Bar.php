@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace Blend\Tests\DependencyInjection\Stubs;
+namespace Blend\Tests\DI\Stubs;
 
 /**
  * Description of Bar

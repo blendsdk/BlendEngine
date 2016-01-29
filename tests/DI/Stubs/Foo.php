@@ -1,14 +1,14 @@
 <?php
 
-namespace Blend\Tests\DependencyInjection\Stubs;
+namespace Blend\Tests\DI\Stubs;
 
-use Blend\Tests\DependencyInjection\Stubs\Bar;
-use Blend\Tests\DependencyInjection\Stubs\IBazInterface;
+use Blend\Tests\DI\Stubs\Bar;
+use Blend\Tests\DI\Stubs\IBazInterface;
 
 class Foo {
 
     /**
-     * @param \Blend\Tests\DependencyInjection\Stubs\Bar $bar
+     * @param \Blend\Tests\DI\Stubs\Bar $bar
      */
     public $bar;
 

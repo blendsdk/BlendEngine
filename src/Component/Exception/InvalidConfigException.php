@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component;
+namespace Blend\Component\Exception;
 
 /**
  * InvalidConfigException represents an exception caused by incorrect object

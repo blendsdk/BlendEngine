@@ -6,13 +6,12 @@
  * and open the template in the editor.
  */
 
-namespace Blend\Tests\DependencyInjection\Stubs;
+namespace Blend\Tests\DI\Stubs;
 
 /**
- * Description of IFoo
  *
- * @author babakhani
+ * @author gevik
  */
-interface IFoo {
+interface IBazInterface {
     //put your code here
 }

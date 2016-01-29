@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component;
+namespace Blend\Component\Configuration;
 
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
@@ -19,7 +19,7 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
  * folder based on {environment-name}.php
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Configiration {
+class Configuration {
 
     /**
      * Holds the list of paremeters
