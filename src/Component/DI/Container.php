@@ -182,6 +182,13 @@ class Container {
         return $callparams;
     }
 
+    /**
+     * Check if the call arguments are correct in count and name
+     * @param type $callsig
+     * @param type $args
+     * @param type $refclass
+     * @throws \InvalidArgumentException
+     */
     private function checkCallArguments($callsig, $args, $refclass) {
         $missing = array_diff(array_keys($callsig), array_keys($args));
         $missingCnt = count($missing);
