@@ -7,6 +7,7 @@ use Blend\Tests\DI\Stubs\Foo;
 use Blend\Tests\DI\Stubs\IBazInterface;
 use Blend\Tests\DI\Stubs\Baz;
 use Blend\Tests\DI\Stubs\Bar;
+use Blend\Tests\DI\Stubs\Counter;
 
 /**
  * Test class for Filesystem
@@ -77,6 +78,19 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
         ]);
         $foo = $c->get(Foo::class);
         $this->assertEquals('factory', $foo->bar->bar);
+    }
+
+    public function testSingleton() {
+        $c = new Container();
+        $counter1 = $c->get('seq', [
+            'class' => Counter::class,
+            'singleton' => true
+        ]);
+        $this->assertEquals(1, $counter1->next());
+        $counter1->next();
+
+        $another = $c->get('seq');
+        $this->assertEquals(3, $another->next());
     }
 
 }

@@ -159,12 +159,20 @@ class Container {
         }
 
         $args = [];
-        if (count($callsig) !== 0) {
+        if (count($callsig) !== 0 && is_bool($singleton)) {
             $callparams = $this->resolve($callsig, array_merge($defparams, $params));
             $args = array_intersect_key($callparams, $callsig);
             $this->checkCallArguments($callsig, $args, $refclass);
         }
-        return $this->newInstanceArgs($refclass, $args, $factory);
+
+        if ($singleton !== false) {
+            if ($singleton === true) {
+                $this->classdefs[$interface]['singleton'] = $this->newInstanceArgs($refclass, $args, $factory);
+            }
+            return $this->classdefs[$interface]['singleton'];
+        } else {
+            return $this->newInstanceArgs($refclass, $args, $factory);
+        }
     }
 
     /**
