@@ -93,4 +93,19 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(3, $another->next());
     }
 
+    public function testCallableArgs() {
+        $local = 0;
+        $c = new Container();
+        $obj1 = $c->get(Baz::class, [
+            'count' => function() use(&$local) {
+                $local += 1;
+                return $local;
+            }
+        ]);
+
+        $this->assertEquals(1, $obj1->count);
+        $obj2 = $c->get(Baz::class);
+        $this->assertEquals(2, $obj2->count);
+    }
+
 }

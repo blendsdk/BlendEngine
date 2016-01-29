@@ -215,7 +215,16 @@ class Container {
      * @param callable/null $factory
      * @return mixed
      */
-    private function newInstanceArgs(ReflectionClass $refclass, $args, $factory) {
+    private function newInstanceArgs(ReflectionClass $refclass, $callargs, $factory) {
+        $args = [];
+        foreach ($callargs as $name => $value) {
+            if (is_callable($value)) {
+                $args[$name] = call_user_func_array($value, [$this]);
+            } else {
+                $args[$name] = $value;
+            }
+        }
+
         if (is_callable($factory)) {
             return call_user_func_array($factory, [$args, $this, $refclass]);
         } else {
