@@ -12,7 +12,7 @@
 namespace Blend\Component\DI;
 
 use ReflectionClass;
-use Blend\Component\InvalidConfigException;
+use Blend\Component\Exception\InvalidConfigException;
 
 /**
  * This class implements a constructor-only dependency injection conatiner
@@ -105,17 +105,9 @@ class Container {
             $config = ['class' => $config];
         }
 
-        $classname = $interface;
-        if (isset($config['class'])) {
-            $classname = $config['class'];
-            unset($config['class']);
-        }
-
-        $singleton = false;
-        if (isset($config['singleton'])) {
-            $singleton = true;
-            unset($config['singleton']);
-        }
+        $classname = $this->extractConfig('class', -1, $interface, $config);
+        $singleton = $this->extractConfig('singleton', true, false, $config);
+        $factory = $this->extractConfig('factory', -1, null, $config);
 
         list($defaultparams, $callsig, $refclass) = $this->reflect($classname);
 
@@ -124,8 +116,28 @@ class Container {
             'singleton' => $singleton,
             'callsig' => $callsig,
             'refclass' => $refclass,
-            'defparams' => array_merge($defaultparams, $config)
+            'defparams' => array_merge($defaultparams, $config),
+            'factory' => $factory
         ];
+    }
+
+    /**
+     * This function is used to extract.normalize the configuration argument
+     * when defining a class/interface
+     * @param string $name
+     * @param mixed $return
+     * @param mixed $default
+     * @param array $config
+     * @return mixed
+     */
+    private function extractConfig($name, $return, $default, &$config) {
+        if (isset($config[$name])) {
+            $r = $return === -1 ? $config[$name] : $return;
+            unset($config[$name]);
+            return $r;
+        } else {
+            return $default;
+        }
     }
 
     /**
@@ -138,7 +150,7 @@ class Container {
      */
     public function get($interface, $params = array()) {
 
-        $singleton = $callsig = $defparams = $refclass = null;
+        $singleton = $callsig = $defparams = $refclass = $factory = null;
 
         if (!$this->isDefined($interface)) {
             extract($this->define($interface, $params));
@@ -146,20 +158,43 @@ class Container {
             extract($this->classdefs[$interface]);
         }
 
+        $args = [];
         if (count($callsig) !== 0) {
             $callparams = array_merge($defparams, $params);
             foreach ($callsig as $name => $type) {
                 if (!isset($callparams[$name]) && !is_null($type)) {
                     $callparams[$name] = $this->get($type);
-                } else {
-
                 }
             }
-            return $refclass->newInstanceArgs(
-                            array_intersect_key($callparams, $callsig)
-            );
+            $args = array_intersect_key($callparams, $callsig);
+            $missing = array_diff(array_keys($callsig), array_keys($args));
+            $missingCnt = count($missing);
+            if ($missingCnt !== 0) {
+                $missingArgs = implode(', ', $missing);
+                $sigArgs = implode(', ', array_keys($callsig));
+                throw new \InvalidArgumentException("Missing {$missingCnt} ($missingArgs) for {$refclass->name}::__construct({$sigArgs})");
+            }
+        }
+        return $this->newInstanceArgs($refclass, $args, $factory);
+    }
+
+    /**
+     * Creates a new instance from a ReflectionClass and parameters that was
+     * provided from the class definition
+     * @param ReflectionClass $refclass
+     * @param mixed $args
+     * @param callable/null $factory
+     * @return mixed
+     */
+    protected function newInstanceArgs(ReflectionClass $refclass, $args, $factory) {
+        if (is_callable($factory)) {
+            return call_user_func_array($factory, [$args, $this, $refclass]);
         } else {
-            return $refclass->newInstance();
+            if (count($args) === 0) {
+                return $refclass->newInstance();
+            } else {
+                return $refclass->newInstanceArgs($args);
+            }
         }
     }
 

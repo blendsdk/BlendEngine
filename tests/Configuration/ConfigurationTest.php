@@ -16,7 +16,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase {
 
     protected function setUp() {
         parent::setUp();
-        $this->fixturesFolder = dirname(__FILE__) . '/fixtures/configuration';
+        $this->fixturesFolder = dirname(__FILE__) . '/fixtures';
     }
 
     public function testTestFileTest1() {

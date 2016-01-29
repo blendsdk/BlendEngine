@@ -14,5 +14,7 @@ namespace Blend\Tests\DI\Stubs;
  * @author babakhani
  */
 class Bar {
-    
+
+    public $bar;
+
 }
