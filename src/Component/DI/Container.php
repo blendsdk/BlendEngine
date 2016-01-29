@@ -167,15 +167,19 @@ class Container {
                 }
             }
             $args = array_intersect_key($callparams, $callsig);
-            $missing = array_diff(array_keys($callsig), array_keys($args));
-            $missingCnt = count($missing);
-            if ($missingCnt !== 0) {
-                $missingArgs = implode(', ', $missing);
-                $sigArgs = implode(', ', array_keys($callsig));
-                throw new \InvalidArgumentException("Missing {$missingCnt} ($missingArgs) for {$refclass->name}::__construct({$sigArgs})");
-            }
+            $this->checkCallArguments($callsig, $args, $refclass);
         }
         return $this->newInstanceArgs($refclass, $args, $factory);
+    }
+
+    protected function checkCallArguments($callsig, $args, $refclass) {
+        $missing = array_diff(array_keys($callsig), array_keys($args));
+        $missingCnt = count($missing);
+        if ($missingCnt !== 0) {
+            $missingArgs = implode(', ', $missing);
+            $sigArgs = implode(', ', array_keys($callsig));
+            throw new \InvalidArgumentException("Missing {$missingCnt} ($missingArgs) for {$refclass->name}::__construct({$sigArgs})");
+        }
     }
 
     /**
