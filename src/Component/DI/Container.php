@@ -36,7 +36,7 @@ class Container {
      * @param string $interface
      * @return bool
      */
-    public function isDefined($interface) {
+    protected function isDefined($interface) {
         return isset($this->classdefs[$interface]);
     }
 
@@ -46,7 +46,7 @@ class Container {
      * @return array
      * @throws InvalidConfigException
      */
-    protected function reflect($classname) {
+    private function reflect($classname) {
         $defparams = [];
         $callsig = [];
         $refclass = new ReflectionClass($classname);
@@ -160,19 +160,29 @@ class Container {
 
         $args = [];
         if (count($callsig) !== 0) {
-            $callparams = array_merge($defparams, $params);
-            foreach ($callsig as $name => $type) {
-                if (!isset($callparams[$name]) && !is_null($type)) {
-                    $callparams[$name] = $this->get($type);
-                }
-            }
+            $callparams = $this->resolve($callsig, array_merge($defparams, $params));
             $args = array_intersect_key($callparams, $callsig);
             $this->checkCallArguments($callsig, $args, $refclass);
         }
         return $this->newInstanceArgs($refclass, $args, $factory);
     }
 
-    protected function checkCallArguments($callsig, $args, $refclass) {
+    /**
+     * Resolves the call dependencies
+     * @param mixed $callsig
+     * @param mixed $callparams
+     * @return type
+     */
+    private function resolve($callsig, $callparams) {
+        foreach ($callsig as $name => $type) {
+            if (!isset($callparams[$name]) && !is_null($type)) {
+                $callparams[$name] = $this->get($type);
+            }
+        }
+        return $callparams;
+    }
+
+    private function checkCallArguments($callsig, $args, $refclass) {
         $missing = array_diff(array_keys($callsig), array_keys($args));
         $missingCnt = count($missing);
         if ($missingCnt !== 0) {
@@ -190,7 +200,7 @@ class Container {
      * @param callable/null $factory
      * @return mixed
      */
-    protected function newInstanceArgs(ReflectionClass $refclass, $args, $factory) {
+    private function newInstanceArgs(ReflectionClass $refclass, $args, $factory) {
         if (is_callable($factory)) {
             return call_user_func_array($factory, [$args, $this, $refclass]);
         } else {
