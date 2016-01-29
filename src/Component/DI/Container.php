@@ -95,7 +95,7 @@ class Container {
      *
      * @throws InvalidConfigException
      */
-    public function define($interface, $config = array()) {
+    public function define($interface, array $config = array()) {
 
         if ($this->isDefined($interface)) {
             throw new InvalidConfigException("$interface already exists in this container!");
@@ -148,7 +148,7 @@ class Container {
      * object
      * @return object The newly created object
      */
-    public function get($interface, $params = array()) {
+    public function get($interface, array $params = array()) {
 
         $singleton = $callsig = $defparams = $refclass = $factory = null;
 
