@@ -153,7 +153,7 @@ class Container {
         $singleton = $callsig = $defparams = $refclass = $factory = null;
 
         if (!$this->isDefined($interface)) {
-            extract($this->define($interface, $params));
+            extract($this->define($interface));
         } else {
             extract($this->classdefs[$interface]);
         }
