@@ -4,7 +4,6 @@ namespace Blend\Tests\DI;
 
 use Blend\Component\DI\Container;
 use Blend\Tests\DI\Stubs\Foo;
-use Blend\Tests\DI\Stubs\IFoo;
 use Blend\Tests\DI\Stubs\IBazInterface;
 use Blend\Tests\DI\Stubs\Baz;
 use Blend\Tests\DI\Stubs\Bar;
