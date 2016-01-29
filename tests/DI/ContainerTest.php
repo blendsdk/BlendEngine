@@ -82,10 +82,10 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 
     public function testSingleton() {
         $c = new Container();
-        $counter1 = $c->get('seq', [
-            'class' => Counter::class,
-            'singleton' => true
+        $counter1 = $c->singleton('seq', [
+            'class' => Counter::class
         ]);
+        $counter1 = $c->get('seq');
         $this->assertEquals(1, $counter1->next());
         $counter1->next();
 
