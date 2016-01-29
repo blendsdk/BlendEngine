@@ -1,9 +1,12 @@
 <?php
 
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * This file is part of the BlendEngine framework.
+ *
+ * (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 namespace Blend\Component\DependencyInjection;
@@ -12,31 +15,42 @@ use ReflectionClass;
 use Blend\Component\InvalidConfigException;
 
 /**
- * Description of Container
+ * This class implements a constructor-only dependency injection conatiner
  *
- * @author babakhani
+ * @author gevikb@gmail.com <Gevik Babakhani>
  */
 class Container {
 
+    /**
+     * Array of class/interface definitions indexed by the interface name
+     * @var array
+     */
     protected $classdefs;
 
     public function __construct() {
         $this->classdefs = [];
     }
 
+    /**
+     * Check if an interface is alreay defined
+     * @param string $interface
+     * @return bool
+     */
     public function isDefined($interface) {
         return isset($this->classdefs[$interface]);
     }
 
-    public function singleton($interface, $config = array()) {
-        $this->define($interface, $config);
-        $this->classdefs[$interface]['singleton'] = true;
-    }
-
+    /**
+     * Extracts information about a given class
+     * @param string $classname
+     * @return array
+     * @throws InvalidConfigException
+     */
     protected function reflect($classname) {
         $defparams = [];
         $callsig = [];
-        $refclass = new \ReflectionClass($classname);
+        $refclass = new ReflectionClass($classname);
+
         if ($refclass->isInterface()) {
             throw new InvalidConfigException("$classname is an interface!");
         }
@@ -55,6 +69,32 @@ class Container {
         return [$defparams, $callsig, $refclass];
     }
 
+    /**
+     * The same at the define(...) method, only defining a class to act as a
+     * singleton
+     * @param string $interface
+     * @param array $config
+     */
+    public function singleton($interface, $config = array()) {
+        $this->define($interface, $config);
+        $this->classdefs[$interface]['singleton'] = true;
+    }
+
+    /**
+     * Defines a class/interface in this container. The interface can also be
+     * a class name.
+     * @param string $interface The name of the class or interface to be defined
+     * in this container. The base way to set this parameter is to use the PHP
+     * Class::class nonation
+     *
+     * @param array $config The configuration parameters for the given interface
+     * In case of defining a class by it's interface a key/value pair
+     * that is 'class' => 'ClassName' is required. The remaining key/value pairs
+     * are going to be used as default call parameters when creating an instanse
+     * for this class
+     *
+     * @throws InvalidConfigException
+     */
     public function define($interface, $config = array()) {
 
         if ($this->isDefined($interface)) {
@@ -79,7 +119,7 @@ class Container {
 
         list($defaultparams, $callsig, $refclass) = $this->reflect($classname);
 
-        $this->classdefs[$interface] = [
+        return $this->classdefs[$interface] = [
             'class' => $classname,
             'singleton' => $singleton,
             'callsig' => $callsig,
@@ -88,15 +128,23 @@ class Container {
         ];
     }
 
+    /**
+     * Retrives an new instance of a given interface. In case of a singleton
+     * it returns the same instanse
+     * @param string $interface The interface name to instantiate
+     * @param array $params The parameters that are used to create the new
+     * object
+     * @return object The newly created object
+     */
     public function get($interface, $params = array()) {
 
-        $class = $singleton = $callsig = $defparams = $refclass = null;
+        $singleton = $callsig = $defparams = $refclass = null;
 
         if (!$this->isDefined($interface)) {
-            $this->define($interface, $params);
+            extract($this->define($interface, $params));
+        } else {
+            extract($this->classdefs[$interface]);
         }
-
-        extract($this->classdefs[$interface]);
 
         if (count($callsig) !== 0) {
             $callparams = array_merge($defparams, $params);
@@ -107,8 +155,9 @@ class Container {
 
                 }
             }
-            $callparams = array_intersect_key($callparams, $callsig);
-            return $refclass->newInstanceArgs($callparams);
+            return $refclass->newInstanceArgs(
+                            array_intersect_key($callparams, $callsig)
+            );
         } else {
             return $refclass->newInstance();
         }
