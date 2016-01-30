@@ -1,6 +1,6 @@
 <?php
 
-use Blend\Component\Database\SQLString;
+use Blend\Component\Database\SQL\SQLString;
 
 /*
  * This file is part of the BlendEngine framework.

@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Database;
+namespace Blend\Component\Database\SQL;
 
 /**
  * SQLString is a helper class that can be used to create SQL flavored strings
