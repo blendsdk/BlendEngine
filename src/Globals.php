@@ -1,7 +1,5 @@
 <?php
 
-use Blend\Component\Database\SQL\SQLString;
-
 /*
  * This file is part of the BlendEngine framework.
  *
@@ -83,7 +81,7 @@ if (!function_exists('sqlstr')) {
      * @return SQLString
      */
     function sqlstr($str) {
-        return new SQLString($str);
+        return new Blend\Component\Database\SQL\SQLString($str);
     }
 
 }
