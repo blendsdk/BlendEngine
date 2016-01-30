@@ -12,7 +12,9 @@
 namespace Blend\Component\Database;
 
 /**
- * Description of SQLString
+ * SQLString is a helper class that can be used to create SQL flavored strings
+ * This class provides various function to help cast, wrap, prefix.. etc with
+ * a specific sql notation
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
