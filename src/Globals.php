@@ -77,7 +77,8 @@ if (!function_exists('array_remove_nulls')) {
 if (!function_exists('sqlstr')) {
 
     /**
-     * @param type $str
+     * Wrapper function around the Blend\Component\Database\SQL\SQLString class
+     * @param syting $str Passed to the SQLString's constructor
      * @return SQLString
      */
     function sqlstr($str) {
