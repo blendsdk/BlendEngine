@@ -1,5 +1,7 @@
 <?php
 
+use Blend\Component\Database\SQLString;
+
 /*
  * This file is part of the BlendEngine framework.
  *
@@ -69,6 +71,19 @@ if (!function_exists('array_remove_nulls')) {
         return array_filter($array, function($v, $k) {
             return $v !== null;
         }, ARRAY_FILTER_USE_BOTH);
+    }
+
+}
+
+
+if (!function_exists('sqlstr')) {
+
+    /**
+     * @param type $str
+     * @return SQLString
+     */
+    function sqlstr($str) {
+        return new SQLString($str);
     }
 
 }
