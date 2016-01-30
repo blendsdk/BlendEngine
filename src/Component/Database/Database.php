@@ -12,7 +12,7 @@
 namespace Blend\Component\Database;
 
 use Psr\Log\LoggerInterface;
-use Blend\Component\Database\QueryResult;
+use Blend\Component\Database\StatementResult;
 use Blend\Component\Exception\InvalidConfigException;
 use Blend\Component\Exception\DatabaseQueryException;
 
@@ -69,13 +69,13 @@ class Database extends \PDO {
      * Executes a SQL statement and retuns a recordset given resultType
      * @param string $sql The SQL to execute
      * @param array $params The parameters to populate the SQL query
-     * @param QueryResult $queryResult The query result to get the number of
+     * @param StatementResult $statementResult The query result to get the number of
      * affected redords
      * @param int $resultType The esult type, defaults to \PDO::FETCH_ASSOC
      * @return mixed
      * @throws DatabaseQueryException
      */
-    public function executeQuery($sql, array $params = array(), QueryResult $queryResult = null, $resultType = \PDO::FETCH_ASSOC) {
+    public function executeQuery($sql, array $params = array(), StatementResult $statementResult = null, $resultType = \PDO::FETCH_ASSOC) {
         $statement = $this->prepare($sql);
 
         if ($this->logger) {
@@ -85,8 +85,8 @@ class Database extends \PDO {
         $statement->execute($params);
 
         if (intval($statement->errorCode()) === 0) {
-            if (!is_null($queryResult)) {
-                $queryResult->populate($statement);
+            if (!is_null($statementResult)) {
+                $statementResult->populate($statement);
             }
             return $statement->fetchAll($resultType);
         } else {
