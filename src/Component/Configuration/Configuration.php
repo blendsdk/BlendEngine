@@ -14,9 +14,10 @@ namespace Blend\Component\Configuration;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
- * The Configuration class Provides an option to read the application
- * configuration parameters In BlendEngine the application configuration
- * is kept in the /config folder based on {environment-name}.php
+ * The Configuration class provides an option to read the application
+ * configuration parameters In BlendEngine. This class also will look
+ * for a file called the ".env.php" which can be used to overwrite the
+ * configuration parameters with environment specific values
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
@@ -55,8 +56,16 @@ class Configuration {
         $this->level = 0;
         if (file_exists($fname)) {
             $this->params = $this->array_flat(include($fname));
+            $this->loadEnvironment($fname);
         } else {
             throw new FileNotFoundException($fname, 500);
+        }
+    }
+
+    protected function loadEnvironment($filename) {
+        $envfile = dirname($filename) . '/.env.php';
+        if (file_exists($envfile)) {
+            $this->params = array_merge($this->params, $this->array_flat(include($envfile)));
         }
     }
 

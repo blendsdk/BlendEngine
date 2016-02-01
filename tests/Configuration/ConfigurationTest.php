@@ -28,6 +28,11 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase {
         $this->fixturesFolder = dirname(__FILE__) . '/fixtures';
     }
 
+    public function testEnvironment() {
+        $conf = new Configuration($this->fixturesFolder . '/app.php');
+        $this->assertEquals('app_production', $conf->get('database.database'));
+    }
+
     public function testTestFileTest1() {
         $conf = new Configuration($this->fixturesFolder . '/test1.php');
         $this->assertTrue($conf->has('section1.stringValue'));
