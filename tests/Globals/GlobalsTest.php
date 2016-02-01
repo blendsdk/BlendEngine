@@ -1,6 +1,6 @@
 <?php
 
-namespace Blend\Tests\Filesystem;
+namespace Blend\Tests\Globals;
 
 /**
  * Test class for Globals
@@ -8,6 +8,24 @@ namespace Blend\Tests\Filesystem;
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class GlobalsTest extends \PHPUnit_Framework_TestCase {
+
+    public function testRenderPHPTemplate() {
+        $root = dirname(__FILE__) . '/fixtures';
+        $result = render_php_template($root . '/template1.php', array(
+            'firstname' => 'Darth',
+            'lastname' => 'Vader'
+        ));
+        $this->assertEquals('Hello Darth Vader', $result);
+
+        $outfile = $root . '/out.txt';
+        render_php_template($root . '/template1.php', array(
+            'firstname' => 'Luke',
+            'lastname' => 'Skywalker'
+                ), $outfile);
+
+        $this->assertEquals('Hello Luke Skywalker', file_get_contents($outfile));
+        unlink($outfile);
+    }
 
     public function testArrayRemoveNulls() {
         $data = [1, 2, null, 4];

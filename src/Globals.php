@@ -86,3 +86,21 @@ if (!function_exists('sqlstr')) {
     }
 
 }
+
+if (!function_exists('render_php_template')) {
+
+    function render_php_template($templateFile, $context, $outputFile = null, $trim = true) {
+        if (is_array($context)) {
+            extract($context, EXTR_PREFIX_SAME, 'data');
+        }
+        ob_start();
+        ob_implicit_flush(false);
+        require($templateFile);
+        $result = ($trim === true ? trim(ob_get_clean()) : ob_get_clean());
+        if (!is_null($outputFile)) {
+            file_put_contents($outputFile, $result);
+        }
+        return $result;
+    }
+
+}
