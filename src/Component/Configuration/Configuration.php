@@ -14,9 +14,10 @@ namespace Blend\Component\Configuration;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
- * Provides an option to read the application configuration parameters.
- * In BlendEngine the application configuration is kept in the /config
- * folder based on {environment-name}.php
+ * The Configuration class Provides an option to read the application
+ * configuration parameters In BlendEngine the application configuration
+ * is kept in the /config folder based on {environment-name}.php
+ *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class Configuration {

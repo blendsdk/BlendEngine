@@ -12,7 +12,8 @@
 namespace Blend\Component\Exception;
 
 /**
- * DatabaseQueryException
+ * DatabaseQueryException represents an exception caused by incorrect SQL
+ * statement or a database error.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

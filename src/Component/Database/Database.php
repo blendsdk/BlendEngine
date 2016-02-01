@@ -17,7 +17,7 @@ use Blend\Component\Exception\InvalidConfigException;
 use Blend\Component\Exception\DatabaseQueryException;
 
 /**
- * Encapsulates common database operations and connectivity
+ * The Database class encapsulates common database operations and connectivity
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

@@ -14,7 +14,7 @@ namespace Blend\Component\Filesystem;
 use Symfony\Component\Filesystem\Filesystem as FilesystemBase;
 
 /**
- * This class provides various file system related functionality
+ * This class provides various filesystem related functionality
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
