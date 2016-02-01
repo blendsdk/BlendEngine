@@ -38,17 +38,8 @@ class LocaleServiceListener implements EventSubscriberInterface {
     public function onKernelRequest(GetResponseEvent $event) {
         $request = $event->getRequest();
         $request->setDefaultLocale($this->defaultLocale);
-
-        $this->setLocale($request);
+        $request->setLocale($request->attributes->get('_locale',$this->defaultLocale));
         $this->setRouterContext($request);
-
-        $this->application->setLocale($request->getLocale());
-    }
-
-    private function setLocale(Request $request) {
-        if ($locale = $request->attributes->get('_locale')) {
-            $request->setLocale($locale);
-        }
     }
 
     private function setRouterContext(Request $request) {

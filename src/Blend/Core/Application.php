@@ -51,12 +51,6 @@ use Blend\Database\DatabaseQueryException;
 abstract class Application implements HttpKernelInterface, TerminableInterface {
 
     /**
-     * Holds the value of the current locale
-     * @var type
-     */
-    private $locale;
-
-    /**
      * Holds instantiated service objects
      * @var \ArrayAccess
      */
@@ -144,21 +138,17 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return type
      */
     public function getLocale() {
-        return is_null($this->locale) ? $this->getConfig('translation.defaultLocale') : $this->locale;
-    }
-
-    /**
-     * Sets the locale for this application. This function is called
-     * from LocaleServiceListener
-     * @param type $locale
-     */
-    public function setLocale($locale) {
         $default = $this->getConfig('translation.defaultLocale');
-        $allowedLocales = $this->getConfig('translation.locales', array($default));
-        if (!in_array($locale, $allowedLocales)) {
-            $this->locale = $default;
+        if ($this->request) {
+            $locale = $this->request->get('_locale', $default);
+            $allowedLocales = $this->getConfig('translation.locales', array($default));
+            if (!in_array($locale, $allowedLocales)) {
+                return $default;
+            } else {
+                return $locale;
+            }
         } else {
-            $this->locale = $locale;
+            return $default;
         }
     }
 
@@ -468,7 +458,6 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
      * @return type
      */
     public function handle(Request $request, $type = self::MASTER_REQUEST, $catch = true) {
-        $this->request = $request;
         $this->setRequestAttributes($request);
         return $this->getHttpKernel()->handle($request, $type, $catch);
     }
@@ -488,14 +477,11 @@ abstract class Application implements HttpKernelInterface, TerminableInterface {
     public function run(Request $request = null) {
 
         try {
-
             $this->registerServices();
+            $request = Request::createFromGlobals();
+            $this->request = $request;
+            $this->getRequestContext()->fromRequest($request);
             $this->registerModules();
-
-            if (null === $request) {
-                $request = Request::createFromGlobals();
-                $this->getRequestContext()->fromRequest($request);
-            }
             $response = $this->handle($request);
         } catch (ResourceNotFoundException $e) {
             $response = $this->resourceNotFoundResponse($e->getMessage());

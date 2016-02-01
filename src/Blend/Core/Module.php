@@ -47,7 +47,7 @@ abstract class Module {
      */
     public function setPath($path) {
         $this->path = $path;
-        $this->application->getTranslator()->loadTranslations($path);
+        $this->application->getTranslator()->addPath($path);
     }
 
     public function getPath($append = '') {

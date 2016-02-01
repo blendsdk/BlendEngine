@@ -26,6 +26,7 @@ class Translator extends BaseTranslator {
 
     protected $application;
     protected $missingTransFile;
+    protected $paths;
 
     public function trans($id, array $parameters = array(), $domain = null, $locale = null) {
         $value = parent::trans($id, $parameters, $domain, $locale);
@@ -38,6 +39,7 @@ class Translator extends BaseTranslator {
 
     public function __construct(Application $application) {
         $this->application = $application;
+        $this->paths = array();
         $cacheDir = $this->application->isProduction() ? $this->application->getRootFolder('/var/cache') : null;
         parent::__construct(null, new MessageSelector(), $cacheDir);
         $this->addLoader('array', new ArrayLoader());
@@ -47,6 +49,10 @@ class Translator extends BaseTranslator {
         } else {
             $this->missingTransFile = null;
         }
+    }
+
+    public function addPath($path) {
+        $this->paths[] = $path;
     }
 
     public function getLocale() {
@@ -61,11 +67,18 @@ class Translator extends BaseTranslator {
         parent::setLocale($locale);
     }
 
+    public function loadTranslations() {
+        foreach ($this->paths as $path) {
+            $this->loadTranslationsFromPath($path);
+        }
+    }
+
     /**
      * Load the translation resources for the messages folder
      * @param string $path
      */
-    public function loadTranslations($path) {
+    protected function loadTranslationsFromPath($path) {
+        //$request = $this->application->request;
         $searchPath = array_values(array_diff(array(
             realpath("{$path}/messages"),
             realpath("{$path}/../messages"),
@@ -73,7 +86,8 @@ class Translator extends BaseTranslator {
             realpath("{$path}/../Messages"),
                         ), array(false)));
         if (count($searchPath) !== 0) {
-            $resources = array_diff(glob("{$searchPath[0]}/{$this->application->getLocale()}/*"), array(false));
+            $locale = $this->application->getLocale();
+            $resources = array_diff(glob("{$searchPath[0]}/{$locale}/*"), array(false));
             foreach ($resources as $file) {
                 $this->loadTranslation($file);
             }

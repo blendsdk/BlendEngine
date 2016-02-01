@@ -53,6 +53,7 @@ class ControllerResolver extends ControllerResolverBase {
     }
 
     protected function instantiateController($class) {
+        $this->application->getTranslator()->loadTranslations();
         $controller = new $class($this->application, $this->module, $this->request);
         return $controller;
     }
