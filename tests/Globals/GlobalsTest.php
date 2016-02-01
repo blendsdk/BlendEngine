@@ -9,6 +9,10 @@ namespace Blend\Tests\Globals;
  */
 class GlobalsTest extends \PHPUnit_Framework_TestCase {
 
+    public function testStrIdentifier() {
+        $this->assertEquals('getCustomerEmail()', str_identifier('customer_email', 'get', '()'));
+    }
+
     public function testRenderPHPTemplate() {
         $root = dirname(__FILE__) . '/fixtures';
         $result = render_php_template($root . '/template1.php', array(

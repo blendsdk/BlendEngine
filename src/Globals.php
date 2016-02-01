@@ -89,6 +89,15 @@ if (!function_exists('sqlstr')) {
 
 if (!function_exists('render_php_template')) {
 
+    /**
+     * Renders a PHP template (view) and retusn the results either as string
+     * or writes the contents to a file
+     * @param string $templateFile The template (view) to render
+     * @param array $context An key/valye array pass to the template
+     * @param string $outputFile Optional filename to write the results to
+     * @param boolen $trim Whether to trim the result, defaults to true
+     * @return string The result as string
+     */
     function render_php_template($templateFile, $context, $outputFile = null, $trim = true) {
         if (is_array($context)) {
             extract($context, EXTR_PREFIX_SAME, 'data');
@@ -101,6 +110,23 @@ if (!function_exists('render_php_template')) {
             file_put_contents($outputFile, $result);
         }
         return $result;
+    }
+
+}
+
+if (!function_exists('str_identifier')) {
+
+    /**
+     * A wrapper around wcwords to create an identifier ike string.
+     * In addition it replaces "_" with spaces so the ucwords can recongnize
+     * the phrase as separate words
+     * @param string $string The string to parse
+     * @param string $prefix Optional prefix
+     * @param string $postfix Optional postfix
+     * @return string The result
+     */
+    function str_identifier($string, $prefix = '', $postfix = '') {
+        return $prefix . str_replace(' ', '', ucwords(str_replace('_', ' ', $string))) . $postfix;
     }
 
 }
