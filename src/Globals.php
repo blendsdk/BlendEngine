@@ -73,6 +73,14 @@ if (!function_exists('array_remove_nulls')) {
 
 }
 
+if (!function_exists('sql_join')) {
+
+    function sql_join($left, $right, $type = '=') {
+        return array($type, $left, $right);
+    }
+
+}
+
 
 if (!function_exists('sqlstr')) {
 
