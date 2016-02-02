@@ -11,7 +11,7 @@
 
 namespace Blend\Component\Database\SQL\Statement;
 
-use Blend\Component\Database\SQL\SQLString;
+use Blend\Component\Database\SQL\Statement\WhereClause;
 
 /**
  * The Select class is a utility class to help generating a SELECT statement
@@ -20,19 +20,61 @@ use Blend\Component\Database\SQL\SQLString;
  */
 class Select {
 
+    /**
+     * Array containing the select columns
+     * @var array
+     */
     protected $columns;
+
+    /**
+     * Array containg the FROM tables
+     * @var array
+     */
     protected $from;
+
+    /**
+     * Array containing the ORDER BY columns
+     * @var array
+     */
+    protected $orderby;
+
+    /**
+     * Index of the last inserted FROM column. This is used to help place
+     * a JOIN on a correct table
+     * @var int
+     */
     private $lastFromIndex;
+
+    /**
+     * @type WhereCluase
+     */
+    use WhereClause;
 
     public function __construct() {
         $this->columns = [];
         $this->from = [];
         $this->lastFromIndex = null;
+        $this->where = [];
+        $this->orderby = [];
     }
 
     /**
-     *
-     * @param type $column
+     * Adds the '*' to the SELECT columns
+     * @param type $prefix The option to prefix (filter) out the unwanted
+     * columns
+     * @return \Blend\Component\Database\SQL\Statement\Select
+     */
+    public function selectAll($prefix = '') {
+        if (!empty($prefix)) {
+            $this->select("{$prefix}.*");
+        } else {
+            return $this->select('*');
+        }
+    }
+
+    /**
+     * Adds a column to SELECT columns
+     * @param string $column
      * @return \Blend\Component\Database\SQL\Statement\Select
      */
     public function select($column) {
@@ -41,9 +83,9 @@ class Select {
     }
 
     /**
-     *
-     * @param type $table
-     * @param type $alias
+     * Adds a table an a optional alias to the FROM list
+     * @param string $table The name of the table
+     * @param string $alias The table alias, default to ''
      * @return \Blend\Component\Database\SQL\Statement\Select
      */
     public function from($table, $alias = '') {
@@ -57,9 +99,10 @@ class Select {
     }
 
     /**
-     *
-     * @param type $table
-     * @param array $sql_join
+     * Adds a JOIN to the last inserted FROm table. Use the sql_join(...)
+     * funtion to create the JOIN conditions
+     * @param string $table The name of the table to join to
+     * @param array $sql_join An array of JOIN conditions. Use sql_join(...)
      * @return \Blend\Component\Database\SQL\Statement\Select
      * @throws \LogicException
      * @throws \InvalidArgumentException
@@ -86,10 +129,58 @@ class Select {
         return $this;
     }
 
+    /**
+     * Adds a column to the ORDER BY list
+     * @param string $column
+     * @return \Blend\Component\Database\SQL\Statement\Select
+     */
+    public function orderBy($column) {
+        $this->orderby[] = $column;
+        return $this;
+    }
+
+    /**
+     * Renders the column list
+     * @return string
+     */
+    private function getColumns() {
+        if (count($this->columns) !== 0) {
+            return implode(', ', $this->columns);
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Renders the FROM list
+     * @return string
+     */
+    private function getForm() {
+        if (count($this->from) !== 0) {
+            return ' FROM ' . implode(', ', $this->from);
+        } else {
+            return '';
+        }
+    }
+
+    /**
+     * Renders the ORDER BY list
+     * @return string
+     */
+    private function getOrderBy() {
+        if (count($this->orderby) !== 0) {
+            return ' ORDER BY ' . implode(', ', $this->orderby);
+        } else {
+            return '';
+        }
+    }
+
     public function __toString() {
         return 'SELECT '
-                . implode(', ', $this->columns) . ' FROM '
-                . implode(', ', $this->from);
+                . $this->getColumns()
+                . $this->getForm()
+                . $this->getWhereClause()
+                . $this->getOrderBy();
     }
 
 }
