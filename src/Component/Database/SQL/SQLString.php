@@ -34,6 +34,7 @@ class SQLString {
     }
 
     /**
+     * Casts a string to a type (aaa::varchar)
      * @param string $type
      * @return \Blend\Component\Database\SQLString
      */
@@ -43,6 +44,7 @@ class SQLString {
     }
 
     /**
+     * Prefixes the string with another string (t1.column1)
      * @param string $prefix
      * @return \Blend\Component\Database\SQLString
      */
@@ -52,6 +54,7 @@ class SQLString {
     }
 
     /**
+     * Helper function to add the column1 AS alias
      * @param string $alias
      * @return \Blend\Component\Database\SQLString
      */
@@ -61,6 +64,7 @@ class SQLString {
     }
 
     /**
+     * Helper function to ass the table1 t1 alias
      * @param string $alias
      * @return \Blend\Component\Database\SQLString
      */
@@ -70,6 +74,7 @@ class SQLString {
     }
 
     /**
+     * Wrapes the string into the md5() function
      * @return \Blend\Component\Database\SQLString
      */
     public function md5() {
@@ -78,11 +83,60 @@ class SQLString {
     }
 
     /**
+     * Adds a SQL concatenation symbol (a || b)
      * @param string $str
      * @return \Blend\Component\Database\SQLString
      */
     public function concat($str) {
         $this->str .= '||' . $str;
+        return $this;
+    }
+
+    /**
+     * Adds the equal sign (a = b)
+     * @param string $condition
+     * @return \Blend\Component\Database\SQL\SQLString
+     */
+    public function equalsTo($condition) {
+        $this->str .= ' = ' . $condition;
+        return $this;
+    }
+
+    /**
+     * Adds the > sign (a > b)
+     * @param string $condition
+     * @return \Blend\Component\Database\SQL\SQLString
+     */
+    public function greaterThan($condition) {
+        $this->str .= ' > ' . $condition;
+        return $this;
+    }
+
+    /**
+     * Adds the < sign (a < b)
+     * @param string $condition
+     * @return \Blend\Component\Database\SQL\SQLString
+     */
+    public function smallerThan($condition) {
+        $this->str .= ' < ' . $condition;
+        return $this;
+    }
+
+    /**
+     * Appends the IS NULL condition
+     * @return \Blend\Component\Database\SQL\SQLString
+     */
+    public function isNull() {
+        $this->str .= ' IS NULL';
+        return $this;
+    }
+
+    /**
+     * Appends the IS NOT NULL condition
+     * @return \Blend\Component\Database\SQL\SQLString
+     */
+    public function isNotNull() {
+        $this->str .= ' IS NOT NULL';
         return $this;
     }
 
