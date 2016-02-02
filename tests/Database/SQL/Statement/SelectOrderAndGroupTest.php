@@ -29,4 +29,15 @@ class SelectOrderAndGroupTest extends DatabaseTestBase {
         $this->assertEquals('SELECT * FROM table1 ORDER BY field1, field2', $s . '');
     }
 
+    public function testGroupBy() {
+        $s = new Select();
+        $s
+                ->from('table1')
+                ->selectCount(null, 'field1')
+                ->select('field1')
+                ->groupBy('field1')
+                ->groupBy('field2');
+        $this->assertEquals('SELECT COUNT(field1), field1 FROM table1 GROUP BY field1, field2', $s . '');
+    }
+
 }

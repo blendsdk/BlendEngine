@@ -39,6 +39,18 @@ class Select {
     protected $orderby;
 
     /**
+     * Array containing the GROUP BY columns
+     * @var array
+     */
+    protected $groupBy;
+
+    /**
+     * Array containing the HAVING conditions
+     * @var type
+     */
+    protected $groupByHaving;
+
+    /**
      * Index of the last inserted FROM column. This is used to help place
      * a JOIN on a correct table
      * @var int
@@ -51,11 +63,26 @@ class Select {
     use WhereClause;
 
     public function __construct() {
+        $this->lastFromIndex = null;
         $this->columns = [];
         $this->from = [];
-        $this->lastFromIndex = null;
         $this->where = [];
         $this->orderby = [];
+        $this->groupBy = [];
+        $this->groupByHaving = [];
+    }
+
+    /**
+     * Adds a count(..) to the columns list
+     * @param string $alias An optional alias to set on the column,
+     * for example: count(*) as count_of
+     * @param string $column an optional column name. In case nothing is
+     * provided it will be set to '*'
+     * @return \Blend\Component\Database\SQL\Statement\Select
+     */
+    public function selectCount($alias = '', $column = null) {
+        $count = sqlstr(empty($column) ? '*' : $column)->count();
+        return $this->select(empty($alias) ? $count : $count->columnAlias($alias));
     }
 
     /**
@@ -140,6 +167,26 @@ class Select {
     }
 
     /**
+     * Adds a column to the GROUP BY list
+     * @param string $column
+     * @return \Blend\Component\Database\SQL\Statement\Select
+     */
+    public function groupBy($column) {
+        $this->groupBy[] = $column;
+        return $this;
+    }
+
+    /**
+     * Adds a condition to the HAVING cluase
+     * @param type $condition
+     * @return \Blend\Component\Database\SQL\Statement\Select
+     */
+    public function groupByHaving($condition) {
+        $this->groupByHaving[] = $condition;
+        return $this;
+    }
+
+    /**
      * Renders the column list
      * @return string
      */
@@ -175,11 +222,24 @@ class Select {
         }
     }
 
+    /**
+     * Renders the GROUP BY list
+     * @return string
+     */
+    private function getGroupBy() {
+        if (count($this->groupBy) !== 0) {
+            return ' GROUP BY ' . implode(', ', $this->groupBy);
+        } else {
+            return '';
+        }
+    }
+
     public function __toString() {
         return 'SELECT '
                 . $this->getColumns()
                 . $this->getForm()
                 . $this->getWhereClause()
+                . $this->getGroupBy()
                 . $this->getOrderBy();
     }
 
