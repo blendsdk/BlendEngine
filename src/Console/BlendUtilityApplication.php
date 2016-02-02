@@ -20,8 +20,8 @@ use Blend\Component\Console\Application;
  */
 class BlendUtilityApplication extends Application {
 
-    public function __construct() {
-        parent::__construct('BlendEngine Command Console', '1.0');
+    public function __construct($scriptname) {
+        parent::__construct($scriptname, 'BlendEngine Command Console', '1.0');
     }
 
 }

@@ -20,7 +20,12 @@ use Symfony\Component\Console\Application as ApplicationBase;
  */
 class Application extends ApplicationBase {
 
-    private $cachedProjectFolder = null;
+    private $projectFolder;
+
+    public function __construct($script_dir, $name = 'UNKNOWN', $version = 'UNKNOWN') {
+        parent::__construct($name, $version);
+        $this->projectFolder = realpath($script_dir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);
+    }
 
     /**
      * Returns the folder where this project is located. The location
@@ -28,20 +33,8 @@ class Application extends ApplicationBase {
      * where this class is instantiated from
      * @return string The project folder or null
      */
-    protected function getProjectFolder() {
-        if (is_null($this->cachedProjectFolder)) {
-            $backtrace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            foreach ($backtrace as $item) {
-                $file = $item['file'];
-                if (stripos($file, 'blend.php') !== false) {
-                    $this->cachedProjectFolder = realpath(dirname($file)
-                            . DIRECTORY_SEPARATOR
-                            . '..'
-                            . DIRECTORY_SEPARATOR);
-                }
-            }
-        }
-        return $this->cachedProjectFolder;
+    public function getProjectFolder() {
+        return $this->projectFolder;
     }
 
 }
