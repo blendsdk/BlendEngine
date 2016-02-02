@@ -65,6 +65,19 @@ class Select {
      * @throws \InvalidArgumentException
      */
     public function innerJoin($table, array $sql_join) {
+        return $this->join('INNER JOIN', $table, $sql_join);
+    }
+
+    /**
+     * Interval method for handling joins
+     * @param type $type
+     * @param type $table
+     * @param array $sql_join
+     * @return \Blend\Component\Database\SQL\Statement\Select
+     * @throws \LogicException
+     * @throws \InvalidArgumentException
+     */
+    private function join($type, $table, array $sql_join) {
         if (is_null($this->lastFromIndex)) {
             throw new \LogicException("Unable to perform a join because no prior 'from' statement");
         }
@@ -82,7 +95,7 @@ class Select {
             $j[] = "{$item[1]} {$item[0]} {$item[2]}";
         }
 
-        $this->from[$this->lastFromIndex] .= ' INNER JOIN ' . $table . ' ON ' . implode(' AND ', $j);
+        $this->from[$this->lastFromIndex] .= ' ' . $type . ' ' . $table . ' ON ' . implode(' AND ', $j);
         return $this;
     }
 
