@@ -54,4 +54,40 @@ class SelectTest extends DatabaseTestBase {
         $this->assertEquals('SELECT * FROM table1 t1 INNER JOIN table2 t2 ON t1.id = t2.id', $s . '');
     }
 
+    public function testSelectCountWithColumn() {
+        $s = new Select();
+        $s
+                ->selectCount(null, 'field1')
+                ->from('table1')
+                ->where(sqlstr('field1')->equalsTo(5));
+        $this->assertEquals('SELECT COUNT(field1) FROM table1 WHERE field1 = 5', $s . '');
+    }
+
+    public function testSelectCountWithColumnAndAlias() {
+        $s = new Select();
+        $s
+                ->selectCount('numbers', 'field1')
+                ->from('table1')
+                ->where(sqlstr('field1')->equalsTo(5));
+        $this->assertEquals('SELECT COUNT(field1) AS numbers FROM table1 WHERE field1 = 5', $s . '');
+    }
+
+    public function testSelectCountTest() {
+        $s = new Select();
+        $s
+                ->selectCount()
+                ->from('table1')
+                ->where(sqlstr('field1')->equalsTo(5));
+        $this->assertEquals('SELECT COUNT(*) FROM table1 WHERE field1 = 5', $s . '');
+    }
+
+    public function testSelectCountWithAliasTest() {
+        $s = new Select();
+        $s
+                ->selectCount('numbers')
+                ->from('table1')
+                ->where(sqlstr('field1')->equalsTo(5));
+        $this->assertEquals('SELECT COUNT(*) AS numbers FROM table1 WHERE field1 = 5', $s . '');
+    }
+
 }

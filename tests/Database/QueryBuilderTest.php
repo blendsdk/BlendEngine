@@ -1,5 +1,7 @@
 <?php
 
+/*
+
 namespace Blend\Tests\Database;
 
 use Blend\Tests\Database\DatabaseTestBase;
@@ -16,3 +18,4 @@ class QueryBuilderTest extends DatabaseTestBase {
     }
 
 }
+ * */

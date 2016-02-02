@@ -28,11 +28,11 @@ class SQLStringTest extends DatabaseTestBase {
     }
 
     public function testAliasColumn() {
-        $this->assertEquals('col1 as column1', sqlstr('col1')->columnAlias('column1'));
+        $this->assertEquals('col1 AS column1', sqlstr('col1')->columnAlias('column1'));
     }
 
     public function testCastAliasColumn() {
-        $this->assertEquals('t1.col1::uuid as col_uuid', sqlstr('col1')->cast('uuid')->columnAlias('col_uuid')->dotPrefix('t1'));
+        $this->assertEquals('t1.col1::uuid AS col_uuid', sqlstr('col1')->cast('uuid')->columnAlias('col_uuid')->dotPrefix('t1'));
     }
 
     public function testTableAlias() {
