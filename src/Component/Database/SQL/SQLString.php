@@ -59,7 +59,7 @@ class SQLString {
      * @return \Blend\Component\Database\SQLString
      */
     public function columnAlias($alias) {
-        $this->str .= ' as ' . $alias;
+        $this->str .= ' AS ' . $alias;
         return $this;
     }
 
@@ -137,6 +137,15 @@ class SQLString {
      */
     public function isNotNull() {
         $this->str .= ' IS NOT NULL';
+        return $this;
+    }
+
+    /**
+     * Wraps the string into a COUNT(...) function
+     * @return \Blend\Component\Database\SQL\SQLString
+     */
+    public function count() {
+        $this->str = 'COUNT(' . $this->str . ')';
         return $this;
     }
 
