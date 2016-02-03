@@ -22,6 +22,12 @@ class Application extends ApplicationBase {
 
     private $projectFolder;
 
+    /**
+     * Constructor
+     * @param type $script_dir This should always be the __DIR__ global variable
+     * @param type $name
+     * @param type $version
+     */
     public function __construct($script_dir, $name = 'UNKNOWN', $version = 'UNKNOWN') {
         parent::__construct($name, $version);
         $this->projectFolder = realpath($script_dir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);

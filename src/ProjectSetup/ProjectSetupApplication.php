@@ -9,19 +9,19 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\BlendUtility;
+namespace Blend\ProjectSetup;
 
 use Blend\Component\Console\Application as ApplicationBase;
 
 /**
- * Description of BlendUtilityApplication
+ * Description of ProjectSetupApplication
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Application extends ApplicationBase {
+class ProjectSetupApplication extends ApplicationBase {
 
     public function __construct($scriptname) {
-        parent::__construct($scriptname, 'BlendEngine Command Console', '1.0');
+        parent::__construct($scriptname, 'BlendEngine ProjectSetup Utility', '1.0');
     }
 
 }
