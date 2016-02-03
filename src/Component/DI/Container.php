@@ -146,7 +146,7 @@ class Container {
      * @param string $interface The interface name to instantiate
      * @param array $params The parameters that are used to create the new
      * object
-     * @return object The newly created object
+     * @return mixed The newly created object
      */
     public function get($interface, array $params = array()) {
 
