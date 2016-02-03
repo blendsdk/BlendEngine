@@ -82,10 +82,32 @@ class InitCommand extends Command {
                 ->addOption('appname', 'a', InputOption::VALUE_OPTIONAL, 'Name of the application to generate', $this->applicationName);
     }
 
+    /**
+     * Creates a rendering context array to be used when rendering 
+     * template files
+     * @return array
+     */
+    private function createRenderContext() {
+        $lowerAppName = strtolower($this->applicationName);
+        $gitInfo = $this->getCurrentGitUser();
+        return array(
+            'applicationName' => $this->applicationName,
+            'applicationScriptName' => $lowerAppName,
+            'applicationNamespace' => $this->applicationName,
+            'applicationPackageName' => get_current_user() . '/' . $lowerAppName,
+            'applicationCommandClassName' => $this->applicationName . 'Application',
+            'applicationDatabaseName' => $lowerAppName,
+            'currentUserName' => $gitInfo['user.name'],
+            'currentUserEmail' => $gitInfo['user.email']
+        );
+    }
+
+    /**
+     * Prepare interval variables
+     */
     private function prepareTablesAndContext() {
 
         $applicationCommandClassName = null;
-
         $lowerName = strtolower($this->applicationName);
         $this->renderContext = $this->createRenderContext();
         extract($this->renderContext);
@@ -124,26 +146,6 @@ class InitCommand extends Command {
         } else {
             $output->writeln("<error>Looks like the " . $this->workFolder . ' is not empty!</error>');
         }
-    }
-
-    /**
-     * Creates a rendering context array to be used when rendering 
-     * template files
-     * @return array
-     */
-    private function createRenderContext() {
-        $lowerAppName = strtolower($this->applicationName);
-        $gitInfo = $this->getCurrentGitUser();
-        return array(
-            'applicationName' => $this->applicationName,
-            'applicationScriptName' => $lowerAppName,
-            'applicationNamespace' => $this->applicationName,
-            'applicationPackageName' => get_current_user() . '/' . $lowerAppName,
-            'applicationCommandClassName' => $this->applicationName . 'Application',
-            'applicationDatabaseName' => $lowerAppName,
-            'currentUserName' => $gitInfo['user.name'],
-            'currentUserEmail' => $gitInfo['user.email']
-        );
     }
 
     /**
