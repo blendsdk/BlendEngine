@@ -75,10 +75,6 @@ class InitCommand extends Command {
         $this->workFolder = getcwd();
         $this->applicationName = str_identifier((new \SplFileInfo($this->workFolder))->getBasename());
         $this->prepareTablesAndContext();
-
-
-
-
         $this->templates = $this->getTemplateNames();
         $this->setName('project:init')
                 ->setDescription('Initializes a new BlendEngine project in [' . $this->workFolder . ']')
