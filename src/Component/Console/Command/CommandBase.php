@@ -35,7 +35,11 @@ abstract class CommandBase extends Command {
     public function __construct($name = null) {
         parent::__construct($name);
         $this->container = new Container();
+    }
+
+    public function run(InputInterface $input, OutputInterface $output) {
         $this->initContainer();
+        parent::run($input, $output);
     }
 
     /**
@@ -44,7 +48,7 @@ abstract class CommandBase extends Command {
     protected function initContainer() {
         $this->container->singleton('config', [
             'class' => Configuration::class,
-            'fname' => $this->getApplication()->getProjectFolder()
+            'fname' => realpath($this->getApplication()->getProjectFolder() . '/config/config.php')
         ]);
     }
 
