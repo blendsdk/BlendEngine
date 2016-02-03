@@ -5,7 +5,7 @@
     "keywords": [],
     "homepage": "https://github.com/blendsdk/BlendEngine",
     "license": "MIT",
-    "bin": ["bin/blend.php"],
+    "bin": ["bin/blend"],
     "authors": [
         {
             "name": "Gevik Babakhani",
