@@ -135,6 +135,7 @@ class InitCommand extends Command {
     protected function execute(InputInterface $input, OutputInterface $output) {
         $output->writeln($this->getApplication()->getLongVersion() . "\n");
         if ($this->checkSanity()) {
+            $this->checkForCompass($output);
             $template = strtolower($input->getOption('template'));
             if ($this->checkTemplate($template)) {
                 $this->applicationName = $input->getOption('appname');
@@ -263,6 +264,19 @@ class InitCommand extends Command {
                 'user.name' => $user,
                 'user.email' => $user
             );
+        }
+    }
+
+    private function checkForCompass(OutputInterface $output) {
+        $p = new Process('compassx --version');
+        try {
+            $p->mustRun();
+            $output->writeln("<info>Compass is installed on your system, great.</info>");
+        } catch (\Exception $e) {
+            $output->writeln("<warn>WARNING: Compass could not be verified on your system!</warn>");
+            $output->writeln("<warn>Perhaps it is not installed or your PATH settings are not correct.</warn>");
+            $output->writeln("<warn>Without compass you will not be able to compile the style sheets.</warn>");
+            $output->writeln("<warn>Check out http://compass-style.org/install for more information.</warn>");
         }
     }
 
