@@ -62,21 +62,44 @@ class InitCommand extends Command {
      */
     private $applicationName;
 
+    /**
+     * Mapping table to be used when rendering files
+     * @var array
+     */
+    private $renderContext;
+
     protected function configure() {
         parent::configure();
 
         $this->templatesFolder = realpath(__DIR__ . '/../Resources/Templates');
         $this->workFolder = getcwd();
         $this->applicationName = str_identifier((new \SplFileInfo($this->workFolder))->getBasename());
+        $this->prepareTablesAndContext();
+
+
+
+
+        $this->templates = $this->getTemplateNames();
+        $this->setName('project:init')
+                ->setDescription('Initializes a new BlendEngine project in [' . $this->workFolder . ']')
+                ->addOption('template', 't', InputOption::VALUE_OPTIONAL, 'Name of the template to generate this project (' . implode(',', $this->templates) . ')', 'Basic')
+                ->addOption('appname', 'a', InputOption::VALUE_OPTIONAL, 'Name of the application to generate', $this->applicationName);
+    }
+
+    private function prepareTablesAndContext() {
+
+        $applicationCommandClassName = null;
 
         $lowerName = strtolower($this->applicationName);
+        $this->renderContext = $this->createRenderContext();
+        extract($this->renderContext);
 
         $this->renameTable = array(
             'config/gitignore' => 'config/.gitignore',
             'bin/app' => 'bin/' . $lowerName,
             'bin/app.bat' => 'bin/' . $lowerName . '.bat',
             'bin/app.php' => 'bin/' . $lowerName . '.php',
-            'src/Console/Application.php' => 'src/Console/' . $this->applicationName . 'Application.php'
+            'src/Console/Application.php' => 'src/Console/' . $applicationCommandClassName . '.php'
         );
 
         $this->renderTable = array(
@@ -89,13 +112,6 @@ class InitCommand extends Command {
             'composer.json',
             'src/Console/Application.php'
         );
-
-
-        $this->templates = $this->getTemplateNames();
-        $this->setName('project:init')
-                ->setDescription('Initializes a new BlendEngine project in [' . $this->workFolder . ']')
-                ->addOption('template', 't', InputOption::VALUE_OPTIONAL, 'Name of the template to generate this project (' . implode(',', $this->templates) . ')', 'Basic')
-                ->addOption('appname', 'a', InputOption::VALUE_OPTIONAL, 'Name of the application to generate', $this->applicationName);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
@@ -144,7 +160,6 @@ class InitCommand extends Command {
         $templateSource = $this->getTemplateFolder($template);
         $finder = new Finder();
         $finder->in($templateSource);
-        $renderContext = $this->createRenderContext();
         foreach ($finder as $item) {
             $relativeName = str_replace(DIRECTORY_SEPARATOR, '/', $item->getRelativePathName());
             $dest = $this->workFolder . '/' . $this->getDestFilename($relativeName);
@@ -153,7 +168,7 @@ class InitCommand extends Command {
             } else {
                 if (in_array($relativeName, $this->renderTable)) {
                     $output->writeln("Rendering " . $relativeName);
-                    render_php_template($item, $renderContext, $dest);
+                    render_php_template($item, $this->renderContext, $dest);
                 } else {
                     $output->writeln("Processing " . $relativeName);
                     $fs->copy($item, $dest);
@@ -245,7 +260,7 @@ class InitCommand extends Command {
             }
             return $result;
         } catch (\Exception $e) {
-            $user  = get_current_user();
+            $user = get_current_user();
             return array(
                 'user.name' => $user,
                 'user.email' => $user
