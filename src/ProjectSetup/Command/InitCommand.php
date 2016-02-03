@@ -267,6 +267,10 @@ class InitCommand extends Command {
         }
     }
 
+    /**
+     * Check to see if ruby compass is installed
+     * @param OutputInterface $output
+     */
     private function checkForCompass(OutputInterface $output) {
         $p = new Process('compassx --version');
         try {
