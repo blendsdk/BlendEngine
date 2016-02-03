@@ -225,6 +225,11 @@ class InitCommand extends Command {
         return $finder->count() === 0;
     }
 
+    /**
+     * Get the current git user information. We need this to extract
+     * the user name and email to put into the generated files
+     * @return mixed
+     */
     private function getCurrentGitUser() {
         $p = new Process('git config --list');
         $p->enableOutput();
@@ -240,9 +245,10 @@ class InitCommand extends Command {
             }
             return $result;
         } catch (\Exception $e) {
+            $user  = get_current_user();
             return array(
-                'user.name' => get_current_user(),
-                'user.email' => ''
+                'user.name' => $user,
+                'user.email' => $user
             );
         }
     }
