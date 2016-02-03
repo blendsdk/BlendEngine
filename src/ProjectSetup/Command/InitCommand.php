@@ -68,6 +68,18 @@ class InitCommand extends Command {
      */
     private $renderContext;
 
+    /**
+     * Indicates if compass is installed
+     * @var boolean
+     */
+    private $hasCompass;
+
+    /**
+     * Indicates if PostgreSQL is installed
+     * @var boolean
+     */
+    private $hasPostgres;
+
     protected function configure() {
         parent::configure();
 
@@ -135,7 +147,10 @@ class InitCommand extends Command {
     protected function execute(InputInterface $input, OutputInterface $output) {
         $output->writeln($this->getApplication()->getLongVersion() . "\n");
         if ($this->checkSanity()) {
-            $this->checkForCompass($output);
+
+            $this->hasCompass = $this->checkForCompass($output);
+            $this->hasPostgres = $this->checkForPostgreSQL($output);
+
             $template = strtolower($input->getOption('template'));
             if ($this->checkTemplate($template)) {
                 $this->applicationName = $input->getOption('appname');
@@ -291,11 +306,49 @@ class InitCommand extends Command {
         try {
             $p->mustRun();
             $output->writeln("<info>Compass is installed on your system, great.</info>");
+            return true;
         } catch (\Exception $e) {
-            $output->writeln("<warn>WARNING: Compass could not be verified on your system!</warn>");
-            $output->writeln("<warn>Perhaps it is not installed or your PATH settings are not correct.</warn>");
-            $output->writeln("<warn>Without compass you will not be able to compile the style sheets.</warn>");
-            $output->writeln("<warn>Check out http://compass-style.org/install for more information.</warn>");
+            $output->writeln([
+                "",
+                "<warn>WARNING: Compass could not be verified on your system!</warn>",
+                "<warn>Perhaps it is not installed or your PATH settings are not correct.</warn>",
+                "<warn>Without compass you will not be able to compile the style sheets.</warn>",
+                "<warn>Check out http://compass-style.org/install for more information.</warn>",
+                ""
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * Check to see if ruby compass is installed
+     * @param OutputInterface $output
+     */
+    private function checkForPostgreSQL(OutputInterface $output) {
+        $p = new Process('php -m');
+        try {
+            $p->mustRun();
+            $lines = explode("\n", trim($p->getOutput()));
+            if (in_array('pdo_pgsql', $lines)) {
+                $output->writeln("<info>PostgreSQL is installed on your system, great.</info>");
+                return true;
+            } else {
+                $output->writeln([
+                    "",
+                    "<warn>WARNING: Could not verify your PostgreSQL installation!</warn>",
+                    "<warn>Did you forget to install the pdo_psql extension?.</warn>",
+                    ""
+                ]);
+                return false;
+            }
+        } catch (\Exception $e) {
+            $output->writeln([
+                "",
+                "<warn>WARNING: Could not verify your PostgreSQL installation!</warn>",
+                "<warn>The PHP command line utility did not run correctly.</warn>",
+                ""
+            ]);
+            return false;
         }
     }
 
