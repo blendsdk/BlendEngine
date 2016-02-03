@@ -283,7 +283,8 @@ class InitCommand extends Command {
                 ->ignoreVCS(true)
                 ->ignoreDotFiles(true)
                 ->exclude('vendor')
-                ->notName("composer.*");
+                ->notName("composer.*")
+                ->notName("reset-project.*");
         return $finder->count() === 0;
     }
 
