@@ -63,7 +63,7 @@ if (!function_exists('array_remove_nulls')) {
     /**
      * Removes the null elements from an array
      * @param array $array
-     * @return type
+     * @return array
      */
     function array_remove_nulls(array $array) {
         return array_filter($array, function($v, $k) {
@@ -75,6 +75,13 @@ if (!function_exists('array_remove_nulls')) {
 
 if (!function_exists('sql_join')) {
 
+    /**
+     * Shorthand helper to create a SQL JOIN condition
+     * @param string $left The condition to the left
+     * @param string $right The condition to the right
+     * @param string $type The condition operator, defaults to '='
+     * @return array
+     */
     function sql_join($left, $right, $type = '=') {
         return array($type, $left, $right);
     }
@@ -135,6 +142,18 @@ if (!function_exists('str_identifier')) {
      */
     function str_identifier($string, $prefix = '', $postfix = '') {
         return $prefix . str_replace(' ', '', ucwords(str_replace('_', ' ', $string))) . $postfix;
+    }
+
+}
+
+if (!function_exists('print_php_header')) {
+
+    /**
+     * Helper function for printing the php file header (<?php)
+     * This function is onternally used for template generation
+     */
+    function print_php_header() {
+        echo "<?php\n";
     }
 
 }
