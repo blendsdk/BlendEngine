@@ -83,7 +83,7 @@ class InitCommand extends Command {
     }
 
     /**
-     * Creates a rendering context array to be used when rendering 
+     * Creates a rendering context array to be used when rendering
      * template files
      * @return array
      */
@@ -159,20 +159,35 @@ class InitCommand extends Command {
         $templateSource = $this->getTemplateFolder($template);
         $finder = new Finder();
         $finder->in($templateSource);
-        foreach ($finder as $item) {
-            $relativeName = str_replace(DIRECTORY_SEPARATOR, '/', $item->getRelativePathName());
+        foreach ($finder as $source) {
+            $relativeName = str_replace(DIRECTORY_SEPARATOR, '/', $source->getRelativePathName());
             $dest = $this->workFolder . '/' . $this->getDestFilename($relativeName);
-            if ($item->isDir()) {
+            if ($source->isDir()) {
                 $fs->ensureFolder($dest);
             } else {
-                if (in_array($relativeName, $this->renderTable)) {
-                    $output->writeln("Rendering " . $relativeName);
-                    render_php_template($item, $this->renderContext, $dest);
-                } else {
-                    $output->writeln("Processing " . $relativeName);
-                    $fs->copy($item, $dest);
-                }
+                $this->processFile($fs, $relativeName, $source, $dest, $output);
             }
+        }
+    }
+
+    /**
+     * Render of copy the file to the correct location
+     * @param Filesystem $fs
+     * @param string $relativeName
+     * @param SplFileInfo $source
+     * @param string $dest
+     * @param OutputInterface $output
+     */
+    private function processFile($fs, $relativeName, $source, $dest, OutputInterface $output) {
+        if (in_array($relativeName, $this->renderTable)) {
+            $output->writeln("Rendering " . $relativeName);
+            render_php_template($source, $this->renderContext, $dest);
+            if ($relativeName === 'bin/app') {
+                var_dump(chmod($dest, 0750));
+            }
+        } else {
+            $output->writeln("Processing " . $relativeName);
+            $fs->copy($source, $dest);
         }
     }
 
@@ -272,7 +287,7 @@ class InitCommand extends Command {
      * @param OutputInterface $output
      */
     private function checkForCompass(OutputInterface $output) {
-        $p = new Process('compassx --version');
+        $p = new Process('compass --version');
         try {
             $p->mustRun();
             $output->writeln("<info>Compass is installed on your system, great.</info>");
