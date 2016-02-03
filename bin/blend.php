@@ -2,7 +2,7 @@
 
 include dirname(__FILE__) . '/../vendor/autoload.php';
 
-use Blend\ProjectSetup\ProjectSetupApplication;
+use Blend\ProjectSetup\SetupApplication;
 
-$app = new ProjectSetupApplication(__DIR__);
+$app = new SetupApplication(__DIR__);
 $app->run();

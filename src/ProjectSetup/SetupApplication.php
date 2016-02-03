@@ -11,17 +11,19 @@
 
 namespace Blend\ProjectSetup;
 
-use Blend\Component\Console\Application as ApplicationBase;
+use Blend\Component\Console\Application;
+use Blend\ProjectSetup\Command\InitCommand;
 
 /**
- * Description of ProjectSetupApplication
+ * ProjectSetupApplication
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class ProjectSetupApplication extends ApplicationBase {
+class SetupApplication extends Application {
 
     public function __construct($scriptname) {
-        parent::__construct($scriptname, 'BlendEngine ProjectSetup Utility', '1.0');
+        parent::__construct($scriptname, 'BlendEngine Setup Utility', '1.0');
+        $this->add(new InitCommand());
     }
 
 }
