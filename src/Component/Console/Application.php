@@ -11,6 +11,8 @@
 
 namespace Blend\Component\Console;
 
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as ApplicationBase;
 
 /**
@@ -31,6 +33,11 @@ class Application extends ApplicationBase {
     public function __construct($script_dir, $name = 'UNKNOWN', $version = 'UNKNOWN') {
         parent::__construct($name, $version);
         $this->projectFolder = realpath($script_dir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);
+    }
+
+    public function doRun(InputInterface $input, OutputInterface $output) {
+        $output->getFormatter()->setStyle('warn', new OutputFormatterStyle('black', 'yellow'));
+        parent::doRun($input, $output);
     }
 
     /**
