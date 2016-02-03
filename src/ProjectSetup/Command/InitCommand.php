@@ -119,13 +119,15 @@ class InitCommand extends Command {
      */
     private function prepareTablesAndContext() {
 
-        $applicationCommandClassName = null;
+        $applicationCommandClassName = $applicationScriptName = null;
         $lowerName = strtolower($this->applicationName);
         $this->renderContext = $this->createRenderContext();
         extract($this->renderContext);
 
         $this->renameTable = array(
             'config/gitignore' => 'config/.gitignore',
+            'resources/gitignore' => 'resources/.gitignore',
+            'resources/sass/app.scss' => 'resources/sass/' . $applicationScriptName . '.scss',
             'bin/app' => 'bin/' . $lowerName,
             'bin/app.bat' => 'bin/' . $lowerName . '.bat',
             'bin/app.php' => 'bin/' . $lowerName . '.php',
@@ -156,11 +158,27 @@ class InitCommand extends Command {
                 $this->applicationName = $input->getOption('appname');
                 $output->writeln('<info>Generating ' . $this->applicationName . ' :)</info>');
                 $this->generateWithTemplate($template, $output);
+                $this->runCompass($output);
             } else {
                 $output->writeln("<error>The requested template [" . $template . '] does not exist!</error>');
             }
         } else {
             $output->writeln("<error>Looks like the " . $this->workFolder . ' is not empty!</error>');
+        }
+    }
+
+    /**
+     * Run compass to compile the default stylesheets
+     * @param type $output
+     */
+    private function runCompass($output) {
+        $p = new Process('compass compile');
+        $p->setWorkingDirectory($this->workFolder . '/resources');
+        try {
+            $output->writeln("<info>Compiling default sass files.</info>");
+            $p->mustRun();
+        } catch (\Exception $e) {
+            $output->writeln("<warn>" . $e->getMessage() . "</warn>");
         }
     }
 
