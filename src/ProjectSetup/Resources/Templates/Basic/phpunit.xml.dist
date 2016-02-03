@@ -11,8 +11,8 @@
     </php>
 
     <testsuites>
-        <testsuite name="ZinInPuur Tests">
-            <directory>./Tests/</directory>
+        <testsuite name="<?php echo $applicationName ?> Tests">
+            <directory>./tests/</directory>
         </testsuite>
     </testsuites>
 
@@ -20,7 +20,7 @@
         <whitelist>
             <directory>./</directory>
             <exclude>
-                <directory>./Tests</directory>
+                <directory>./tests</directory>
                 <directory>./vendor</directory>
             </exclude>
         </whitelist>

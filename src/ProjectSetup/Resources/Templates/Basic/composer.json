@@ -1,0 +1,19 @@
+{
+    "minimum-stability": "dev",
+    "name": "<?php echo $applicationPackageName;?>",
+    "require-dev": {
+        "phpunit/phpunit": "5.1.*"
+    },
+    "require": {
+        "php": ">=5.5.9",
+        "blendsdk/blendengine": "dev-engine2"
+    },
+    "autoload": {
+        "psr-4": {
+            "<?php echo $applicationName;?>\\": "src"
+        },
+        "files": [
+            "src/Globals.php"
+        ]
+    }
+}
