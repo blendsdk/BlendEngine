@@ -31,9 +31,9 @@ class Application extends ApplicationBase {
      * @param type $name
      * @param type $version
      */
-    public function __construct($script_dir, $name = 'UNKNOWN', $version = 'UNKNOWN') {
+    public function __construct($projectFolder, $name = 'UNKNOWN', $version = 'UNKNOWN') {
         parent::__construct($name, $version);
-        $this->projectFolder = realpath($script_dir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);
+        $this->projectFolder = realpath($projectFolder);
     }
 
     public function doRun(InputInterface $input, OutputInterface $output) {
