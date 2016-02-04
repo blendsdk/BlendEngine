@@ -5,6 +5,8 @@ namespace Blend\Tests\ProjectSetup;
 use Blend\Component\Filesystem\Filesystem;
 use Blend\ProjectSetup\SetupApplication;
 use Symfony\Component\Console\Tester\CommandTester;
+use Composer\Autoload\ClassLoader;
+use Blend\Component\DI\Container;
 
 /**
  * Description of TestBase
@@ -20,10 +22,26 @@ class TestBase extends \PHPUnit_Framework_TestCase {
      * @param array $params
      * @return CommandTester
      */
-    protected static function runCommand($projectFolder, $commandName, array $params = []) {
+    protected static function runCommand($projectFolder, $commandName, array $params = [], $app = null) {
         $curDir = getcwd();
         chdir($projectFolder);
-        $app = new SetupApplication($projectFolder);
+        if ($app === null) {
+            $app = new SetupApplication($projectFolder);
+        } else if (is_string($app)) {
+
+            $classes = explode('\\', $app);
+            $loader = new ClassLoader();
+            $loader->addPsr4("{$classes[0]}\\", $projectFolder . '/src/');
+            $loader->register(true);
+
+            $c = new Container();
+            $c->define('app', [
+                'class' => $app,
+                'scriptPath' => $projectFolder . '/bin'
+            ]);
+
+            $app = $c->get('app');
+        }
         $commandTester = new CommandTester($app->find($commandName));
         $commandTester->execute($params);
         chdir($curDir);
@@ -47,6 +65,7 @@ class TestBase extends \PHPUnit_Framework_TestCase {
         }
 
         $fs->ensureFolder($projectFolder);
+        $projectFolder = realpath($projectFolder);
         self::runCommand($projectFolder, 'project:init');
         return $projectFolder;
     }

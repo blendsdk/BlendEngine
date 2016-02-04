@@ -21,6 +21,8 @@ class SetupApplicationTest extends TestBase {
         $projectFolder = self::createNewProject('sanity', true);
         $this->assertTrue(file_exists("$projectFolder/bin/sanity.php"));
         $this->assertTrue(file_exists("$projectFolder/web/css/sanity.css"));
+        $commandTester = self::runCommand($projectFolder, 'list', [], 'Sanity\Console\SanityApplication'); 
+        $this->assertTrue(stripos($commandTester->getDisplay(), "Sanity Command Utility version 1.0") !== false);
     }
 
 }
