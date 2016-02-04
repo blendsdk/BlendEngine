@@ -11,8 +11,8 @@ use Blend\Component\Console\Application;
  */
 class <?php echo $applicationCommandClassName;?> extends Application {
 
-    public function __construct($scriptname) {
-        parent::__construct($scriptname, '<?php echo $applicationName?> Command Utility', '1.0');
+    public function __construct($scriptPath) {
+        parent::__construct($scriptPath, '<?php echo $applicationName?> Command Utility', '1.0');
     }
 
 }
