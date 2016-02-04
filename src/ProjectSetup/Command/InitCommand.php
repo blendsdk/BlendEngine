@@ -216,7 +216,7 @@ class InitCommand extends Command {
             $output->writeln("Rendering " . $relativeName);
             render_php_template($source, $this->renderContext, $dest);
             if ($relativeName === 'bin/app') {
-                var_dump(chmod($dest, 0750));
+                chmod($dest, 0750);
             }
         } else {
             $output->writeln("Processing " . $relativeName);
