@@ -119,4 +119,18 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(2, $obj2->count);
     }
 
+    public function testSingletonWithFactory() {
+        $c = new Container();
+        $c->define(IBazInterface::class, [
+            'factory' => function($count, Container $container) {
+                $baz = new Baz($count);
+                return $baz;
+            }
+        ]);
+        $baz = $c->get(IBazInterface::class, [
+            'count' => 5
+        ]);
+        $this->assertTrue($baz instanceof Baz);
+    }
+
 }

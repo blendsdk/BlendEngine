@@ -12,6 +12,7 @@
 namespace Blend\Component\DI;
 
 use ReflectionClass;
+use ReflectionFunction;
 use Blend\Component\Exception\InvalidConfigException;
 
 /**
@@ -43,30 +44,45 @@ class Container {
     /**
      * Extracts information about a given class
      * @param string $classname
+     * @param boolean $hasFactory
      * @return array
      * @throws InvalidConfigException
      */
-    private function reflect($classname) {
+    private function reflect($classname, $hasFactory = false) {
         $defparams = [];
         $callsig = [];
-        $refclass = new ReflectionClass($classname);
+        if ($hasFactory === false) {
+            $refclass = new ReflectionClass($classname);
 
-        if ($refclass->isInterface()) {
-            throw new InvalidConfigException("$classname is an interface!");
-        }
+            if ($refclass->isInterface()) {
+                throw new InvalidConfigException("$classname is an interface!");
+            }
 
-        if ($ctor = $refclass->getConstructor()) {
-            if ($ctor->getNumberOfParameters() !== 0) {
-                foreach ($ctor->getParameters() as $param) {
-                    if ($param->isDefaultValueAvailable()) {
-                        $defparams[$param->name] = $param->getDefaultValue();
-                    }
-                    $callsig[$param->name] = $param->getClass() ? $param->getClass()->name : null;
+            if ($ctor = $refclass->getConstructor()) {
+                if ($ctor->getNumberOfParameters() !== 0) {
+                    list($defparams, $callsig) = $this->reflectParameters($ctor->getParameters());
                 }
+            }
+        } else {
+            $refclass = new ReflectionFunction($classname);
+            if ($refclass->getNumberOfParameters() !== 0) {
+                list($defparams, $callsig) = $this->reflectParameters($refclass->getParameters());
             }
         }
 
         return [$defparams, $callsig, $refclass];
+    }
+
+    private function reflectParameters(array $parameters) {
+        $defparams = [];
+        $callsig = [];
+        foreach ($parameters as $param) {
+            if ($param->isDefaultValueAvailable()) {
+                $defparams[$param->name] = $param->getDefaultValue();
+            }
+            $callsig[$param->name] = $param->getClass() ? $param->getClass()->name : null;
+        }
+        return [$defparams, $callsig];
     }
 
     /**
@@ -109,7 +125,7 @@ class Container {
         $singleton = $this->extractConfig('singleton', true, false, $config);
         $factory = $this->extractConfig('factory', -1, null, $config);
 
-        list($defaultparams, $callsig, $refclass) = $this->reflect($classname);
+        list($defaultparams, $callsig, $refclass) = $this->reflect(is_null($factory) ? $classname : $factory, !is_null($factory));
 
         return $this->classdefs[$interface] = [
             'class' => $classname,
@@ -215,7 +231,7 @@ class Container {
      * @param callable/null $factory
      * @return mixed
      */
-    private function newInstanceArgs(ReflectionClass $refclass, $callargs, $factory) {
+    private function newInstanceArgs($refclass, $callargs, $factory) {
         $args = [];
         foreach ($callargs as $name => $value) {
             if (is_callable($value)) {
@@ -226,7 +242,7 @@ class Container {
         }
 
         if (is_callable($factory)) {
-            return call_user_func_array($factory, [$args, $this, $refclass]);
+            return call_user_func_array($factory, [$args, $this]);
         } else {
             if (count($args) === 0) {
                 return $refclass->newInstance();
