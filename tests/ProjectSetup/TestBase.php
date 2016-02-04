@@ -15,11 +15,15 @@ use Blend\Component\DI\Container;
  */
 class TestBase extends \PHPUnit_Framework_TestCase {
 
+
     /**
-     * Runs a command and retuns the CommandTester
+     * Runa a command in and returns the commandTester object. This method can
+     * run either a blend command or a sub-application command
      * @param string $projectFolder
      * @param string $commandName
-     * @param array $params
+     * @param string $params
+     * @param string $app In case of null it will be set to blend. In case of
+     * className as string, the application's class name will be used
      * @return CommandTester
      */
     protected static function runCommand($projectFolder, $commandName, array $params = [], $app = null) {
