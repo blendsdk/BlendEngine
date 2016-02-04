@@ -1,6 +1,15 @@
 <?php
 
-namespace Blend\Tests\ProjectSetup;
+/*
+ * This file is part of the BlendEngine framework.
+ *
+ * (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace Blend\Tests;
 
 use Blend\Component\Filesystem\Filesystem;
 use Blend\ProjectSetup\SetupApplication;
@@ -9,12 +18,12 @@ use Composer\Autoload\ClassLoader;
 use Blend\Component\DI\Container;
 
 /**
- * Description of TestBase
+ * ProjectUtil is a utility class for creating sub-project and run console
+ * command in the test suite
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class TestBase extends \PHPUnit_Framework_TestCase {
-
+class ProjectUtil {
 
     /**
      * Runa a command in and returns the commandTester object. This method can
@@ -26,7 +35,7 @@ class TestBase extends \PHPUnit_Framework_TestCase {
      * className as string, the application's class name will be used
      * @return CommandTester
      */
-    protected static function runCommand($projectFolder, $commandName, array $params = [], $app = null) {
+    public static function runCommand($projectFolder, $commandName, array $params = [], $app = null) {
         $curDir = getcwd();
         chdir($projectFolder);
         if ($app === null) {
@@ -58,10 +67,10 @@ class TestBase extends \PHPUnit_Framework_TestCase {
      * @param boolean $rebuild
      * @return string
      */
-    protected static function createNewProject($projectName, $rebuild = false) {
+    public static function createNewProject($projectName, $rebuild = false) {
 
         $fs = new Filesystem();
-        $projectFolder = dirname(__FILE__) . '/../TestProjects/' . $projectName;
+        $projectFolder = dirname(__FILE__) . '/TestProjects/' . $projectName;
         if ($rebuild) {
             if ($fs->exists($projectFolder)) {
                 $fs->remove($projectFolder);
