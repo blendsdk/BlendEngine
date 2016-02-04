@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace Blend\Tests\DI\Stubs;
+namespace Blend\Tests\Component\DI\Stubs;
 
 /**
  * Description of Counter

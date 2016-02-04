@@ -1,6 +1,6 @@
 <?php
 
-namespace Blend\Tests\Filesystem;
+namespace Blend\Tests\Component\Filesystem;
 
 use Blend\Component\Filesystem\Filesystem;
 

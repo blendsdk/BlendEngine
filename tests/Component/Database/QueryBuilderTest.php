@@ -2,9 +2,9 @@
 
 /*
 
-namespace Blend\Tests\Database;
+namespace Blend\Tests\Component\Database;
 
-use Blend\Tests\Database\DatabaseTestBase;
+use Blend\Tests\Component\Database\DatabaseTestBase;
 
 class QueryBuilderTest extends DatabaseTestBase {
 

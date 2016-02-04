@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Tests\Database\SQL\Statement;
+namespace Blend\Tests\Component\Database\SQL\Statement;
 
-use Blend\Tests\Database\DatabaseTestBase;
+use Blend\Tests\Component\Database\DatabaseTestBase;
 use Blend\Component\Database\SQL\Statement\Select;
 
 /**

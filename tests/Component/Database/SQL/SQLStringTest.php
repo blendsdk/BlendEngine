@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Tests\Database\SQL;
+namespace Blend\Tests\Component\Database\SQL;
 
-use Blend\Tests\Database\DatabaseTestBase;
+use Blend\Tests\Component\Database\DatabaseTestBase;
 
 class SQLStringTest extends DatabaseTestBase {
 

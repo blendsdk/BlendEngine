@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Tests\Configuration;
+namespace Blend\Tests\Component\Configuration;
 
 use Blend\Component\Configuration\Configuration;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;

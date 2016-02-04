@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Tests\Database;
+namespace Blend\Tests\Component\Database;
 
 use Blend\Component\Database\Database;
 

@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Tests\DI;
+namespace Blend\Tests\Component\DI;
 
 use Blend\Component\DI\Container;
-use Blend\Tests\DI\Stubs\Foo;
-use Blend\Tests\DI\Stubs\IBazInterface;
-use Blend\Tests\DI\Stubs\Baz;
-use Blend\Tests\DI\Stubs\Bar;
-use Blend\Tests\DI\Stubs\Counter;
+use Blend\Tests\Component\DI\Stubs\Foo;
+use Blend\Tests\Component\DI\Stubs\IBazInterface;
+use Blend\Tests\Component\DI\Stubs\Baz;
+use Blend\Tests\Component\DI\Stubs\Bar;
+use Blend\Tests\Component\DI\Stubs\Counter;
 
 /**
  * Test class for ContainerTest

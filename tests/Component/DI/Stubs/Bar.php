@@ -6,12 +6,15 @@
  * and open the template in the editor.
  */
 
-namespace Blend\Tests\DI\Stubs;
+namespace Blend\Tests\Component\DI\Stubs;
 
 /**
+ * Description of Bar
  *
- * @author gevik
+ * @author babakhani
  */
-interface IBazInterface {
-    //put your code here
+class Bar {
+
+    public $bar;
+
 }

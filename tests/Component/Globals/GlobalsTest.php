@@ -1,6 +1,6 @@
 <?php
 
-namespace Blend\Tests\Globals;
+namespace Blend\Tests\Component\Globals;
 
 /**
  * Test class for Globals

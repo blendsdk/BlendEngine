@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Tests\Database;
+namespace Blend\Tests\Component\Database;
 
 use Blend\Component\Database\Database;
-use Blend\Tests\Database\DatabaseTestBase;
+use Blend\Tests\Component\Database\DatabaseTestBase;
 
 /**
  * Test class for Database
