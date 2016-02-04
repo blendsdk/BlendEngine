@@ -11,7 +11,7 @@
 
 namespace Blend\Component\Console\Command;
 
-use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Command\Command as CommandBase;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,7 +24,7 @@ use Blend\Component\Configuration\Configuration;
  * 
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class CommandBase extends Command {
+abstract class Command extends CommandBase {
 
     /**
      * DI Container for handling services and object
@@ -46,7 +46,7 @@ abstract class CommandBase extends Command {
      * Initializes the DI container
      */
     protected function initContainer() {
-        $this->container->singleton('config', [
+        $this->container->singleton(Configuration::class, [
             'class' => Configuration::class,
             'fname' => realpath($this->getApplication()->getProjectFolder() . '/config/config.php')
         ]);
@@ -60,7 +60,7 @@ abstract class CommandBase extends Command {
      */
     public function getConfig($name, $default = null) {
         /* @var $config Configuration */
-        $config = $this->container->get('config');
+        $config = $this->container->get(Configuration::class);
         return $config->get($name, $default);
     }
 
