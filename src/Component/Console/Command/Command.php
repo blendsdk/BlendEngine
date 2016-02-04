@@ -17,6 +17,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Blend\Component\DI\Container;
 use Blend\Component\Configuration\Configuration;
+use Monolog\Logger;
+use \Monolog\Handler\StreamHandler;
+use Psr\Log\LoggerInterface;
+use Blend\Component\Filesystem\Filesystem;
 
 /**
  * CommandBase in the base class for all application level command in 
@@ -49,6 +53,18 @@ abstract class Command extends CommandBase {
         $this->container->singleton(Configuration::class, [
             'class' => Configuration::class,
             'fname' => realpath($this->getApplication()->getProjectFolder() . '/config/config.php')
+        ]);
+
+        $this->container->singleton(LoggerInterface::class, [
+            'factory' => function() {
+                $fs = new Filesystem();
+                $logfolder = $this->getApplication()->getProjectFolder() . '/var/log';
+                $logname = $this->getApplication()->getName() . '-console';
+                $fs->ensureFolder($logfolder);
+                $log = new Logger($logname);
+                $log->pushHandler(new StreamHandler($logfolder . '/' . $logname . '.log', Logger::WARNING));
+                return $log;
+            }
         ]);
     }
 
