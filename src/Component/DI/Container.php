@@ -220,13 +220,15 @@ class Container {
         }
     }
 
+
     /**
      * Creates a new instance from a ReflectionClass and parameters that was
      * provided from the class definition
-     * @param ReflectionClass $refclass
-     * @param mixed $args
-     * @param callable/null $factory
-     * @return mixed
+     *
+     * @param type $refclass
+     * @param type $callargs
+     * @param type $factory
+     * @return type
      */
     private function newInstanceArgs($refclass, $callargs, $factory) {
         $args = [];
