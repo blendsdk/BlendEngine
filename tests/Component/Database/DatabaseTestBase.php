@@ -18,6 +18,11 @@ use Blend\Component\Database\Database;
  */
 abstract class DatabaseTestBase extends \PHPUnit_Framework_TestCase {
 
+    /**
+     * @var Database
+     */
+    public static $currentDatabase;
+
     public static function getDefaultDatabaseConfig() {
         return [
             'username' => 'postgres',
@@ -42,12 +47,19 @@ abstract class DatabaseTestBase extends \PHPUnit_Framework_TestCase {
         return null;
     }
 
+    public static function setUpSchema() {
+        return;
+    }
+
     public static function setUpBeforeClass() {
         $config = static::getTestingDatabaseConfig();
         if (!is_null($config)) {
+            $config['database'] = str_replace(array('\\', ' '), '_', trim(strtolower($config['database'])));
             $db = new Database(static::getDefaultDatabaseConfig());
             $db->executeQuery("drop database if exists {$config['database']}");
             $db->executeQuery("create database {$config['database']}");
+            static::$currentDatabase = new Database($config);
+            static::setUpSchema();
         }
     }
 
