@@ -44,43 +44,40 @@ class Container {
     /**
      * Extracts information about a given class
      * @param string $classname
-     * @param boolean $hasFactory
      * @return array
      * @throws InvalidConfigException
      */
-    private function reflect($classname, $hasFactory = false) {
+    private function reflect($classname) {
         $defparams = [];
         $callsig = [];
-        if ($hasFactory === false) {
-            $refclass = new ReflectionClass($classname);
+        if (!is_closure($classname)) {
+            $ref = new ReflectionClass($classname);
 
-            if ($refclass->isInterface()) {
+            if ($ref->isInterface()) {
                 throw new InvalidConfigException("$classname is an interface!");
             }
 
-            if ($ctor = $refclass->getConstructor()) {
-                if ($ctor->getNumberOfParameters() !== 0) {
-                    list($defparams, $callsig) = $this->reflectParameters($ctor->getParameters());
-                }
+            if ($ctor = $ref->getConstructor()) {
+                list($defparams, $callsig) = $this->reflectParameters($ctor);
             }
         } else {
-            $refclass = new ReflectionFunction($classname);
-            if ($refclass->getNumberOfParameters() !== 0) {
-                list($defparams, $callsig) = $this->reflectParameters($refclass->getParameters());
-            }
+            $ref = new ReflectionFunction($classname);
+            list($defparams, $callsig) = $this->reflectParameters($ref);
         }
 
-        return [$defparams, $callsig, $refclass];
+        return [$defparams, $callsig, $ref];
     }
 
-    private function reflectParameters(array $parameters) {
+    private function reflectParameters($ref) {
         $defparams = [];
         $callsig = [];
-        foreach ($parameters as $param) {
-            if ($param->isDefaultValueAvailable()) {
-                $defparams[$param->name] = $param->getDefaultValue();
+        if ($ref->getNumberOfParameters() !== 0) {
+            foreach ($ref->getParameters() as $param) {
+                if ($param->isDefaultValueAvailable()) {
+                    $defparams[$param->name] = $param->getDefaultValue();
+                }
+                $callsig[$param->name] = $param->getClass() ? $param->getClass()->name : null;
             }
-            $callsig[$param->name] = $param->getClass() ? $param->getClass()->name : null;
         }
         return [$defparams, $callsig];
     }
@@ -125,7 +122,7 @@ class Container {
         $singleton = $this->extractConfig('singleton', true, false, $config);
         $factory = $this->extractConfig('factory', -1, null, $config);
 
-        list($defaultparams, $callsig, $refclass) = $this->reflect(is_null($factory) ? $classname : $factory, !is_null($factory));
+        list($defaultparams, $callsig, $refclass) = $this->reflect(is_null($factory) ? $classname : $factory);
 
         return $this->classdefs[$interface] = [
             'class' => $classname,
