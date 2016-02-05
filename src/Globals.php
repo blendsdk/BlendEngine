@@ -157,3 +157,16 @@ if (!function_exists('print_php_header')) {
     }
 
 }
+
+if (!function_exists('is_closure')) {
+
+    /**
+     * Check if a given object is a Closure
+     * @param mixed $obj
+     * @return boolean
+     */
+    function is_closure($obj) {
+        return is_object($obj) && ($obj instanceof Closure);
+    }
+
+}
