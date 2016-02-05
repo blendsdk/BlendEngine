@@ -125,7 +125,6 @@ class Container {
         list($defaultparams, $callsig, $refclass) = $this->reflect(is_null($factory) ? $classname : $factory);
 
         return $this->classdefs[$interface] = [
-            'class' => $classname,
             'singleton' => $singleton,
             'callsig' => $callsig,
             'refclass' => $refclass,
@@ -163,13 +162,11 @@ class Container {
      */
     public function get($interface, array $params = array()) {
 
-        $singleton = $callsig = $defparams = $refclass = $factory = null;
-
-        if (!$this->isDefined($interface)) {
-            extract($this->define($interface));
-        } else {
-            extract($this->classdefs[$interface]);
-        }
+        list($singleton, $callsig, $refclass, $defparams, $factory) = array_values(
+                (
+                $this->isDefined($interface) ? $this->classdefs[$interface] : $this->define($interface)
+                )
+        );
 
         $args = [];
         if (count($callsig) !== 0 && is_bool($singleton)) {
@@ -219,7 +216,6 @@ class Container {
             throw new \InvalidArgumentException("Missing {$missingCnt} ($missingArgs) for {$refclass->name}::__construct({$sigArgs})");
         }
     }
-
 
     /**
      * Creates a new instance from a ReflectionClass and parameters that was
