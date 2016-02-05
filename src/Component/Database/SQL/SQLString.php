@@ -22,6 +22,16 @@ class SQLString {
 
     private $str;
 
+    /**
+     * Returns a string renderer Closure
+     * @return \Closure
+     */
+    public static function STRING_RENDERER() {
+        return function($key, $value, $values) {
+            return "E'" . str_replace(array("\'", "\\", "\n", "\r", "\t"), array("''", "\\\\", '\n', '\r', '\t'), $value) . "'";
+        };
+    }
+
     public function __construct($str) {
         $this->str = $str;
     }
@@ -147,6 +157,47 @@ class SQLString {
     public function count() {
         $this->str = 'COUNT(' . $this->str . ')';
         return $this;
+    }
+
+    /**
+     * 
+     * @param array $array
+     */
+    public static function arrayAsStrings(array $array) {
+        foreach ($array as $idx => $item) {
+            $array[$idx] = '$$' . $item . '$$';
+        }
+    }
+
+    /**
+     * 
+     * @param array $values
+     * @return \Blend\Component\Database\SQL\SQLString
+     */
+    public function notInList(array $values, $itemRenderer = null) {
+        $this->str .= ' NOT IN ('
+                . implode(', ', $this->renderListItem($values)) . ')';
+        return $this;
+    }
+
+    /**
+     * 
+     * @param array $values
+     * @return \Blend\Component\Database\SQL\SQLString
+     */
+    public function inList(array $values, $itemRenderer = null) {
+        $this->str .= ' IN ('
+                . implode(', ', $this->renderListItem($values, $itemRenderer)) . ')';
+        return $this;
+    }
+
+    private function renderListItem(array $values, $itemRenderer) {
+        if (!is_null($itemRenderer)) {
+            foreach ($values as $key => $value) {
+                $values[$key] = call_user_func_array($itemRenderer, [$key, $value, $values]);
+            }
+        }
+        return $values;
     }
 
 }

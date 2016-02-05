@@ -12,6 +12,7 @@
 namespace Blend\Tests\Component\Database\SQL;
 
 use Blend\Tests\Component\Database\DatabaseTestBase;
+use Blend\Component\Database\SQL\SQLString;
 
 class SQLStringTest extends DatabaseTestBase {
 
