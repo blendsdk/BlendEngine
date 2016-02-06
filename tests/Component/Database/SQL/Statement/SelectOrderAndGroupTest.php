@@ -12,7 +12,7 @@
 namespace Blend\Tests\Component\Database\SQL\Statement;
 
 use Blend\Tests\Component\Database\DatabaseTestBase;
-use Blend\Component\Database\SQL\Statement\Select;
+use Blend\Component\Database\SQL\Statement\SelectStatement;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -20,7 +20,7 @@ use Blend\Component\Database\SQL\Statement\Select;
 class SelectOrderAndGroupTest extends DatabaseTestBase {
 
     public function testOrderBy() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->from('table1')
                 ->orderBy('field1')
@@ -30,7 +30,7 @@ class SelectOrderAndGroupTest extends DatabaseTestBase {
     }
 
     public function testGroupBy() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->from('table1')
                 ->selectCount(null, 'field1')

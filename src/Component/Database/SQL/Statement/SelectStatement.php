@@ -18,7 +18,7 @@ use Blend\Component\Database\SQL\Statement\WhereClause;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Select {
+class SelectStatement {
 
     /**
      * Array containing the select columns

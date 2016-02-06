@@ -12,7 +12,7 @@
 namespace Blend\Tests\Component\Database\SQL\Statement;
 
 use Blend\Tests\Component\Database\DatabaseTestBase;
-use Blend\Component\Database\SQL\Statement\Select;
+use Blend\Component\Database\SQL\Statement\SelectStatement;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -20,7 +20,7 @@ use Blend\Component\Database\SQL\Statement\Select;
 class SelectWhereClauseTest extends DatabaseTestBase {
 
     public function testWhere() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->from('table1')
                 ->where(sqlstr('field1')->equalsTo('5'))
@@ -29,7 +29,7 @@ class SelectWhereClauseTest extends DatabaseTestBase {
     }
 
     public function testAndWhere() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->from('table1')
                 ->where(sqlstr('field1')->equalsTo('5'))
@@ -39,7 +39,7 @@ class SelectWhereClauseTest extends DatabaseTestBase {
     }
 
     public function testOrWhere() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->from('table1')
                 ->where(sqlstr('field1')->equalsTo('5'))
@@ -50,7 +50,7 @@ class SelectWhereClauseTest extends DatabaseTestBase {
     }
 
     public function testScope() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->from('table1')
                 ->whereScope()
@@ -63,7 +63,7 @@ class SelectWhereClauseTest extends DatabaseTestBase {
     }
 
     public function testNulls() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->from('table1')
                 ->where(sqlstr('field1')->isNull())

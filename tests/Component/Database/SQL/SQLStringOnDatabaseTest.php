@@ -12,7 +12,7 @@
 namespace Blend\Tests\Component\Database\SQL;
 
 use Blend\Tests\Component\Database\DatabaseTestBase;
-use Blend\Component\Database\SQL\Statement\Select;
+use Blend\Component\Database\SQL\Statement\SelectStatement;
 use Blend\Component\Database\SQL\SQLString;
 
 /**
@@ -40,7 +40,7 @@ class SQLStringOnDatabaseTest extends DatabaseTestBase {
             "a\'a",
             "a\"a"
         ];
-        $q = new Select();
+        $q = new SelectStatement();
         $q->from('table1')
                 ->selectCount()
                 ->where(sqlstr('col1')->inList($list, SQLString::STRING_RENDERER()));

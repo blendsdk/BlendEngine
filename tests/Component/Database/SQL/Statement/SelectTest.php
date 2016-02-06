@@ -12,7 +12,7 @@
 namespace Blend\Tests\Component\Database\SQL\Statement;
 
 use Blend\Tests\Component\Database\DatabaseTestBase;
-use Blend\Component\Database\SQL\Statement\Select;
+use Blend\Component\Database\SQL\Statement\SelectStatement;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -20,7 +20,7 @@ use Blend\Component\Database\SQL\Statement\Select;
 class SelectTest extends DatabaseTestBase {
 
     public function testSimpleSelect() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s->from('table1')
                 ->select('col1')
                 ->select('col2');
@@ -28,7 +28,7 @@ class SelectTest extends DatabaseTestBase {
     }
 
     public function testSimpleSelectWithAlias() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s->from(sqlstr('table1')->tableAlias('t1'))
                 ->select(sqlstr('col1')->dotPrefix('t1'))
                 ->select(sqlstr('col2')->dotPrefix('t1'));
@@ -36,7 +36,7 @@ class SelectTest extends DatabaseTestBase {
     }
 
     public function testSimpleSelectMultiFrom() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->from(sqlstr('table1')->tableAlias('t1'))
                 ->from(sqlstr('table2')->tableAlias('t2'))
@@ -46,7 +46,7 @@ class SelectTest extends DatabaseTestBase {
     }
 
     public function testInnerJoin1() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->from(sqlstr('table1')->tableAlias('t1'))
                 ->innerJoin(sqlstr('table2')->tableAlias('t2'), sql_join(sqlstr('id')->dotPrefix('t1'), sqlstr('id')->dotPrefix('t2')))
@@ -55,7 +55,7 @@ class SelectTest extends DatabaseTestBase {
     }
 
     public function testSelectCountWithColumn() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->selectCount(null, 'field1')
                 ->from('table1')
@@ -64,7 +64,7 @@ class SelectTest extends DatabaseTestBase {
     }
 
     public function testSelectCountWithColumnAndAlias() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->selectCount('numbers', 'field1')
                 ->from('table1')
@@ -73,7 +73,7 @@ class SelectTest extends DatabaseTestBase {
     }
 
     public function testSelectCountTest() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->selectCount()
                 ->from('table1')
@@ -82,7 +82,7 @@ class SelectTest extends DatabaseTestBase {
     }
 
     public function testSelectCountWithAliasTest() {
-        $s = new Select();
+        $s = new SelectStatement();
         $s
                 ->selectCount('numbers')
                 ->from('table1')
