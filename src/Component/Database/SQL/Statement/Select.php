@@ -200,14 +200,15 @@ class Select {
     }
 
     /**
-     * Renders the column list
+     * Renders the column list if not column is select then we will select all
+     * column by returning '*'
      * @return string
      */
     private function getColumns() {
         if (count($this->columns) !== 0) {
             return implode(', ', $this->columns);
         } else {
-            return '';
+            return '*';
         }
     }
 
