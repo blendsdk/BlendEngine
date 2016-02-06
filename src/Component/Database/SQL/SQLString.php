@@ -181,6 +181,12 @@ class SQLString {
         return $this;
     }
 
+    /**
+     * Renders items of a IN list with a given renderer
+     * @param array $values
+     * @param Closure $itemRenderer
+     * @return array
+     */
     private function renderListItem(array $values, $itemRenderer) {
         if (!is_null($itemRenderer)) {
             foreach ($values as $key => $value) {
