@@ -12,6 +12,8 @@
 namespace Blend\Tests\Component\Database;
 
 use Blend\Component\Database\Database;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 
 /**
  * Abstract class for Database tests
@@ -55,10 +57,12 @@ abstract class DatabaseTestBase extends \PHPUnit_Framework_TestCase {
         $config = static::getTestingDatabaseConfig();
         if (!is_null($config)) {
             $config['database'] = str_replace(array('\\', ' '), '_', trim(strtolower($config['database'])));
-            $db = new Database(static::getDefaultDatabaseConfig());
+            $log = new Logger($config['database']);
+            $log->pushHandler(new StreamHandler(TEMP_DIR . '/' . $config['database'] . '.log', Logger::DEBUG));
+            $db = new Database(static::getDefaultDatabaseConfig(), $log);
             $db->executeQuery("drop database if exists {$config['database']}");
             $db->executeQuery("create database {$config['database']}");
-            static::$currentDatabase = new Database($config);
+            static::$currentDatabase = new Database($config,$log);
             static::setUpSchema();
         }
     }

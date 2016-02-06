@@ -30,4 +30,10 @@ if (!defined('BLEND_COMPOSER_INSTALL')) {
     die(1);
 }
 
+$tempFolder = dirname(__FILE__) . '/temp';
+if (!file_exists($tempFolder)) {
+    mkdir($tempFolder, 0777, true);
+}
+define('TEMP_DIR', $tempFolder);
+
 require BLEND_COMPOSER_INSTALL;
