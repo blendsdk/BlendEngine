@@ -161,22 +161,12 @@ class SQLString {
 
     /**
      * 
-     * @param array $array
-     */
-    public static function arrayAsStrings(array $array) {
-        foreach ($array as $idx => $item) {
-            $array[$idx] = '$$' . $item . '$$';
-        }
-    }
-
-    /**
-     * 
      * @param array $values
      * @return \Blend\Component\Database\SQL\SQLString
      */
     public function notInList(array $values, $itemRenderer = null) {
         $this->str .= ' NOT IN ('
-                . implode(', ', $this->renderListItem($values)) . ')';
+                . implode(', ', $this->renderListItem($values, $itemRenderer)) . ')';
         return $this;
     }
 
