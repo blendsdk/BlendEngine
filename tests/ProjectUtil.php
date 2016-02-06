@@ -70,7 +70,7 @@ class ProjectUtil {
     public static function createNewProject($projectName, $rebuild = false) {
 
         $fs = new Filesystem();
-        $projectFolder = dirname(__FILE__) . '/TestProjects/' . $projectName;
+        $projectFolder = TEMP_DIR . '/TestProjects/' . $projectName;
         if ($rebuild) {
             if ($fs->exists($projectFolder)) {
                 $fs->remove($projectFolder);
