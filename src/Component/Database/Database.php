@@ -50,7 +50,7 @@ class Database extends \PDO {
     }
 
     /**
-     * xecutes the query, and returns the first column of the first row in the
+     * Executes a SQL statament and returns the first column of the first row in the
      * result set returned by the query. Additional columns or rows are ignored.
      * @param string $sql The SQL to execute
      * @param array $params The parameters to populate the SQL query
