@@ -62,7 +62,7 @@ abstract class Command extends CommandBase {
                 $logname = $this->getApplication()->getName() . '-console';
                 $fs->ensureFolder($logfolder);
                 $log = new Logger($logname);
-                $log->pushHandler(new StreamHandler($logfolder . '/' . $logname . '.log', Logger::WARNING));
+                $log->pushHandler(new StreamHandler($logfolder . '/' . $logname . '.log', Logger::DEBUG));
                 return $log;
             }
         ]);
