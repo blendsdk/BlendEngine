@@ -3,7 +3,7 @@
 namespace <?php echo $applicationNamespace;?>\Console;
 
 use Blend\Component\Console\Application;
-use Blend\DataAccessBuilder\Command\DataAccessLayerCommand;
+use Blend\DataModelBuilder\Command\DataModelCommand;
 
 /**
  * Description of ApplicationCommand
@@ -14,7 +14,7 @@ class <?php echo $applicationCommandClassName;?> extends Application {
 
     public function __construct($scriptPath) {
         parent::__construct($scriptPath, '<?php echo $applicationName?> Command Utility', '1.0');
-        $this->add(new DataAccessLayerCommand());
+        $this->add(new DataModelCommand());
     }
 
 }

@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Tests\DataAccessBuilder\Schema;
+namespace Blend\Tests\DataModelBuilder\Schema;
 
 use Blend\Tests\Component\Database\DatabaseTestBase;
-use Blend\DataAccessBuilder\Schema\SchemaReader;
+use Blend\DataModelBuilder\Schema\SchemaReader;
 
 /**
  * Description of SchemaReaderTest
