@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\DataAccessBuilder;
+namespace Blend\DataAccessBuilder\Schema;
 
 use Blend\Component\Database\Database;
 use Blend\Component\Database\SQL\Statement\SelectStatement;
