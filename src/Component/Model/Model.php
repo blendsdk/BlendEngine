@@ -89,6 +89,10 @@ class Model {
         return array_merge($this->data, $this->updates);
     }
 
+    /**
+     * Reruns the JSON version of the getData
+     * @return string
+     */
     public function __toString() {
         return json_encode($this->getData());
     }
