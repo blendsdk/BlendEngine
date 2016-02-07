@@ -43,6 +43,10 @@ class SchemaReader {
         return $this->getSchemas();
     }
 
+    /**
+     * Load the schemas from the database
+     * @return Schema[]
+     */
     protected function getSchemas() {
         $skip = ['pg_toast', 'pg_temp_1', 'pg_catalog', 'pg_toast_temp_1', 'information_schema'];
         $sql = new SelectStatement();
@@ -59,6 +63,10 @@ class SchemaReader {
         return $result;
     }
 
+    /**
+     * Loads the Relations fro a given schema
+     * @param Schema $schema
+     */
     protected function loadRelationsForSchema(Schema $schema) {
         $sql = new SelectStatement();
         $sql->from('information_schema.tables')
@@ -73,6 +81,10 @@ class SchemaReader {
         }
     }
 
+    /**
+     * Loads the contains for a given Relation
+     * @param Relation $relation
+     */
     protected function loadContraintsForRelation(Relation $relation) {
         "select * from information_schema.table_constraints where constraint_type in ('UNIQUE','PRIMARY KEY','FOREIGN KEY') and table_schema = :table_schema and table_catalog = :table_catalog and table_name = :table_name";
 
@@ -107,6 +119,10 @@ class SchemaReader {
         }
     }
 
+    /**
+     * Loads columns for a given relation
+     * @param Relation $relation
+     */
     protected function loadColumnsForRelation(Relation $relation) {
         $sql = new SelectStatement();
         $sql->from('information_schema.columns')
