@@ -12,7 +12,8 @@
 namespace Blend\Component\Model;
 
 /**
- * Model represents a data model
+ * Model represents a data model. It provides functionality to set and get field
+ * values and internally keep track of changed fields.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
