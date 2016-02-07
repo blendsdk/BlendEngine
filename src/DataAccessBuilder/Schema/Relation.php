@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Database\Schema;
+namespace Blend\DataAccessBuilder\Schema;
 
-use Blend\Component\Database\Schema\Record;
+use Blend\DataAccessBuilder\Schema\Record;
 use Blend\Component\Exception\InvalidSchemaException;
 
 /**

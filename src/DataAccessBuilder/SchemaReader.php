@@ -9,14 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Database\Schema;
+namespace Blend\DataAccessBuilder;
 
 use Blend\Component\Database\Database;
 use Blend\Component\Database\SQL\Statement\SelectStatement;
 use Blend\Component\Database\SQL\SQLString;
-use Blend\Component\Database\Schema\Schema;
-use Blend\Component\Database\Schema\Relation;
-use Blend\Component\Database\Schema\Column;
+use Blend\DataAccessBuilder\Schema\Schema;
+use Blend\DataAccessBuilder\Schema\Column;
+use Blend\DataAccessBuilder\Schema\Relation;
 
 /**
  * Read the database schema from a PostgreSQL Database for code 

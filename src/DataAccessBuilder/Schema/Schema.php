@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Database\Schema;
+namespace Blend\DataAccessBuilder\Schema;
 
-use Blend\Component\Database\Schema\Relation;
+use Blend\DataAccessBuilder\Schema\Record;
+use Blend\DataAccessBuilder\Schema\Relation;
 use Blend\Component\Exception\InvalidSchemaException;
-use Blend\Component\Database\Schema\Record;
 
 /**
  * Schema represents a schema from a PostgreSQL database

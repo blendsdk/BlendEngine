@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Database\Schema;
+namespace Blend\DataAccessBuilder\Schema;
 
-use Blend\Component\Database\Schema\Relation;
-use Blend\Component\Database\Schema\Record;
+
+use Blend\DataAccessBuilder\Schema\Record;
 
 /**
  * Column represents a column of a table from a PostgreSQL database

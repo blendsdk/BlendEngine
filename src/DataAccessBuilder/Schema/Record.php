@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Database\Schema;
+namespace Blend\DataAccessBuilder\Schema;
 
 /**
  * Record is the base class for a record from the database
