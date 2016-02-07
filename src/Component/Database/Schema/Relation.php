@@ -84,8 +84,7 @@ class Relation extends Record {
     public function getLocalKeys() {
         $result = array();
         $keys = array();
-        $keytypes = array('PRIMARY KEY', 'UNIQUE', 'VIEW');
-        foreach ($keytypes as $type) {
+        foreach (array('PRIMARY KEY', 'UNIQUE', 'VIEW') as $type) {
             if (isset($this->keysByType[$type])) {
                 $keys = array_merge($keys, $this->keysByType[$type]);
             }
@@ -120,7 +119,7 @@ class Relation extends Record {
     public function addKeyColumn($keyColumn, $constraint_type) {
         $name = $keyColumn['constraint_name'];
         if (stripos($name, '_pkey') !== false) {
-            $name = 'primary';
+            $name = $constraint_type;
         }
         $this->keysByType[$constraint_type][] = $name;
         $this->keys[$name][] = $this->columns[$keyColumn['column_name']];
