@@ -35,7 +35,7 @@ class ProjectUtil {
      * className as string, the application's class name will be used
      * @return CommandTester
      */
-    public static function runCommand($projectFolder, $commandName, array $params = [], $app = null) {
+    public static function runCommand($projectFolder, $commandName, array $params = [], $app = null, $runOptions = []) {
         $curDir = getcwd();
         chdir($projectFolder);
         if ($app === null) {
@@ -56,7 +56,7 @@ class ProjectUtil {
             $app = $c->get('app');
         }
         $commandTester = new CommandTester($app->find($commandName));
-        $commandTester->execute($params);
+        $commandTester->execute($params, $runOptions);
         chdir($curDir);
         return $commandTester;
     }
