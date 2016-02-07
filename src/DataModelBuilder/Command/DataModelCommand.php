@@ -22,7 +22,7 @@ use Symfony\Component\Console\Input\InputArgument;
 class DataModelCommand extends Command {
 
     protected function configure() {
-        $this->setName('databate:generate')
+        $this->setName('datamodel:generate')
                 ->setDescription('Generates a Data Model Layer from the current database')
                 ->addOption('config', 'c'
                         , InputArgument::OPTIONAL
