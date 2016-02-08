@@ -2,9 +2,11 @@
 
 return array(
     'database' => array(
+        'host' => 'localhost',
         'database' => '<?php echo $applicationDatabaseName?>',
         'username' => 'postgres',
-        'password' => 'postgres'
+        'password' => 'postgres',
+        'port' => 5432
     ),
     'email' => array(
         'host' => 'email.host.com',
