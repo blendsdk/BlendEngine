@@ -1,3 +1,5 @@
+create schema customer_reporting;
+
 create table sys_user (
     user_id serial not null primary key,
     user_name varchar not null unique,
@@ -31,4 +33,8 @@ create table sys_order_item (
     order_item_id serial not null primary key,
     product_id integer not null references sys_product(product_id) on update cascade on delete cascade,
     order_item_amount numeric not null default 0    
+);
+
+
+create table customer_reporting.aggrigations (
 );
