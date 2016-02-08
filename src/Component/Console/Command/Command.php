@@ -46,10 +46,16 @@ abstract class Command extends CommandBase {
      */
     protected $input;
 
+    /**
+     * @var Filesystem
+     */
+    protected $fileSystem;
+
     protected function initialize(InputInterface $input, OutputInterface $output) {
         $this->input = $input;
         $this->output = $output;
         $this->container = new Container();
+        $this->fileSystem = new Filesystem();
         $this->initContainer();
     }
 
