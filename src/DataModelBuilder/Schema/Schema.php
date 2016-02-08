@@ -31,8 +31,12 @@ class Schema extends Record {
      * Gets the schema name
      * @return string
      */
-    public function getName() {
-        return $this->record['schema_name'];
+    public function getName($prettify = false) {
+        if ($prettify) {
+            return str_identifier($this->record['schema_name']);
+        } else {
+            return $this->record['schema_name'];
+        }
     }
 
     /**
