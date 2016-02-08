@@ -36,6 +36,7 @@ class ProjectUtil {
      * @return CommandTester
      */
     public static function runCommand($projectFolder, $commandName, array $params = [], $app = null, $runOptions = []) {
+        $loader = new ClassLoader();
         $curDir = getcwd();
         chdir($projectFolder);
         if ($app === null) {
@@ -43,7 +44,6 @@ class ProjectUtil {
         } else if (is_string($app)) {
 
             $classes = explode('\\', $app);
-            $loader = new ClassLoader();
             $loader->addPsr4("{$classes[0]}\\", $projectFolder . '/src/');
             $loader->register(true);
 
@@ -58,6 +58,10 @@ class ProjectUtil {
         $commandTester = new CommandTester($app->find($commandName));
         $commandTester->execute($params, $runOptions);
         chdir($curDir);
+        $c = null;
+        if ($loader) {
+            $loader->unregister();
+        }
         return $commandTester;
     }
 
