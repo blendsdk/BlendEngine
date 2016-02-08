@@ -17,6 +17,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Blend\DataModelBuilder\Command\ModelBuilderDefaultConfig;
 use Blend\Component\DI\Container;
+use Blend\Component\Configuration\Configuration;
+use Blend\Component\Database\Database;
+use Blend\DataModelBuilder\Schema\SchemaReader;
+use Blend\Component\Exception\InvalidConfigException;
 
 /**
  * Data Model Layer generator. This class will load the schemas, tables, etc...
@@ -27,6 +31,10 @@ use Blend\Component\DI\Container;
 class DataModelCommand extends Command {
 
     private $schemas;
+
+    /**
+     * @var ModelBuilderConfig
+     */
     private $config = null;
 
     protected function configure() {
@@ -38,7 +46,37 @@ class DataModelCommand extends Command {
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $this->loadConfig($input, $output);
+        $this->loadConfig();
+        if ($this->loadDatabaseSchema()) {
+
+        }
+    }
+
+    protected function loadDatabaseSchema() {
+        $database = new Database([
+            'username' => $this->getConfig('database.username'),
+            'password' => $this->getConfig('database.password'),
+            'database' => $this->getConfig('database.database'),
+            'host' => $this->getConfig('database.host'),
+            'port' => $this->getConfig('database.port'),
+        ]);
+        $schemaReader = new SchemaReader($database);
+        $schemas = $schemaReader->load();
+        if (is_null($this->config->getSchemaListToGenerate())) {
+            $this->schemas = $schemas;
+        } else {
+            foreach ($this->config->getSchemaListToGenerate() as $name) {
+                if (isset($schemas[$name])) {
+                    $this->schemas[$name] = $schemas[$name];
+                } else {
+                    $this->output->writeln("<error>There is no [{$name}] schema in this database.</error>");
+                }
+            }
+        }
+        if (!isset($this->schemas['public'])) {
+            $this->output->writeln("<warn>WARNING: The [public] schema from your database was not selected!</warn>");
+        }
+        return true;
     }
 
     /**
@@ -46,20 +84,15 @@ class DataModelCommand extends Command {
      * @param InputInterface $input
      * @throws \InvalidArgumentException
      */
-    private function loadConfig(InputInterface $input, OutputInterface $output) {
-        $configClass = $input->getOption('configclass');
+    private function loadConfig() {
+        $configClass = $this->input->getOption('configclass');
         if (is_null($configClass)) {
             $configClass = ModelBuilderDefaultConfig::class;
         };
-        $container = new Container();
-        $this->config = $container->get($configClass,[
+        $this->config = $this->container->get($configClass, [
             'projectFolder' => $this->getApplication()->getProjectFolder()
         ]);
-        $output->writeln('<info>Useing the ' . get_class($this->config) . ' as configuration</info>');
-    }
-
-    private function validateInputConfig($config) {
-        return $config;
+        $this->output->writeln('<info>Using the ' . get_class($this->config) . ' as configuration</info>');
     }
 
 }

@@ -11,6 +11,8 @@
 
 namespace Blend\DataModelBuilder\Command;
 
+use Blend\Component\Filesystem\Filesystem;
+
 /**
  * ModelBuilderConfig base class for a ModelBuilder Configuration
  *
@@ -19,13 +21,23 @@ namespace Blend\DataModelBuilder\Command;
 abstract class ModelBuilderConfig {
 
     protected $projectFolder;
+    protected $targetRootFolder;
 
     public abstract function getApplicationNamespace();
 
     public abstract function getModelRootNamespace();
 
+    public abstract function getSchemaListToGenerate();
+
     public function __construct($projectFolder) {
         $this->projectFolder = $projectFolder;
+        $this->targetRootFolder = $projectFolder . '/src/' . $this->getModelRootNamespace();
+        $fs = new Filesystem();
+        $fs->ensureFolder($this->targetRootFolder);
+    }
+
+    public function getTargetRootFolder() {
+        return $this->targetRootFolder;
     }
 
 }

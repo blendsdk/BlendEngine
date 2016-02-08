@@ -35,6 +35,7 @@ class DataModelCommandTest extends DatabaseTestBase {
 
     public function testDefaultParameters() {
         $app = $this->createApplication();
+        define('BLEND_APPLICATION_NAMESPACE', 'DALTest');
         ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', [], $app, ['verbosity' => true]);
     }
 
@@ -47,7 +48,7 @@ class DataModelCommandTest extends DatabaseTestBase {
     }
 
     private function createApplication() {
-        $app = new Application(self::$projectFolder, 'DAL');
+        $app = new Application(self::$projectFolder, 'DALTest');
         $app->add(new DataModelCommand());
         return $app;
     }

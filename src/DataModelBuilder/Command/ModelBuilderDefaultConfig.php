@@ -34,4 +34,8 @@ class ModelBuilderDefaultConfig extends ModelBuilderConfig {
         return 'Database';
     }
 
+    public function getSchemaListToGenerate() {
+        return null; // will generate all schemas
+    }
+
 }
