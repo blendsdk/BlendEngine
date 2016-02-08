@@ -36,14 +36,21 @@ abstract class Command extends CommandBase {
      */
     protected $container;
 
-    public function __construct($name = null) {
-        parent::__construct($name);
-        $this->container = new Container();
-    }
+    /**
+     * @var OutputInterface
+     */
+    protected $output;
 
-    public function run(InputInterface $input, OutputInterface $output) {
+    /**
+     * @var InputInterface
+     */
+    protected $input;
+
+    protected function initialize(InputInterface $input, OutputInterface $output) {
+        $this->input = $input;
+        $this->output = $output;
+        $this->container = new Container();
         $this->initContainer();
-        parent::run($input, $output);
     }
 
     /**
