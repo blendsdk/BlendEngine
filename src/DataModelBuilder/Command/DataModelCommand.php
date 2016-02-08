@@ -16,11 +16,11 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Blend\DataModelBuilder\Command\ModelBuilderDefaultConfig;
-use Blend\Component\DI\Container;
-use Blend\Component\Configuration\Configuration;
 use Blend\Component\Database\Database;
 use Blend\DataModelBuilder\Schema\SchemaReader;
 use Blend\Component\Exception\InvalidConfigException;
+use Blend\Component\Filesystem\Filesystem;
+use Blend\DataModelBuilder\Schema\Schema;
 
 /**
  * Data Model Layer generator. This class will load the schemas, tables, etc...
@@ -48,10 +48,29 @@ class DataModelCommand extends Command {
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->loadConfig();
         if ($this->loadDatabaseSchema()) {
-
+            foreach ($this->schemas as $schemaName => $schema) {
+                /* @var $schema \Blend\DataModelBuilder\Schema\Schema */
+                $this->output->writeln("<info>Generating Models for schema [{$schemaName}]</info>");
+                $schemaPath = $this->createSchemaTargetPath($schema);
+            }
         }
     }
 
+    /**
+     * Creates a destination forlder for a given schema
+     * @param Schema $schema
+     * @return string
+     */
+    protected function createSchemaTargetPath(Schema $schema) {
+        $schemaPath = $this->config->getModelRootNamespace() . '/' . $schema->getName(true);
+        return $this->fileSystem->ensureFolder($schemaPath);
+    }
+
+    /**
+     * Load the Schema information from the database that is configured in the
+     * config.php
+     * @return boolean
+     */
     protected function loadDatabaseSchema() {
         $database = new Database([
             'username' => $this->getConfig('database.username'),
