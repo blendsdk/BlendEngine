@@ -43,7 +43,7 @@ class DataModelCommandTest extends DatabaseTestBase {
         return [
             'username' => 'postgres',
             'password' => 'postgres',
-            'database' => __CLASS__
+            'database' => 'daltest'
         ];
     }
 
