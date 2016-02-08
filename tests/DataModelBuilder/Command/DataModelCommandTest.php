@@ -35,7 +35,7 @@ class DataModelCommandTest extends DatabaseTestBase {
 
     public function testDefaultParameters() {
         $app = $this->createApplication();
-        ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', [], $app);
+        ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', [], $app, ['verbosity' => true]);
     }
 
     public static function getTestingDatabaseConfig() {

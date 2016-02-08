@@ -15,6 +15,8 @@ use Blend\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Blend\DataModelBuilder\Command\ModelBuilderDefaultConfig;
+use Blend\Component\DI\Container;
 
 /**
  * Data Model Layer generator. This class will load the schemas, tables, etc...
@@ -30,13 +32,13 @@ class DataModelCommand extends Command {
     protected function configure() {
         $this->setName('datamodel:generate')
                 ->setDescription('Generates a Data Model Layer from the current database')
-                ->addOption('config', 'c'
+                ->addOption('configclass', 'c'
                         , InputArgument::OPTIONAL
-                        , 'Configuration file to specify how to generate the DAL');
+                        , 'A config class that is going to be used to generated the models');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
-        $this->loadConfig($input);
+        $this->loadConfig($input, $output);
     }
 
     /**
@@ -44,13 +46,16 @@ class DataModelCommand extends Command {
      * @param InputInterface $input
      * @throws \InvalidArgumentException
      */
-    private function loadConfig(InputInterface $input) {
-        $configFile = $input->getOption('config');
-        if (!is_null($configFile) && !file_exists($configFile)) {
-            throw new \InvalidArgumentException("Provided configuration file could not be loaded [{$configFile}]");
-        } else {
-            $this->config = $this->validateInputConfig(include($configFile));
-        }
+    private function loadConfig(InputInterface $input, OutputInterface $output) {
+        $configClass = $input->getOption('configclass');
+        if (is_null($configClass)) {
+            $configClass = ModelBuilderDefaultConfig::class;
+        };
+        $container = new Container();
+        $this->config = $container->get($configClass,[
+            'projectFolder' => $this->getApplication()->getProjectFolder()
+        ]);
+        $output->writeln('<info>Useing the ' . get_class($this->config) . ' as configuration</info>');
     }
 
     private function validateInputConfig($config) {

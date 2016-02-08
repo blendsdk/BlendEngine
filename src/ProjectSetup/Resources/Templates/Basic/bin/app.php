@@ -25,5 +25,7 @@ require BLEND_COMPOSER_INSTALL;
 
 use <?php echo $applicationNamespace;?>\Console\<?php echo $applicationCommandClassName?>;
 
+define('BLEND_APPLICATION_NAMESPACE', '<?php echo $applicationNamespace;?>');
+
 $app = new <?php echo $applicationCommandClassName?>(__DIR__.'/../');
 $app->run();
