@@ -38,6 +38,8 @@ class DataModelCommand extends Command {
      */
     private $config = null;
     private $templateFolder;
+    private $dbToPHPTypes = [
+    ];
 
     protected function configure() {
         $this->setName('datamodel:generate')
@@ -58,13 +60,12 @@ class DataModelCommand extends Command {
             foreach ($this->schemas as $schemaName => $schema) {
                 /* @var $schema \Blend\DataModelBuilder\Schema\Schema */
                 $this->output->writeln("<info>Generating Models for schema [{$schemaName}]</info>");
-                $this->generateModels($schema);
+                $this->generateClasses($schema);
             }
         }
     }
 
-    protected function generateModels(Schema $schema) {
-
+    protected function generateClasses(Schema $schema) {
         foreach ($schema->getRelations() as $relation) {
             $this->generateModel($relation, $this->isRelationCustomized($relation), !$schema->getIsSingleSchema());
         }
@@ -73,32 +74,71 @@ class DataModelCommand extends Command {
     protected function generateModel(Relation $relation, $customized = false, $includeSchema = false) {
 
         if ($customized) {
-            
+            $classes = array(
+                'Model' => array(
+                    'namespace' => $this->createFQNamespace($relation, 'Model', $includeSchema, false),
+                    'uses' => ['Blend\Component\Model\Base\\' . $relation->getName(true) . ' as ' . $relation->getName(true) . 'Base'],
+                    'baseClass' => $relation->getName(true) . 'Base'
+                ),
+                'Model\Base' => array(
+                    'namespace' => $this->createFQNamespace($relation, 'Model\Base', $includeSchema, false),
+                    'uses' => ['Blend\Component\Model\Model'],
+                    'baseClass' => 'Model',
+                    'classmod' => 'abstract',
+                    'genprops' => true
+                )
+            );
         } else {
+            $classes = array(
+                'Model' => array(
+                    'namespace' => $this->createFQNamespace($relation, 'Model', $includeSchema, false),
+                    'uses' => ['Blend\Component\Model\Model'],
+                    'baseClass' => 'Model',
+                    'genprops' => true
+                )
+            );
+        }
+
+        foreach ($classes as $type => $class) {
             $template = new ModelTemplate();
             $template
-                    ->setNamespace($this->createFQNamespace($relation, $includeSchema))
+                    ->setNamespace($class['namespace'])
+                    ->addUsedClass($class['uses'])
+                    ->setFQRN($relation->getFQRN())
                     ->setClassname($relation->getName(true))
-                    ->setBaseClass('Model')
-                    ->addUsedClass('Blend\Component\Model\Model');
-            $this->renderRelation($template, $relation, 'Model', $includeSchema);
+                    ->setBaseClass($class['baseClass'])
+                    ->setClassModifier(isset($class['classmod']) ? $class['classmod'] : null);
+            if (isset($class['genprops'])) {
+                foreach ($relation->getColumns() as $column) {
+                    $template->addProperty($column->getName());
+                }
+            }
+            $outFile = $this->prepareOutput($template, $relation, $type, $includeSchema);
+            $template->render($outFile);
+            $this->output->writeln("Generate {$class['classname']} ({$type})");
         }
     }
 
-    private function renderRelation(Template $template, Relation $relation, $type, $includeSchema = false) {
+    private function translateTypeToPHP($type) {
+        return isset($this->dbToPHPTypes[$type]) ?
+                $this->dbToPHPTypes[$type] : null;
+    }
+
+    private function prepareOutput(Template $template, Relation $relation, $type, $includeSchema = false) {
         $folder = $this->config->getTargetRootFolder()
                 . '/' . $this->config->getModelRootNamespace()
                 . ($includeSchema ? '/' . $relation->getSchemaName(true) : '')
                 . '/' . $type;
         $this->fileSystem->ensureFolder($folder);
-        $template->render($folder . '/' . $relation->getName(true) . '.php');
+        return $folder . '/' . $relation->getName(true) . '.php';
     }
 
-    private function createFQNamespace(Relation $relation, $includeSchema = false) {
+    private function createFQNamespace(Relation $relation, $type, $includeSchema = false) {
         return $this->config->getApplicationNamespace()
                 . '\\'
                 . $this->config->getModelRootNamespace()
-                . ($includeSchema ? '\\' . $relation->getSchemaName(true) : '');
+                . ($includeSchema ? '\\' . $relation->getSchemaName(true) : '')
+                . '\\' . $type;
     }
 
     private function isRelationCustomized(Relation $relation) {
@@ -153,9 +193,20 @@ class DataModelCommand extends Command {
         if (is_null($configClass)) {
             $configClass = ModelBuilderDefaultConfig::class;
         };
-        $this->config = $this->container->get($configClass, [
-            'projectFolder' => $this->getApplication()->getProjectFolder()
-        ]);
+        try {
+            $this->config = $this->container->get($configClass, [
+                'projectFolder' => $this->getApplication()->getProjectFolder()
+            ]);
+        } catch (ReflectionException $ex) {
+            $this->output->writeln([
+                "<warn>Unable to load the provided configuration [{$configClass}]",
+                "Will continue with the default configuration."
+            ]);
+            $configClass = ModelBuilderDefaultConfig::class;
+            $this->config = $this->container->get($configClass, [
+                'projectFolder' => $this->getApplication()->getProjectFolder()
+            ]);
+        }
         $this->output->writeln('<info>Using the ' . get_class($this->config) . ' as configuration</info>');
     }
 
