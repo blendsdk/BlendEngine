@@ -199,8 +199,8 @@ class DataModelCommand extends Command {
             ]);
         } catch (ReflectionException $ex) {
             $this->output->writeln([
-                "<warn>Unable to load the provided configuration [{$configClass}]",
-                "Will continue with the default configuration."
+                "<warn>Unable to load the provided configuration [{$configClass}]</warn>",
+                "<warn>Will continue with the default configuration.</warn>"
             ]);
             $configClass = ModelBuilderDefaultConfig::class;
             $this->config = $this->container->get($configClass, [
