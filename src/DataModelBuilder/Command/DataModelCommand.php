@@ -20,9 +20,9 @@ use Blend\Component\Database\Database;
 use Blend\DataModelBuilder\Schema\SchemaReader;
 use Blend\DataModelBuilder\Schema\Schema;
 use Blend\DataModelBuilder\Schema\Relation;
-use Blend\DataModelBuilder\Template\ModelTemplate;
-use Blend\DataModelBuilder\Template\FactoryTemplate;
-use Blend\DataModelBuilder\Template\Template;
+use Blend\DataModelBuilder\Builder\ModelBuilder;
+use Blend\DataModelBuilder\Builder\FactoryBuilder;
+use Blend\Component\DI\Container;
 
 /**
  * Data Model Layer generator. This class will load the schemas, tables, etc...
@@ -39,8 +39,42 @@ class DataModelCommand extends Command {
      */
     private $config = null;
     private $templateFolder;
-    private $dbToPHPTypes = [
-    ];
+
+    protected function generateClasses(Schema $schema) {
+        $conatiner = new Container();
+        foreach ($schema->getRelations() as $relation) {
+
+            $allowCustomize = $this->allowCustomize($relation);
+            $rootPath = $this->config->getTargetRootFolder();
+            $rootNamespace = $this->config->getModelRootNamespace();
+            $appNamespace = $this->config->getApplicationNamespace();
+
+            foreach ([ModelBuilder::class, FactoryBuilder::class] as $builderClass) {
+                /* @var $builderClass \Blend\DataModelBuilder\Builder\ClassBuilder */
+                $builder = $conatiner->get($builderClass, [
+                    'relation' => $relation,
+                    'includeSchema' => !$schema->isSingle()
+                ]);
+                $builder->setApplicationNamespace($appNamespace);
+                $builder->setRootNamespace($rootNamespace);
+                $builder->setRootPath($rootPath);
+                $builder->build($allowCustomize);
+            }
+        }
+    }
+
+    /**
+     * Check if the Relation needs to be customized later
+     * @param Relation $relation
+     * @return type
+     */
+    private function allowCustomize(Relation $relation) {
+        $customizedModels = $this->config->getCustomizedRelationList();
+        if (!is_array($customizedModels)) {
+            $customizedModels = [];
+        }
+        return (in_array($relation->getName(), $customizedModels) || in_array($relation->getFQRN(), $customizedModels));
+    }
 
     protected function configure() {
         $this->setName('datamodel:generate')
@@ -66,147 +100,13 @@ class DataModelCommand extends Command {
         }
     }
 
-    protected function generateClasses(Schema $schema) {
-        foreach ($schema->getRelations() as $relation) {
-            $this->generateModel($relation, $this->isRelationCustomized($relation), !$schema->getIsSingleSchema());
-            $this->generateFactory($relation, $this->isRelationCustomized($relation), !$schema->getIsSingleSchema());
-        }
-    }
-
-    protected function createBuildDefinition(Relation $relation, $type, $includeSchema, $customized, $inheritFrom) {
-        $basetype = "{$type}\\Base";
-        $relName = $relation->getName(true);
-        $namespace = $this->createFQNamespace($relation, $type, $includeSchema, false);
-        if ($customized) {
-            $classes = array(
-                $type => array(
-                    'namespace' => $namespace,
-                    'uses' => ["{$namespace}\\Base\\{$relName} as {$relName}Base"],
-                    'baseClass' => "{$relName}Base",
-                    'overwrite' => false
-                ),
-                $basetype => array(
-                    'namespace' => "{$namespace}\\Base",
-                    'uses' => [$inheritFrom],
-                    'baseClass' => $type,
-                    'classmod' => 'abstract',
-                    'generate' => true
-                )
-            );
-        } else {
-            $classes = array(
-                $type => array(
-                    'namespace' => $namespace,
-                    'uses' => [$inheritFrom],
-                    'baseClass' => $type,
-                    'generate' => true
-                )
-            );
-        }
-        return $classes;
-    }
-
-    protected function generateFactory(Relation $relation, $customized = false, $includeSchema = false) {
-
-        $classes = $this->createBuildDefinition($relation, 'Factory', $includeSchema, $customized
-                , 'Blend\Component\Database\Factory\Factory');
-
-        foreach ($classes as $type => $class) {
-            $template = new FactoryTemplate();
-            $template
-                    ->setNamespace($class['namespace'])
-                    ->addUsedClass($class['uses'])
-                    ->setFQRN($relation->getFQRN())
-                    ->setClassname($relation->getName(true))
-                    ->setBaseClass($class['baseClass'])
-                    ->setClassModifier(isset($class['classmod']) ? $class['classmod'] : null);
-            if (isset($class['genprops'])) {
-//                foreach ($relation->getColumns() as $column) {
-//                    $template->addProperty($column->getName());
-//                }
-            }
-            refactore here!!!!
-            $outFile = $this->prepareOutput($template, $relation, $type, $includeSchema);
-            $overwrite = isset($class['overwrite']) ? $class['overwrite'] : true;
-            if (!$this->fileSystem->exists($outFile) ||
-                    ($this->fileSystem->exists($outFile) && $overwrite === true)) {
-                $template->render($outFile);
-                $this->output->writeln("Generate {$relation->getName(true)} ({$type})");
-            } else {
-                $this->output->writeln("<warn>Skipping {$relation->getName(true)} ({$type})</warn>");
-            }
-        }
-    }
-
-    protected function generateModel(Relation $relation, $customized = false, $includeSchema = false) {
-        $classes = $this->createBuildDefinition($relation, 'Model', $includeSchema, $customized
-                , 'Blend\Component\Model\Model');
-
-        foreach ($classes as $type => $class) {
-            $template = new ModelTemplate();
-            $template
-                    ->setNamespace($class['namespace'])
-                    ->addUsedClass($class['uses'])
-                    ->setFQRN($relation->getFQRN())
-                    ->setClassname($relation->getName(true))
-                    ->setBaseClass($class['baseClass'])
-                    ->setClassModifier(isset($class['classmod']) ? $class['classmod'] : null);
-            if (isset($class['generate'])) {
-                foreach ($relation->getColumns() as $column) {
-                    $template->addProperty($column->getName());
-                }
-            }
-            $outFile = $this->prepareOutput($template, $relation, $type, $includeSchema);
-            $template->render($outFile);
-            $this->output->writeln("Generate {$relation->getName(true)} ({$type})");
-        }
-    }
-
-    private function translateTypeToPHP($type) {
-        return isset($this->dbToPHPTypes[$type]) ?
-                $this->dbToPHPTypes[$type] : null;
-    }
-
-    private function prepareOutput(Template $template, Relation $relation, $type, $includeSchema = false) {
-        $folder = $this->config->getTargetRootFolder()
-                . '/' . $this->config->getModelRootNamespace()
-                . ($includeSchema ? '/' . $relation->getSchemaName(true) : '')
-                . '/' . $type;
-        $this->fileSystem->ensureFolder($folder);
-        return $folder . '/' . $relation->getName(true) . '.php';
-    }
-
-    private function createFQNamespace(Relation $relation, $type, $includeSchema = false) {
-        return $this->config->getApplicationNamespace()
-                . '\\'
-                . $this->config->getModelRootNamespace()
-                . ($includeSchema ? '\\' . $relation->getSchemaName(true) : '')
-                . '\\' . $type;
-    }
-
-    private function isRelationCustomized(Relation $relation) {
-
-        $customizedModels = $this->config->getCustomizedRelationList();
-        if (!is_array($customizedModels)) {
-            $customizedModels = [];
-        }
-
-        return (in_array($relation->getName(), $customizedModels) || in_array($relation->getFQRN(), $customizedModels));
-    }
-
     /**
      * Load the Schema information from the database that is configured in the
      * config.php
      * @return boolean
      */
     protected function loadDatabaseSchema() {
-        $database = new Database([
-            'username' => $this->getConfig('database.username'),
-            'password' => $this->getConfig('database.password'),
-            'database' => $this->getConfig('database.database'),
-            'host' => $this->getConfig('database.host'),
-            'port' => $this->getConfig('database.port'),
-        ]);
+        $database = $this->createDatabaseInstance();
         $schemaReader = new SchemaReader($database);
         $schemas = $schemaReader->load();
         if (is_null($this->config->getSchemaListToGenerate())) {
@@ -227,6 +127,20 @@ class DataModelCommand extends Command {
     }
 
     /**
+     * Creates and a new Database instance
+     * @return Database
+     */
+    private function createDatabaseInstance() {
+        return new Database([
+            'username' => $this->getConfig('database.username'),
+            'password' => $this->getConfig('database.password'),
+            'database' => $this->getConfig('database.database'),
+            'host' => $this->getConfig('database.host'),
+            'port' => $this->getConfig('database.port'),
+        ]);
+    }
+
+    /**
      * Load the configuration file if possible
      * @param InputInterface $input
      * @throws \InvalidArgumentException
@@ -235,7 +149,7 @@ class DataModelCommand extends Command {
         $configClass = $this->input->getOption('configclass');
         if (is_null($configClass)) {
             $configClass = ModelBuilderDefaultConfig::class;
-        };
+        }
         try {
             $this->config = $this->container->get($configClass, [
                 'projectFolder' => $this->getApplication()->getProjectFolder()

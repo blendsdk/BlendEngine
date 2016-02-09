@@ -28,20 +28,15 @@ class Schema extends Record {
     private $relations = [];
 
     /**
-     * Gets the schema name
-     * @return string
-     */
-    public function getName($prettify = false) {
-        return $this->getString('schema_name'
-                        , $prettify, array('public' => 'Common'));
-    }
-
-    /**
      * Gets if this is the only available schema in the database
      * @return type
      */
-    public function getIsSingleSchema() {
+    public function isSingle() {
         return $this->record['is_single'];
+    }
+
+    public function getName() {
+        return $this->getString('schema_name');
     }
 
     /**
