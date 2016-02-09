@@ -30,6 +30,14 @@ if (!defined('BLEND_COMPOSER_INSTALL')) {
     die(1);
 }
 
+if (!function_exists('is_windows')) {
+
+    function is_windows() {
+        return (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
+    }
+
+}
+
 $tempFolder = dirname(__FILE__) . '/temp';
 if (!file_exists($tempFolder)) {
     mkdir($tempFolder, 0777, true);
