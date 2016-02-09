@@ -39,7 +39,7 @@ abstract class ModelBuilderConfig {
      * return "null" to generate all the schemas
      */
     public abstract function getSchemaListToGenerate();
-    
+
     /**
      * Should return a string array of relation (tables and views) names that
      * you are going to customize
