@@ -53,7 +53,8 @@ class Relation extends Record {
      * @return string
      */
     public function getSchemaName($prettify = false) {
-        return $this->getString('table_schema', $prettify);
+        return $this->getString('table_schema'
+                        , $prettify, array('public' => 'Common'));
     }
 
     /**

@@ -18,7 +18,7 @@ use Blend\DataModelBuilder\Template\Template;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class ClassTemplate extends Template{
+abstract class ClassTemplate extends Template {
 
     /**
      * @param type $value
@@ -53,6 +53,15 @@ abstract class ClassTemplate extends Template{
      */
     public function setClassModifier($value) {
         $this->set('classModifier', $value);
+        return $this;
+    }
+
+    /**
+     * @param type $value
+     * @return \Blend\DataModelBuilder\Template\ClassTemplate
+     */
+    public function addUsedClass($value) {
+        $this->set('uses', $value, true);
         return $this;
     }
 

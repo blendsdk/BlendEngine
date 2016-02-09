@@ -32,12 +32,8 @@ class Schema extends Record {
      * @return string
      */
     public function getName($prettify = false) {
-        $name = $this->record['schema_name'];
-        if ($prettify) {
-            return str_identifier($name);
-        } else {
-            return $name;
-        }
+        return $this->getString('schema_name'
+                        , $prettify, array('public' => 'Common'));
     }
 
     /**
