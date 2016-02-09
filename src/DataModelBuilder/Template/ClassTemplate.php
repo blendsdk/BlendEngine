@@ -61,7 +61,12 @@ abstract class ClassTemplate extends Template {
      * @return \Blend\DataModelBuilder\Template\ClassTemplate
      */
     public function addUsedClass($value) {
-        $this->set('uses', $value, true);
+        if (!is_array($value)) {
+            $value = [$value];
+        }
+        foreach ($value as $itm) {
+            $this->set('uses', $itm, true);
+        }
         return $this;
     }
 
