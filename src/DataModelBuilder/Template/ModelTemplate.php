@@ -18,10 +18,35 @@ use Blend\DataModelBuilder\Template\ClassTemplate;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class ModelTemplate extends ClassTemplate{
+class ModelTemplate extends ClassTemplate {
 
     public function __construct() {
         parent::__construct('model.php');
+    }
+
+    /**
+     * @param type $value
+     * @return \Blend\DataModelBuilder\Template\ModelTemplate
+     */
+    public function setFQRN($value) {
+        $this->set('fqrn', $value);
+        return $this;
+    }
+
+    /**
+     * @param type $name
+     * @param type $type
+     * @return \Blend\DataModelBuilder\Template\ModelTemplate
+     */
+    public function addProperty($name, $type = 'mixed') {
+        $data = [
+            'name' => $name,
+            'getter' => 'get' . str_identifier($name),
+            'setter' => 'set' . str_identifier($name),
+            'type' => $type
+        ];
+        $this->set('props', $data, true);
+        return $this;
     }
 
 }
