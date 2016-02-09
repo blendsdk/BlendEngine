@@ -21,6 +21,7 @@ use Blend\DataModelBuilder\Schema\SchemaReader;
 use Blend\DataModelBuilder\Schema\Schema;
 use Blend\DataModelBuilder\Schema\Relation;
 use Blend\DataModelBuilder\Template\ModelTemplate;
+use Blend\DataModelBuilder\Template\Template;
 
 /**
  * Data Model Layer generator. This class will load the schemas, tables, etc...
@@ -57,13 +58,12 @@ class DataModelCommand extends Command {
             foreach ($this->schemas as $schemaName => $schema) {
                 /* @var $schema \Blend\DataModelBuilder\Schema\Schema */
                 $this->output->writeln("<info>Generating Models for schema [{$schemaName}]</info>");
-                $targetPath = $this->createSchemaTargetPath($schema);
-                $this->generateModels($schema, $targetPath);
+                $this->generateModels($schema);
             }
         }
     }
 
-    protected function generateModels(Schema $schema, $targetPath) {
+    protected function generateModels(Schema $schema) {
 
         foreach ($schema->getRelations() as $relation) {
             $this->generateModel($relation, $this->isRelationCustomized($relation), !$schema->getIsSingleSchema());
@@ -75,22 +75,30 @@ class DataModelCommand extends Command {
         if ($customized) {
             
         } else {
-            list($namespace, $folder, $file) = $this->createNamespace($relation, $includeSchema);
-            $this->fileSystem->ensureFolder($folder);
-            $mt = new ModelTemplate();
-            $mt->setNamespace($namespace)
+            $template = new ModelTemplate();
+            $template
+                    ->setNamespace($this->createFQNamespace($relation, $includeSchema))
                     ->setClassname($relation->getName(true))
-                    ->setBaseClass('Model');
-            $mt->render($file);
+                    ->setBaseClass('Model')
+                    ->addUsedClass('Blend\Component\Model\Model');
+            $this->renderRelation($template, $relation, 'Model', $includeSchema);
         }
     }
 
-    private function createNamespace(Relation $relation, $includeSchema = false) {
-        $ns = $this->config->getModelRootNamespace()
-                . (($includeSchema ? '\\' . $relation->getSchemaName(true) : ''));
-        $folder = $this->config->getTargetRootFolder() . '/' . $ns;
-        $file = $folder . '/' . $relation->getName(true) . '.php';
-        return [$this->config->getApplicationNamespace() . '\\' . $ns, $folder, $file];
+    private function renderRelation(Template $template, Relation $relation, $type, $includeSchema = false) {
+        $folder = $this->config->getTargetRootFolder()
+                . '/' . $this->config->getModelRootNamespace()
+                . ($includeSchema ? '/' . $relation->getSchemaName(true) : '')
+                . '/' . $type;
+        $this->fileSystem->ensureFolder($folder);
+        $template->render($folder . '/' . $relation->getName(true) . '.php');
+    }
+
+    private function createFQNamespace(Relation $relation, $includeSchema = false) {
+        return $this->config->getApplicationNamespace()
+                . '\\'
+                . $this->config->getModelRootNamespace()
+                . ($includeSchema ? '\\' . $relation->getSchemaName(true) : '');
     }
 
     private function isRelationCustomized(Relation $relation) {
@@ -101,18 +109,6 @@ class DataModelCommand extends Command {
         }
 
         return (in_array($relation->getName(), $customizedModels) || in_array($relation->getFQRN(), $customizedModels));
-    }
-
-    /**
-     * Creates a destination forlder for a given schema
-     * @param Schema $schema
-     * @return string
-     */
-    protected function createSchemaTargetPath(Schema $schema, $appendName = true) {
-        $root = $this->config->getTargetRootFolder()
-                . (!$schema->getIsSingleSchema() ? '/' . $schema->getName(true) : '');
-        $this->fileSystem->ensureFolder($root);
-        return $root;
     }
 
     /**
