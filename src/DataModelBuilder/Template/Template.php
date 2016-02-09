@@ -26,12 +26,16 @@ abstract class Template {
         $this->templateFile = dirname(__FILE__) . '/Resources/' . $templateFile;
     }
 
-    protected function set($key, $value) {
-        $this->context[$key] = $value;
+    protected function set($key, $value, $asArray = false) {
+        if ($asArray) {
+            $this->context[$key][] = $value;
+        } else {
+            $this->context[$key] = $value;
+        }
     }
 
     public function render($toFile = null) {
-        return render_php_template($this->templateFile, $this->context, $this->normalizePath($toFile));
+        return render_php_template($this->templateFile, $this->context, $this->normalizePath($toFile), false);
     }
 
     private function normalizePath($path) {
