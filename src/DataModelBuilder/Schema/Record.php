@@ -28,4 +28,13 @@ abstract class Record {
         return $record;
     }
 
+    protected function getString($name, $prettify = false) {
+        $name = $this->record[$name];
+        if ($prettify) {
+            return str_identifier($name);
+        } else {
+            return $name;
+        }
+    }
+
 }

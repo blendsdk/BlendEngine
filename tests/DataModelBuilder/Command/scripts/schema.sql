@@ -1,4 +1,5 @@
 create schema customer_reporting;
+create table customer_reporting.aggrigations ();
 
 create table sys_user (
     user_id serial not null primary key,
@@ -35,6 +36,3 @@ create table sys_order_item (
     order_item_amount numeric not null default 0    
 );
 
-
-create table customer_reporting.aggrigations (
-);

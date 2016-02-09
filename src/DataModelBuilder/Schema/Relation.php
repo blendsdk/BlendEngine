@@ -40,16 +40,20 @@ class Relation extends Record {
      * Gets the relation name
      * @return string
      */
-    public function getName() {
-        return $this->record['table_name'];
+    public function getName($prettify = false) {
+        return $this->getString('table_name', $prettify);
+    }
+
+    public function getFQRN() {
+        return $this->getSchemaName() . '.' . $this->getName();
     }
 
     /**
      * Gets the schema name
      * @return string
      */
-    public function getSchemaName() {
-        return $this->record['table_schema'];
+    public function getSchemaName($prettify = false) {
+        return $this->getString('table_schema', $prettify);
     }
 
     /**

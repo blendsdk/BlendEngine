@@ -55,7 +55,10 @@ class SchemaReader {
                 ->where(sqlstr('schema_name')->notInList($skip, SQLString::STRING_RENDERER()));
 
         $result = [];
-        foreach ($this->database->executeQuery($sql) as $record) {
+        $list = $this->database->executeQuery($sql);
+        $singleSchema = count($list) === 1;
+        foreach ($list as $record) {
+            $record['is_single'] = $singleSchema;
             $schema = new Schema($record);
             $this->loadRelationsForSchema($schema);
             $result[$schema->getName()] = $schema;

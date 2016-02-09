@@ -18,9 +18,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Blend\DataModelBuilder\Command\ModelBuilderDefaultConfig;
 use Blend\Component\Database\Database;
 use Blend\DataModelBuilder\Schema\SchemaReader;
-use Blend\Component\Exception\InvalidConfigException;
-use Blend\Component\Filesystem\Filesystem;
 use Blend\DataModelBuilder\Schema\Schema;
+use Blend\DataModelBuilder\Schema\Relation;
+use Blend\DataModelBuilder\Template\ModelTemplate;
 
 /**
  * Data Model Layer generator. This class will load the schemas, tables, etc...
@@ -36,6 +36,7 @@ class DataModelCommand extends Command {
      * @var ModelBuilderConfig
      */
     private $config = null;
+    private $templateFolder;
 
     protected function configure() {
         $this->setName('datamodel:generate')
@@ -45,15 +46,61 @@ class DataModelCommand extends Command {
                         , 'A config class that is going to be used to generated the models');
     }
 
+    protected function initialize(InputInterface $input, OutputInterface $output) {
+        parent::initialize($input, $output);
+        $this->templateFolder = realpath(dirname(__FILE__) . '/../Templates');
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output) {
         $this->loadConfig();
         if ($this->loadDatabaseSchema()) {
             foreach ($this->schemas as $schemaName => $schema) {
                 /* @var $schema \Blend\DataModelBuilder\Schema\Schema */
                 $this->output->writeln("<info>Generating Models for schema [{$schemaName}]</info>");
-                $schemaPath = $this->createSchemaTargetPath($schema);
+                $targetPath = $this->createSchemaTargetPath($schema);
+                $this->generateModels($schema, $targetPath);
             }
         }
+    }
+
+    protected function generateModels(Schema $schema, $targetPath) {
+
+        foreach ($schema->getRelations() as $relation) {
+            $this->generateModel($relation, $this->isRelationCustomized($relation), !$schema->getIsSingleSchema());
+        }
+    }
+
+    protected function generateModel(Relation $relation, $customized = false, $includeSchema = false) {
+
+        if ($customized) {
+            
+        } else {
+            list($namespace, $folder, $file) = $this->createNamespace($relation, $includeSchema);
+            $this->fileSystem->ensureFolder($folder);
+            $mt = new ModelTemplate();
+            $mt->setNamespace($namespace)
+                    ->setClassname($relation->getName(true))
+                    ->setBaseClass('Model');
+            $mt->render($file);
+        }
+    }
+
+    private function createNamespace(Relation $relation, $includeSchema = false) {
+        $ns = $this->config->getModelRootNamespace()
+                . (($includeSchema ? '\\' . $relation->getSchemaName(true) : ''));
+        $folder = $this->config->getTargetRootFolder() . '/' . $ns;
+        $file = $folder . '/' . $relation->getName(true) . '.php';
+        return [$this->config->getApplicationNamespace() . '\\' . $ns, $folder, $file];
+    }
+
+    private function isRelationCustomized(Relation $relation) {
+
+        $customizedModels = $this->config->getCustomizedRelationList();
+        if (!is_array($customizedModels)) {
+            $customizedModels = [];
+        }
+
+        return (in_array($relation->getName(), $customizedModels) || in_array($relation->getFQRN(), $customizedModels));
     }
 
     /**
@@ -61,9 +108,11 @@ class DataModelCommand extends Command {
      * @param Schema $schema
      * @return string
      */
-    protected function createSchemaTargetPath(Schema $schema) {
-        $schemaPath = $this->config->getModelRootNamespace() . '/' . $schema->getName(true);
-        return $this->fileSystem->ensureFolder($schemaPath);
+    protected function createSchemaTargetPath(Schema $schema, $appendName = true) {
+        $root = $this->config->getTargetRootFolder()
+                . (!$schema->getIsSingleSchema() ? '/' . $schema->getName(true) : '');
+        $this->fileSystem->ensureFolder($root);
+        return $root;
     }
 
     /**

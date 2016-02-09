@@ -30,7 +30,13 @@ class Filesystem extends FilesystemBase {
         if (!$this->exists($folder)) {
             $this->mkdir($folder, $mode);
         }
-        return realpath($folder);
+        if (is_array($folder)) {
+            foreach ($folder as $key => $item) {
+                $folder[$key] = realpath($item);
+            }
+        } else {
+            return realpath($folder);
+        }
     }
 
 }

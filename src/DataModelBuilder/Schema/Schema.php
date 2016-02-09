@@ -32,11 +32,20 @@ class Schema extends Record {
      * @return string
      */
     public function getName($prettify = false) {
+        $name = $this->record['schema_name'];
         if ($prettify) {
-            return str_identifier($this->record['schema_name']);
+            return str_identifier($name);
         } else {
-            return $this->record['schema_name'];
+            return $name;
         }
+    }
+
+    /**
+     * Gets if this is the only available schema in the database
+     * @return type
+     */
+    public function getIsSingleSchema() {
+        return $this->record['is_single'];
     }
 
     /**

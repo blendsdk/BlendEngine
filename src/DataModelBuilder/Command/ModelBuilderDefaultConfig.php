@@ -38,4 +38,8 @@ class ModelBuilderDefaultConfig extends ModelBuilderConfig {
         return null; // will generate all schemas
     }
 
+    public function getCustomizedRelationList() {
+        return null; // nothing to customze
+    }
+
 }

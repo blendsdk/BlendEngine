@@ -23,19 +23,40 @@ abstract class ModelBuilderConfig {
     protected $projectFolder;
     protected $targetRootFolder;
 
+    /**
+     * Should return the root namespace of your application
+     */
     public abstract function getApplicationNamespace();
 
+    /**
+     * Should resturn the root namespace of your DAL (Data Access Layer)
+     * "Database" for example
+     */
     public abstract function getModelRootNamespace();
 
+    /**
+     * Should return aa string array of schemas to generate otherwise it should
+     * return "null" to generate all the schemas
+     */
     public abstract function getSchemaListToGenerate();
+    
+    /**
+     * Should return a string array of relation (tables and views) names that
+     * you are going to customize
+     */
+    public abstract function getCustomizedRelationList();
 
     public function __construct($projectFolder) {
         $this->projectFolder = $projectFolder;
-        $this->targetRootFolder = $projectFolder . '/src/' . $this->getModelRootNamespace();
+        $this->targetRootFolder = $projectFolder . '/src';
         $fs = new Filesystem();
         $fs->ensureFolder($this->targetRootFolder);
     }
 
+    /**
+     * Gets the root folder where DAL files will be generated
+     * @return type
+     */
     public function getTargetRootFolder() {
         return $this->targetRootFolder;
     }
