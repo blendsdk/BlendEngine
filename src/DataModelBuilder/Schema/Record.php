@@ -28,10 +28,15 @@ abstract class Record {
         return $record;
     }
 
-    protected function getString($name, $prettify = false) {
+    protected function getString($name, $prettify = false, $replace = array()) {
         $name = $this->record[$name];
         if ($prettify) {
-            return str_identifier($name);
+            return str_identifier(
+                    str_replace(
+                            array_keys($replace)
+                            , array_values($replace)
+                            , $name)
+            );
         } else {
             return $name;
         }
