@@ -11,7 +11,6 @@
 
 namespace Blend\DataModelBuilder\Schema;
 
-
 use Blend\DataModelBuilder\Schema\Record;
 
 /**
@@ -21,14 +20,12 @@ use Blend\DataModelBuilder\Schema\Record;
  */
 class Column extends Record {
 
-    const COLUMN_NAME = 'column_name';
-
     /**
      * Gets the name of this Column
      * @return type
      */
     public function getName() {
-        return $this->record[self::COLUMN_NAME];
+        return $this->getString('column_name');
     }
 
 }

@@ -115,7 +115,7 @@ class DataModelCommand extends Command {
             }
             $outFile = $this->prepareOutput($template, $relation, $type, $includeSchema);
             $template->render($outFile);
-            $this->output->writeln("Generate {$class['classname']} ({$type})");
+            $this->output->writeln("Generate {$relation->getName(true)} ({$type})");
         }
     }
 
