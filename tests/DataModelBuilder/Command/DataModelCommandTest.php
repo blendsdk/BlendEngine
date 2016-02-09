@@ -15,6 +15,7 @@ use Blend\Component\Console\Application;
 use Blend\DataModelBuilder\Command\DataModelCommand;
 use Blend\Tests\Component\Database\DatabaseTestBase;
 use Blend\Tests\ProjectUtil;
+use Blend\Component\Filesystem\Filesystem;
 
 /**
  * DataModelCommandTest
@@ -25,18 +26,18 @@ class DataModelCommandTest extends DatabaseTestBase {
 
     private static $projectFolder;
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testSanityCommandTest() {
+    public function testDefaultConfig() {
         $app = $this->createApplication();
-        ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', ['--config' => 'not-exist.php'], $app);
+        ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', [], $app);
+        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/SysUser.php');
+        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/SysUserProfile.php');
     }
 
-    public function testDefaultParameters() {
+    public function testCustomizedConfig() {
         $app = $this->createApplication();
-        define('BLEND_APPLICATION_NAMESPACE', 'DALTest');
-        ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', [], $app);
+        ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', ['--configclass' => 'Blend\Tests\DataModelBuilder\Command\CustomizedModelConfig'], $app);
+        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/SysOrder.php');
+        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/Base/SysOrder.php');
     }
 
     public static function getTestingDatabaseConfig() {
@@ -53,7 +54,15 @@ class DataModelCommandTest extends DatabaseTestBase {
         return $app;
     }
 
+    protected function setUp() {
+        if (is_windows()) {
+            $fs = new Filesystem();
+            $fs->remove(self::$projectFolder . '/src/Database');
+        }
+    }
+
     public static function setUpSchema() {
+        define('BLEND_APPLICATION_NAMESPACE', 'DALTest');
         self::$currentDatabase->executeScript(file_get_contents(__DIR__ . '/scripts/schema.sql'));
         $projectFolder = ProjectUtil::createNewProject("DALTest", !is_windows());
         self::$projectFolder = $projectFolder;
