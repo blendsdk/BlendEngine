@@ -21,6 +21,7 @@ use Blend\DataModelBuilder\Schema\SchemaReader;
 use Blend\DataModelBuilder\Schema\Schema;
 use Blend\DataModelBuilder\Schema\Relation;
 use Blend\DataModelBuilder\Template\ModelTemplate;
+use Blend\DataModelBuilder\Template\FactoryTemplate;
 use Blend\DataModelBuilder\Template\Template;
 
 /**
@@ -68,36 +69,78 @@ class DataModelCommand extends Command {
     protected function generateClasses(Schema $schema) {
         foreach ($schema->getRelations() as $relation) {
             $this->generateModel($relation, $this->isRelationCustomized($relation), !$schema->getIsSingleSchema());
+            $this->generateFactory($relation, $this->isRelationCustomized($relation), !$schema->getIsSingleSchema());
         }
     }
 
-    protected function generateModel(Relation $relation, $customized = false, $includeSchema = false) {
-
+    protected function createBuildDefinition(Relation $relation, $type, $includeSchema, $customized, $inheritFrom) {
+        $basetype = "{$type}\\Base";
+        $relName = $relation->getName(true);
+        $namespace = $this->createFQNamespace($relation, $type, $includeSchema, false);
         if ($customized) {
             $classes = array(
-                'Model' => array(
-                    'namespace' => $this->createFQNamespace($relation, 'Model', $includeSchema, false),
-                    'uses' => ['Blend\Component\Model\Base\\' . $relation->getName(true) . ' as ' . $relation->getName(true) . 'Base'],
-                    'baseClass' => $relation->getName(true) . 'Base'
+                $type => array(
+                    'namespace' => $namespace,
+                    'uses' => ["{$namespace}\\Base\\{$relName} as {$relName}Base"],
+                    'baseClass' => "{$relName}Base",
+                    'overwrite' => false
                 ),
-                'Model\Base' => array(
-                    'namespace' => $this->createFQNamespace($relation, 'Model\Base', $includeSchema, false),
-                    'uses' => ['Blend\Component\Model\Model'],
-                    'baseClass' => 'Model',
+                $basetype => array(
+                    'namespace' => "{$namespace}\\Base",
+                    'uses' => [$inheritFrom],
+                    'baseClass' => $type,
                     'classmod' => 'abstract',
-                    'genprops' => true
+                    'generate' => true
                 )
             );
         } else {
             $classes = array(
-                'Model' => array(
-                    'namespace' => $this->createFQNamespace($relation, 'Model', $includeSchema, false),
-                    'uses' => ['Blend\Component\Model\Model'],
-                    'baseClass' => 'Model',
-                    'genprops' => true
+                $type => array(
+                    'namespace' => $namespace,
+                    'uses' => [$inheritFrom],
+                    'baseClass' => $type,
+                    'generate' => true
                 )
             );
         }
+        return $classes;
+    }
+
+    protected function generateFactory(Relation $relation, $customized = false, $includeSchema = false) {
+
+        $classes = $this->createBuildDefinition($relation, 'Factory', $includeSchema, $customized
+                , 'Blend\Component\Database\Factory\Factory');
+
+        foreach ($classes as $type => $class) {
+            $template = new FactoryTemplate();
+            $template
+                    ->setNamespace($class['namespace'])
+                    ->addUsedClass($class['uses'])
+                    ->setFQRN($relation->getFQRN())
+                    ->setClassname($relation->getName(true))
+                    ->setBaseClass($class['baseClass'])
+                    ->setClassModifier(isset($class['classmod']) ? $class['classmod'] : null);
+            if (isset($class['genprops'])) {
+//                foreach ($relation->getColumns() as $column) {
+//                    $template->addProperty($column->getName());
+//                }
+            }
+            refactore here!!!!
+            $outFile = $this->prepareOutput($template, $relation, $type, $includeSchema);
+            $overwrite = isset($class['overwrite']) ? $class['overwrite'] : true;
+            if (!$this->fileSystem->exists($outFile) ||
+                    ($this->fileSystem->exists($outFile) && $overwrite === true)) {
+                $template->render($outFile);
+                $this->output->writeln("Generate {$relation->getName(true)} ({$type})");
+            } else {
+                $this->output->writeln("<warn>Skipping {$relation->getName(true)} ({$type})</warn>");
+            }
+        }
+    }
+
+    protected function generateModel(Relation $relation, $customized = false, $includeSchema = false) {
+        $classes = $this->createBuildDefinition($relation, 'Model', $includeSchema, $customized
+                , 'Blend\Component\Model\Model');
 
         foreach ($classes as $type => $class) {
             $template = new ModelTemplate();
@@ -108,7 +151,7 @@ class DataModelCommand extends Command {
                     ->setClassname($relation->getName(true))
                     ->setBaseClass($class['baseClass'])
                     ->setClassModifier(isset($class['classmod']) ? $class['classmod'] : null);
-            if (isset($class['genprops'])) {
+            if (isset($class['generate'])) {
                 foreach ($relation->getColumns() as $column) {
                     $template->addProperty($column->getName());
                 }
