@@ -42,4 +42,12 @@ class ModelBuilderDefaultConfig extends ModelBuilderConfig {
         return null; // nothing to customze
     }
 
+    public function getLocalDateTimeFormat() {
+        return [
+            'date' => 'd-m-Y',
+            'time' => 'H:i:s',
+            'datetime' => 'd-m-Y H:i:s'
+        ];
+    }
+
 }

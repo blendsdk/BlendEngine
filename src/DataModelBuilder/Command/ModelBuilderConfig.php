@@ -46,6 +46,16 @@ abstract class ModelBuilderConfig {
      */
     public abstract function getCustomizedRelationList();
 
+    /**
+     * Should return the local date format, for example
+     * return [
+     *      'date' => 'd-m-Y',
+     *      'time' => 'H:i:s',
+     *      'datetime' => 'd-m-Y H:i:s'
+     * ]
+     */
+    public abstract function getLocalDateTimeFormat();
+
     public function __construct($projectFolder) {
         $this->projectFolder = $projectFolder;
         $this->targetRootFolder = $projectFolder . '/src';
