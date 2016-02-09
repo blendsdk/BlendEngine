@@ -55,7 +55,7 @@ class DataModelCommandTest extends DatabaseTestBase {
 
     public static function setUpSchema() {
         self::$currentDatabase->executeScript(file_get_contents(__DIR__ . '/scripts/schema.sql'));
-        $projectFolder = ProjectUtil::createNewProject("DALTest", true);
+        $projectFolder = ProjectUtil::createNewProject("DALTest", !is_windows());
         self::$projectFolder = $projectFolder;
     }
 
