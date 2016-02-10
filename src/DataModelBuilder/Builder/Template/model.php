@@ -3,7 +3,7 @@
 namespace <?php echo $appNamespace . '\\' . $classNamespace ?>;
 
 <?php foreach ($uses as $use): ?>
-use <?php echo $appNamespace . '\\' . $use; ?>;
+use <?php echo $use; ?>;
 <?php endforeach; ?>
 
 /**

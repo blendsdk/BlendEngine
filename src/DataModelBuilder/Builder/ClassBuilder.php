@@ -69,7 +69,7 @@ abstract class ClassBuilder {
                     'className' => $className,
                     'classNamespace' => $this->rootNamespace,
                     'classBaseClass' => $className . 'Base',
-                    'uses' => [$this->rootNamespace . '\\Base\\' . $className . ' as ' . $className . 'Base']
+                    'uses' => [$this->applicationNamespace . '\\' . $this->rootNamespace . '\\Base\\' . $className . ' as ' . $className . 'Base']
                 ),
                 array(
                     'classModifier' => 'abstract',
