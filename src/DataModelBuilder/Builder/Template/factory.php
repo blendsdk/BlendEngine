@@ -12,4 +12,6 @@ use <?php echo $use; ?>;
  */
 <?php if (isset($classModifier)) echo $classModifier . ' '; ?>class <?php echo $className ?> extends <?php echo $classBaseClass; ?> {
 
+    <?php if (isset($generate)):?>protected $modelClass = '<?php echo $modelClass?>';<?php endif;?>
+
 }

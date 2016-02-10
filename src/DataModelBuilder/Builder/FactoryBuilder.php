@@ -21,6 +21,8 @@ use Blend\DataModelBuilder\Schema\Relation;
  */
 class FactoryBuilder extends ClassBuilder {
 
+    protected $modelRootNamespace;
+
     public function __construct(Relation $relation, $includeSchema) {
         parent::__construct('factory', $relation, $includeSchema);
         $this->defaultBaseClassName = $this->classNamePostfix = 'Factory';
@@ -29,10 +31,16 @@ class FactoryBuilder extends ClassBuilder {
 
     public function setRootNamespace($schema) {
         parent::setRootNamespace($schema);
+        $this->modelRootNamespace = $this->rootNamespace;
         $this->rootNamespace .= '\\Factory';
     }
 
     protected function preparBuildDefinition($def) {
+        $modelClass = $this->applicationNamespace
+                . '\\' . $this->modelRootNamespace
+                . '\\Model\\' . $this->relation->getName(true);
+        $def['modelClass'] = $modelClass;
+        $def['uses'][] = $modelClass;
         return $def;
     }
 
