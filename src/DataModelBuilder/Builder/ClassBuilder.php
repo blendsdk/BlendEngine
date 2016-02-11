@@ -53,22 +53,73 @@ abstract class ClassBuilder {
         $this->fieldConverterClassParams = null;
     }
 
-    public function setFieldConverterClassParams($param) {
-        $this->fieldConverterClassParams = $param;
-    }
-
+    /**
+     * Sets the FQCN of the FieldConverter class
+     * @param type $class
+     */
     public function setFieldConverterClass($class) {
         $this->fieldConverterClass = $class;
     }
 
+    /**
+     * Gets the previously set the FieldConverter class
+     * @return type
+     */
     public function getFieldConverterInfo() {
         return $this->fieldConverterInfo;
     }
 
+    /**
+     * Set the previously generated field converter information
+     * @param type $info
+     */
     public function setFieldConverterInfo($info) {
         $this->fieldConverterInfo = $info;
     }
 
+    /**
+     * Sets the columnConverterResolver. This is a closure that will call the 
+     * config->getConverterForField(....)
+     * @param \Blend\DataModelBuilder\Builder\callable $resolver
+     */
+    public function setColumnConverterResolver(callable $resolver) {
+        $this->columnConverterResolver = $resolver;
+    }
+
+    /**
+     * Setter to the Application's root namespace
+     * @param type $namespace
+     */
+    public function setApplicationNamespace($namespace) {
+        $this->applicationNamespace = $namespace;
+    }
+
+    /**
+     * Setter for the rootNamespace. For example (MyApp)\Database[Model/Factory]
+     * @param type $namespace
+     */
+    public function setRootNamespace($namespace) {
+        $this->rootNamespace = $namespace
+                . ($this->includeSchema ? '\\' . $this->relation->getSchemaName(true) : '');
+    }
+
+    /**
+     * Sets the root path where the files will be generated. (.../src)
+     * @param type $path
+     */
+    public function setRootPath($path) {
+        $this->rootPath = $path;
+    }
+
+    /**
+     * Here we use the columnConverterResolver (closure set from the DataModelCommand)
+     * to optionally get a converter for a column
+     * @param type $schema
+     * @param type $relation
+     * @param type $column
+     * @param type $dbtype
+     * @param type $fqcn
+     */
     public function resolveColumnConverter($schema, $relation, $column, $dbtype, $fqcn) {
         if ($this->columnConverterResolver) {
             $converter = call_user_func_array($this->columnConverterResolver, [$schema, $relation, $column, $dbtype, $fqcn]);
@@ -83,23 +134,15 @@ abstract class ClassBuilder {
         }
     }
 
-    public function setColumnConverterResolver(callable $resolver) {
-        $this->columnConverterResolver = $resolver;
-    }
-
-    public function setApplicationNamespace($namespace) {
-        $this->applicationNamespace = $namespace;
-    }
-
-    public function setRootNamespace($namespace) {
-        $this->rootNamespace = $namespace
-                . ($this->includeSchema ? '\\' . $this->relation->getSchemaName(true) : '');
-    }
-
-    public function setRootPath($path) {
-        $this->rootPath = $path;
-    }
-
+    /**
+     * Here we create a build definition (what to generate) based on the 
+     * $allowCustomize flag. If a class needs to be able to customized then
+     * we create a bass class and generate the code in the base class, 
+     * and create derived class from the base class. Otherwise we create just 
+     * one class and generate the code in that class.
+     * @param type $allowCustomize
+     * @return array
+     */
     protected function createBuildDefinition($allowCustomize) {
 
         $className = $this->relation->getName(true) . $this->classNamePostfix;
@@ -136,6 +179,10 @@ abstract class ClassBuilder {
         return $classes;
     }
 
+    /**
+     * Builds one or more classes based on the build definition
+     * @param boolean $allowCustomize
+     */
     public function build($allowCustomize) {
         $classes = $this->createBuildDefinition($allowCustomize);
         foreach ($classes as $def) {
@@ -147,6 +194,11 @@ abstract class ClassBuilder {
         }
     }
 
+    /**
+     * Creates a target folder for a class definition
+     * @param type $def
+     * @return type
+     */
     protected function createTargetFolder($def) {
         $path = $this->normalizePath($this->rootPath . '/' . $def['classNamespace']);
         if (!$this->fileSystem->exists($path)) {
@@ -155,6 +207,11 @@ abstract class ClassBuilder {
         return $path;
     }
 
+    /**
+     * Normalizer to convert the \ to / when used namespace parts as path parts
+     * @param type $str
+     * @return string
+     */
     protected function normalizePath($str) {
         return str_replace('\\', '/', $str);
     }
