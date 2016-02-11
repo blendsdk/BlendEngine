@@ -15,7 +15,8 @@ use Blend\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Blend\DataModelBuilder\Command\ModelBuilderDefaultConfig;
+use Blend\DataModelBuilder\Builder\Config\DefaultBuilderConfig;
+use Blend\DataModelBuilder\Builder\Config\BuilderConfig;
 use Blend\Component\Database\Database;
 use Blend\DataModelBuilder\Schema\SchemaReader;
 use Blend\DataModelBuilder\Schema\Schema;
@@ -35,20 +36,23 @@ class DataModelCommand extends Command {
     private $schemas;
 
     /**
-     * @var ModelBuilderConfig
+     * @var BuilderConfig
      */
     private $config = null;
     private $templateFolder;
 
     protected function generateClasses(Schema $schema) {
         $conatiner = new Container();
+        $converterResolver = function($schema, $relation, $column, $dbtype, $fqcn) {
+            return $this->config->getConverterForField($schema, $relation, $column, $dbtype, $fqcn);
+        };
         foreach ($schema->getRelations() as $relation) {
 
             $allowCustomize = $this->allowCustomize($relation);
             $rootPath = $this->config->getTargetRootFolder();
             $rootNamespace = $this->config->getModelRootNamespace();
             $appNamespace = $this->config->getApplicationNamespace();
-
+            $converterInfo = null;
             foreach ([ModelBuilder::class, FactoryBuilder::class] as $builderClass) {
                 /* @var $builderClass \Blend\DataModelBuilder\Builder\ClassBuilder */
                 $builder = $conatiner->get($builderClass, [
@@ -58,7 +62,21 @@ class DataModelCommand extends Command {
                 $builder->setApplicationNamespace($appNamespace);
                 $builder->setRootNamespace($rootNamespace);
                 $builder->setRootPath($rootPath);
+                $builder->setColumnConverterResolver($converterResolver);
+
+                if ($builder instanceof FactoryBuilder) {
+                    if (count($converterInfo) !== 0) {
+                        $builder->setFieldConverterClass($this->config->getFieldConverterClass());
+                        $builder->setFieldConverterClassParams('[]');
+                    }
+                    $builder->setFieldConverterInfo($converterInfo);
+                }
+
                 $builder->build($allowCustomize);
+
+                if ($builder instanceof ModelBuilder) {
+                    $converterInfo = $builder->getFieldConverterInfo();
+                }
             }
         }
     }
@@ -86,7 +104,7 @@ class DataModelCommand extends Command {
 
     protected function initialize(InputInterface $input, OutputInterface $output) {
         parent::initialize($input, $output);
-        $this->templateFolder = realpath(dirname(__FILE__) . '/../Templates');
+        $this->templateFolder = realpath(dirname(__FILE__) . '/../Builder/Template');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
@@ -98,6 +116,23 @@ class DataModelCommand extends Command {
                 $this->generateClasses($schema);
             }
         }
+        $this->generateDataTimeSettings();
+    }
+
+    protected function generateDataTimeSettings() {
+        $header = "<?php ";
+        $settings = var_export(array(
+            'datetimeFormat' => $this->config->getLocalDateTimeFormat()
+                ), true);
+        $settings = str_replace(["\t", 'array (', ')'], ['', '[', ']'], $settings);
+        $tmpFile = TEMP_DIR . '/' . uniqid() . '.php';
+        file_put_contents($tmpFile, $header . $settings);
+        $settings = php_strip_whitespace($tmpFile);
+        unlink($tmpFile);
+        render_php_template($this->templateFolder . '/datetime.php', [
+            'settings' => trim(str_replace($header, '', $settings)),
+            'namespace' => $this->config->getApplicationNamespace() . '\\' . $this->config->getModelRootNamespace()
+                ], $this->config->getTargetRootFolder() . '/Database/DateTimeConversion.php', false);
     }
 
     /**
@@ -148,7 +183,7 @@ class DataModelCommand extends Command {
     private function loadConfig() {
         $configClass = $this->input->getOption('configclass');
         if (is_null($configClass)) {
-            $configClass = ModelBuilderDefaultConfig::class;
+            $configClass = DefaultBuilderConfig::class;
         }
         try {
             $this->config = $this->container->get($configClass, [
@@ -159,7 +194,7 @@ class DataModelCommand extends Command {
                 "<warn>Unable to load the provided configuration [{$configClass}]</warn>",
                 "<warn>Will continue with the default configuration.</warn>"
             ]);
-            $configClass = ModelBuilderDefaultConfig::class;
+            $configClass = DefaultBuilderConfig::class;
             $this->config = $this->container->get($configClass, [
                 'projectFolder' => $this->getApplication()->getProjectFolder()
             ]);

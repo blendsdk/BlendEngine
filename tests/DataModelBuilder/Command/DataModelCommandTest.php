@@ -15,7 +15,9 @@ use Blend\Component\Console\Application;
 use Blend\DataModelBuilder\Command\DataModelCommand;
 use Blend\Tests\Component\Database\DatabaseTestBase;
 use Blend\Tests\ProjectUtil;
+use Blend\Component\DI\Container;
 use Blend\Component\Filesystem\Filesystem;
+use Composer\Autoload\ClassLoader;
 
 /**
  * DataModelCommandTest
@@ -38,6 +40,17 @@ class DataModelCommandTest extends DatabaseTestBase {
         ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', ['--configclass' => 'Blend\Tests\DataModelBuilder\Command\CustomizedModelConfig'], $app);
         $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/SysOrder.php');
         $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/Base/SysOrder.php');
+
+
+        $loader = new ClassLoader();
+        $loader->addPsr4("DALTest\\", self::$projectFolder . '/src/');
+        $loader->register();
+
+        $c = new Container();
+        $f = $c->get('DALTest\Database\Common\Factory\SysUserFactory', [
+            'database' => self::$currentDatabase
+        ]);
+        $f->createNewModel(['user_name' => 'Gevik', 'date_created' => '2016-02-09 22:13:55']);
     }
 
     public static function getTestingDatabaseConfig() {

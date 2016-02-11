@@ -28,4 +28,16 @@ class Column extends Record {
         return $this->getString('column_name');
     }
 
+    public function getField($name) {
+        return $this->record[$name];
+    }
+
+    public function getFQCN() {
+        return $this->record['table_schema']
+                . '.'
+                . $this->record['table_name']
+                . '.'
+                . $this->record['column_name'];
+    }
+
 }

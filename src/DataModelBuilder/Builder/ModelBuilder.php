@@ -37,6 +37,10 @@ class ModelBuilder extends ClassBuilder {
         foreach ($this->relation->getColumns() as $column) {
             $name = $column->getName();
             $type = 'mixed';
+            $schema = $column->getField('table_schema');
+            $relation = $column->getField('table_name');
+            $dbtype = $column->getField('data_type');
+            $this->resolveColumnConverter($schema, $relation, $column->getName(), $dbtype, $column->getFQCN());
             $properties[] = array(
                 'name' => $name,
                 'getter' => 'get' . str_identifier($name),

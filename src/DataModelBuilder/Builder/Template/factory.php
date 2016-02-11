@@ -15,6 +15,20 @@ use <?php echo $use; ?>;
 <?php if (isset($generate)):?>
     public function __construct(Database $database) {
         parent::__construct($database, '<?php echo $modelClass?>');
+<?php if(isset($fieldConverter)):?>
+        $this->fieldConverter = new <?php echo "{$fieldConverter}(['datetimeFormat' => DateTimeConversion::SETTINGS])";?>;
+<?php endif;?>
     }
+
+<?php if(count($converters) !== 0):?>
+    protected function convertFromRecord(array $record) {
+<?php foreach($converters as $field => $converterlist):?>
+<?php foreach($converterlist as $converter):?>
+        $this->fieldConverter->fromRecord($record, '<?php echo $field;?>', '<?php echo $converter?>');
+<?php endforeach;?>
+<?php endforeach;?>
+        return $record;
+    }
+<?php endif;?>
 <?php endif;?>
 }

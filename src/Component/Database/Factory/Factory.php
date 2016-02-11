@@ -13,8 +13,8 @@ namespace Blend\Component\Database\Factory;
 
 use Blend\Component\Database\Database;
 use Blend\Component\DI\Container;
-use Blend\Component\Database\Factory\TypeConverter;
-use Blend\Component\Database\Factory\DefaultTypeConverter;
+use Blend\Component\Database\Factory\Converter\FieldConverter;
+use Blend\Component\Model\Model;
 
 /**
  * Factory is the base class for a model factory
@@ -41,23 +41,28 @@ abstract class Factory {
     protected $container;
 
     /**
-     * @var TypeConverter
+     * @var FieldConverter
      */
-    protected $typeConverter;
+    protected $fieldConverter;
 
-    public function __construct(Database $database, $modelClass, TypeConverter $typeConverter = null) {
+    public function __construct(Database $database, $modelClass) {
         $this->database = $database;
         $this->modelClass = $modelClass;
         $this->container = new Container();
-        $this->container->define('model');
-        $this->typeConverter = is_null($typeConverter) ?
-                $this->container->get(DefaultTypeConverter::class) : $typeConverter;
+        $this->container->define('model', [
+            'class' => $modelClass
+        ]);
+        $this->fieldConverter = null;
     }
 
-    protected function createNewModel(array $record = []) {
+    public function createNewModel(array $record = []) {
         return $this->container->get('model', [
                     'record' => $this->convertFromRecord($record)
         ]);
+    }
+
+    protected function convertFromModel(Model $model) {
+        return $model->getData();
     }
 
     protected function convertFromRecord(array $record) {

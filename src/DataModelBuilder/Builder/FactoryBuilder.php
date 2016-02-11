@@ -40,7 +40,20 @@ class FactoryBuilder extends ClassBuilder {
                 . '\\' . $this->modelRootNamespace
                 . '\\Model\\' . $this->relation->getName(true);
         $def['modelClass'] = $modelClass;
-        $def['uses'][] = $modelClass;
+        $def['uses'] = [
+            'Blend\Component\Database\Database',
+            'Blend\Component\Database\Factory\Factory',
+            $modelClass
+        ];
+        if (count($this->fieldConverterInfo) !== 0) {
+            $def['uses'][] = $this->fieldConverterClass;
+            $ns = explode('\\', $modelClass);
+            $def['uses'][] = "{$ns[0]}\\{$ns[1]}\\DateTimeConversion";
+            $class = explode('\\', $this->fieldConverterClass);
+            $def['fieldConverter'] = end($class);
+        }
+        $def['converters'] = $this->fieldConverterInfo;
+
         return $def;
     }
 

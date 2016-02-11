@@ -30,6 +30,10 @@ abstract class ClassBuilder {
     protected $defaultBaseClassName;
     protected $defaultBaseClassFQN;
     protected $fileSystem;
+    protected $columnConverterResolver;
+    protected $fieldConverterInfo;
+    protected $fieldConverterClass;
+    protected $fieldConverterClassParams;
 
     /**
      * @var Relation 
@@ -44,6 +48,43 @@ abstract class ClassBuilder {
         $this->includeSchema = $includeSchema;
         $this->classNamePostfix = '';
         $this->fileSystem = new Filesystem();
+        $this->fieldConverterInfo = [];
+        $this->fieldConverterClass = null;
+        $this->fieldConverterClassParams = null;
+    }
+
+    public function setFieldConverterClassParams($param) {
+        $this->fieldConverterClassParams = $param;
+    }
+
+    public function setFieldConverterClass($class) {
+        $this->fieldConverterClass = $class;
+    }
+
+    public function getFieldConverterInfo() {
+        return $this->fieldConverterInfo;
+    }
+
+    public function setFieldConverterInfo($info) {
+        $this->fieldConverterInfo = $info;
+    }
+
+    public function resolveColumnConverter($schema, $relation, $column, $dbtype, $fqcn) {
+        if ($this->columnConverterResolver) {
+            $converter = call_user_func_array($this->columnConverterResolver, [$schema, $relation, $column, $dbtype, $fqcn]);
+            if (!is_null($converter)) {
+                if (is_string($converter)) {
+                    $converter = [$converter];
+                }
+                if (is_array($converter)) {
+                    $this->fieldConverterInfo[$column] = $converter;
+                }
+            }
+        }
+    }
+
+    public function setColumnConverterResolver(callable $resolver) {
+        $this->columnConverterResolver = $resolver;
     }
 
     public function setApplicationNamespace($namespace) {
