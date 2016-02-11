@@ -15,7 +15,7 @@ use Blend\DataModelBuilder\Builder\ClassBuilder;
 use Blend\DataModelBuilder\Schema\Relation;
 
 /**
- * Description of ModelBuilder
+ * ModelBuilder builds a Model class for a given Relation (table/view)
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
@@ -27,11 +27,22 @@ class ModelBuilder extends ClassBuilder {
         $this->defaultBaseClassFQN = 'Blend\Component\Model\Model';
     }
 
+    /**
+     * Sets the root namespace where the models will be generated
+     * @param type $schema
+     */
     public function setRootNamespace($schema) {
         parent::setRootNamespace($schema);
         $this->rootNamespace .= '\\Model';
     }
 
+    /**
+     * Here we loop the columns and create a property definition.
+     * We also resolve an optional field converter for a given property
+     * that we provided in the builder configuration file
+     * @param array $def
+     * @return type
+     */
     protected function preparBuildDefinition($def) {
         $properties = [];
         foreach ($this->relation->getColumns() as $column) {

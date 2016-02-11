@@ -15,7 +15,7 @@ use Blend\DataModelBuilder\Builder\ClassBuilder;
 use Blend\DataModelBuilder\Schema\Relation;
 
 /**
- * Description of ModelBuilder
+ * FactoryBuilder builds a factory class for a given relation (table/view)
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
@@ -29,12 +29,22 @@ class FactoryBuilder extends ClassBuilder {
         $this->defaultBaseClassFQN = 'Blend\Component\Database\Factory\Factory';
     }
 
+    /**
+     * Sets the root namespace where the factory classes will be generated
+     * @param type $schema
+     */
     public function setRootNamespace($schema) {
         parent::setRootNamespace($schema);
         $this->modelRootNamespace = $this->rootNamespace;
         $this->rootNamespace .= '\\Factory';
     }
 
+    /**
+     * Here we configure the build definitions by adding the "use" statements
+     * and setting the paremeters for a fieldConverter if needed
+     * @param type $def
+     * @return type
+     */
     protected function preparBuildDefinition($def) {
         $modelClass = $this->applicationNamespace
                 . '\\' . $this->modelRootNamespace

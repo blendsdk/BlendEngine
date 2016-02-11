@@ -35,7 +35,7 @@ abstract class BuilderConfig {
     public abstract function getModelRootNamespace();
 
     /**
-     * Should return aa string array of schemas to generate otherwise it should
+     * Should return a string array of schemas to generate otherwise it should
      * return "null" to generate all the schemas
      */
     public abstract function getSchemaListToGenerate();
@@ -53,7 +53,7 @@ abstract class BuilderConfig {
     public abstract function getConverterForField($schema, $relation, $column, $dbtype, $fqcn);
 
     /**
-     * Should return a FQCN string
+     * Should return a FQCN string of your FieldConverter class
      */
     public abstract function getFieldConverterClass();
 

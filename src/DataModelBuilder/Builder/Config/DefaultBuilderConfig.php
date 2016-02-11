@@ -23,7 +23,13 @@ use Blend\Component\Database\Factory\Converter\DefaultFieldConverter;
  */
 class DefaultBuilderConfig extends BuilderConfig {
 
+    /**
+     * Should return the root namespace of your application
+     */
     public function getApplicationNamespace() {
+        /**
+         * This value normally is set the in the bin/[appname].php
+         */
         if (defined('BLEND_APPLICATION_NAMESPACE')) {
             return BLEND_APPLICATION_NAMESPACE;
         } else {
@@ -31,18 +37,38 @@ class DefaultBuilderConfig extends BuilderConfig {
         }
     }
 
+    /**
+     * Should resturn the root namespace of your DAL (Data Access Layer)
+     * "Database" for example
+     */
     public function getModelRootNamespace() {
         return 'Database';
     }
 
+    /**
+     * Should return a string array of schemas to generate otherwise it should
+     * return "null" to generate all the schemas
+     */
     public function getSchemaListToGenerate() {
         return null; // will generate all schemas
     }
 
+    /**
+     * Should return a string array of relation (tables and views) names that
+     * you are going to customize
+     */
     public function getCustomizedRelationList() {
         return null; // nothing to customze
     }
 
+    /**
+     * Should return the local date format, for example
+     * return [
+     *      'date' => 'd-m-Y',
+     *      'time' => 'H:i:s',
+     *      'datetime' => 'd-m-Y H:i:s'
+     * ]
+     */
     public function getLocalDateTimeFormat() {
         return [
             'date' => 'd-m-Y',
@@ -51,10 +77,17 @@ class DefaultBuilderConfig extends BuilderConfig {
         ];
     }
 
+    /**
+     * Should return a converter identifier based on the fully qualified
+     * column name, thatis schema.relation.column (public.userser.user_name)
+     */
     public function getConverterForField($schema, $relation, $column, $dbtype, $fqcn) {
         return null;
     }
 
+    /**
+     * Should return a FQCN string of your FieldConverter class
+     */
     public function getFieldConverterClass() {
         return DefaultFieldConverter::class;
     }
