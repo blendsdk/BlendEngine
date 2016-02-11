@@ -22,6 +22,7 @@ use Blend\DataModelBuilder\Schema\SchemaReader;
 use Blend\DataModelBuilder\Schema\Schema;
 use Blend\DataModelBuilder\Schema\Relation;
 use Blend\DataModelBuilder\Builder\ModelBuilder;
+use Blend\DataModelBuilder\Builder\DateTimeConversionBuilder;
 use Blend\DataModelBuilder\Builder\FactoryBuilder;
 use Blend\Component\DI\Container;
 
@@ -42,6 +43,13 @@ class DataModelCommand extends Command {
     private $templateFolder;
 
     protected function generateClasses(Schema $schema) {
+        /**
+         * To build the Models and Factory classes we use the following strategy:
+         * First we build a model and gather the $converterInfo, then when we
+         * are buidling the Factory class we use the previously built $converterInfo
+         * to feed the Factory building. This is primarily done to avoid writing
+         * redundant code.
+         */
         $conatiner = new Container();
         $converterResolver = function($schema, $relation, $column, $dbtype, $fqcn) {
             return $this->config->getConverterForField($schema, $relation, $column, $dbtype, $fqcn);
@@ -67,7 +75,6 @@ class DataModelCommand extends Command {
                 if ($builder instanceof FactoryBuilder) {
                     if (count($converterInfo) !== 0) {
                         $builder->setFieldConverterClass($this->config->getFieldConverterClass());
-                        $builder->setFieldConverterClassParams('[]');
                     }
                     $builder->setFieldConverterInfo($converterInfo);
                 }
@@ -119,20 +126,12 @@ class DataModelCommand extends Command {
         $this->generateDataTimeSettings();
     }
 
+    /**
+     * Generates the DateTimeConversion file
+     */
     protected function generateDataTimeSettings() {
-        $header = "<?php ";
-        $settings = var_export(array(
-            'datetimeFormat' => $this->config->getLocalDateTimeFormat()
-                ), true);
-        $settings = str_replace(["\t", 'array (', ')'], ['', '[', ']'], $settings);
-        $tmpFile = TEMP_DIR . '/' . uniqid() . '.php';
-        file_put_contents($tmpFile, $header . $settings);
-        $settings = php_strip_whitespace($tmpFile);
-        unlink($tmpFile);
-        render_php_template($this->templateFolder . '/datetime.php', [
-            'settings' => trim(str_replace($header, '', $settings)),
-            'namespace' => $this->config->getApplicationNamespace() . '\\' . $this->config->getModelRootNamespace()
-                ], $this->config->getTargetRootFolder() . '/Database/DateTimeConversion.php', false);
+        $builder = new DateTimeConversionBuilder($this->config);
+        $builder->build();
     }
 
     /**
