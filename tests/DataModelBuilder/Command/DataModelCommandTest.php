@@ -35,22 +35,36 @@ class DataModelCommandTest extends DatabaseTestBase {
         $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/SysUserProfile.php');
     }
 
-    public function testCustomizedConfig() {
+    public function testFactory() {
         $app = $this->createApplication();
         ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', ['--configclass' => 'Blend\Tests\DataModelBuilder\Command\CustomizedModelConfig'], $app);
-        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/SysOrder.php');
-        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/Base/SysOrder.php');
-
-
         $loader = new ClassLoader();
         $loader->addPsr4("DALTest\\", self::$projectFolder . '/src/');
         $loader->register();
 
+        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/SysOrder.php');
+        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Model/Base/SysOrder.php');
+        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Factory/SysOrderFactory.php');
+        $this->assertFileExists(self::$projectFolder . '/src/Database/Common/Factory/Base/SysOrderFactory.php');
+
         $c = new Container();
-        $f = $c->get('DALTest\Database\Common\Factory\SysUserFactory', [
-            'database' => self::$currentDatabase
-        ]);
-        $f->createNewModel(['user_name' => 'Gevik', 'date_created' => '2016-02-09 22:13:55']);
+
+        /* @var $userFactory \DALTest\Database\Common\Factory\SysUserFactory */
+        $userFactory = $c->get('DALTest\Database\Common\Factory\SysUserFactory', ['database' => self::$currentDatabase]);
+
+        /* @var $user \DALTest\Database\Common\Model\SysUser */
+        $user = $userFactory->newModel();
+        $user->setUserEmail('JOHNY@DOE.COM');
+        $user->setUserPassword('test123');
+        $user->setUserName('Johny');
+        $userFactory->saveObject($user);
+
+        $this->assertEquals('johny@doe.com', $user->getUserEmail());
+        $this->assertEquals(sha1('test123'), $user->getUserPassword());
+
+        $user->setUserEmail('johny@bravo.com');
+        $user->setNullableColumn('it is not null now');
+        $userFactory->saveObject($user);
     }
 
     public static function getTestingDatabaseConfig() {

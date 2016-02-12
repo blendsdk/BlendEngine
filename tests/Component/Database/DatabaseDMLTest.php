@@ -12,6 +12,7 @@
 namespace Blend\Tests\Component\Database;
 
 use Blend\Tests\Component\Database\DatabaseTestBase;
+use Blend\Component\Database\StatementResult;
 
 /**
  * DatabaseDMLTest
@@ -27,19 +28,28 @@ class DatabaseDMLTest extends DatabaseTestBase {
             'database' => 'database_dml_test'
         ];
     }
-    
+
     public function testInsert() {
-        
         $qr = new \Blend\Component\Database\StatementResult();
-        
+
         $result = self::$currentDatabase->insert('table1', [
             'field1' => 'data1',
             'field2' => 100
-        ],$qr);
-        
+                ], $qr);
+
         $this->assertEquals(1, $qr->getAffectedRecords());
-        $this->assertEquals(1, $result['id']);
-        
+        $this->assertEquals(1, $result[0]['id']);
+    }
+
+    public function testUpdate() {
+        for ($a = 0; $a != 10; $a++) {
+            self::$currentDatabase->insert('table2', ['field1' => 'f1' . $a, 'field2' => $a]);
+        }
+        $sr = new StatementResult();
+        self::$currentDatabase->update('table2', ['field2' => 1000], sqlstr('id')->equalsTo(':p1'), [':p1' => 2], $sr);
+        $updateCounts = self::$currentDatabase->executeScalar('select count(*) from table2 where field2=1000');
+        $this->assertEquals(1, $updateCounts);
+        $this->assertEquals(1, $sr->getAffectedRecords());
     }
 
     public static function setUpSchema() {

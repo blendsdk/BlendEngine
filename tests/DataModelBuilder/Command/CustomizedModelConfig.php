@@ -12,6 +12,7 @@
 namespace Blend\Tests\DataModelBuilder\Command;
 
 use Blend\DataModelBuilder\Builder\Config\DefaultBuilderConfig;
+use Blend\Component\Database\Factory\Converter\DefaultFieldConverter as C;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -24,12 +25,12 @@ class CustomizedModelConfig extends DefaultBuilderConfig {
 
     public function getConverterForField($schema, $relation, $column, $dbtype, $fqcn) {
 
-        if ($dbtype === 'timestamp without time zone') {
-            return 'datetime_converter';
+        if (stripos($column, 'email') !== false) {
+            return C::CONVERT_EMAIL_FIELD;
         }
 
-        if (stripos($column, 'email') !== false) {
-            return "email_field_converter";
+        if (stripos($column, 'password') !== false) {
+            return C::CONVERT_PASSWORD;
         }
 
         return null;

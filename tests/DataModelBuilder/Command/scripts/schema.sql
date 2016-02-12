@@ -6,7 +6,8 @@ create table sys_user (
     user_name varchar not null unique,
     user_email varchar not null unique,
     user_password varchar not null,
-    date_created timestamp not null default now()
+    date_created timestamp not null default now(),
+    nullable_column varchar
 );
 
 create table sys_user_profile (
