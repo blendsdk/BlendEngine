@@ -124,7 +124,7 @@ abstract class ClassBuilder {
         if ($this->columnConverterResolver) {
             $converter = call_user_func_array($this->columnConverterResolver, [$schema, $relation, $column, $dbtype, $fqcn]);
             if (!is_null($converter)) {
-                if (is_string($converter)) {
+                if (!is_array($converter)) {
                     $converter = [$converter];
                 }
                 if (is_array($converter)) {
