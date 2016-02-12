@@ -11,15 +11,21 @@
 
 namespace Blend\Component\Database\Factory\Converter;
 
-use Blend\Component\Model\Model;
+use Blend\Component\Database\Factory\Converter\IConverter;
 
 /**
+ * Description of ToLowerCaseConverter
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface IConverter {
+class ToLowerCaseConverter implements IConverter {
 
-    public function toDbRecord($value);
+    public function toModel($value) {
+        return strtolower($value);
+    }
 
-    public function toModel($value);
+    public function toDbRecord($value) {
+        return strtolower($value);
+    }
+
 }

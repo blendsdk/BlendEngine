@@ -11,15 +11,21 @@
 
 namespace Blend\Component\Database\Factory\Converter;
 
-use Blend\Component\Model\Model;
+use Blend\Component\Database\Factory\Converter\IConverter;
 
 /**
+ * Description of ObjectConverter
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface IConverter {
+class ObjectConverter implements IConverter {
 
-    public function toDbRecord($value);
+    public function toDbRecord($value) {
+        return base64_encode(serialize($value));
+    }
 
-    public function toModel($value);
+    public function toModel($value) {
+        return unserialize(base64_decode($value));
+    }
+
 }
