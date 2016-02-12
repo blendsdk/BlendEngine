@@ -11,14 +11,14 @@
 
 namespace Blend\Component\Database\SQL\Statement;
 
-use Blend\Component\Database\SQL\Statement\WhereClause;
+use Blend\Component\Database\SQL\Statement\ConditionableStatement;
 
 /**
  * The Select class is a utility class to help generating a SELECT statement
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class SelectStatement {
+class SelectStatement extends ConditionableStatement {
 
     /**
      * Array containing the select columns
@@ -56,11 +56,6 @@ class SelectStatement {
      * @var int
      */
     private $lastFromIndex;
-
-    /**
-     * @type WhereCluase
-     */
-    use WhereClause;
 
     public function __construct() {
         $this->lastFromIndex = null;

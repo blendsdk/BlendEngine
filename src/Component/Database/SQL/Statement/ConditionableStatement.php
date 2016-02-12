@@ -12,17 +12,18 @@
 namespace Blend\Component\Database\SQL\Statement;
 
 /**
- * Description of WhereClause
+ * ConditionableStatement is the base class for SELECT, UPDATE, and the DELETE
+ * statements providing the ability to set add a WHERE clause to the statement
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-trait WhereClause {
+class ConditionableStatement {
 
     protected $where;
 
     /**
      * @param type $condition
-     * @return WhereClause
+     * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
     public function where($condition) {
         $this->where[] = $condition;
@@ -31,7 +32,7 @@ trait WhereClause {
 
     /**
      * @param type $condition
-     * @return type
+     * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
     public function andWhere($condition) {
         $this->where[] = 'AND ' . $condition;
@@ -40,7 +41,7 @@ trait WhereClause {
 
     /**
      * @param type $condition
-     * @return WhereClause
+     * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
     public function orWhere($condition) {
         $this->where[] = 'OR ' . $condition;
@@ -48,7 +49,7 @@ trait WhereClause {
     }
 
     /**
-     *
+     * Retins the WHERE clause
      * @return string
      */
     protected function getWhereClause() {
@@ -60,8 +61,7 @@ trait WhereClause {
     }
 
     /**
-     *
-     * @return WhereClause
+     * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
     public function whereScope() {
         $this->where[] = '(';
@@ -69,8 +69,7 @@ trait WhereClause {
     }
 
     /**
-     *
-     * @return WhereClause
+     * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
     public function endWhereScope() {
         $this->where[] = ')';
