@@ -21,18 +21,26 @@ class Model {
 
     private $data;
     private $updates;
+    private $isNew;
 
     public function __construct($data = array()) {
         $this->data = $data;
         $this->updates = [];
+        $this->isNew = empty($data);
+    }
+
+    public function sync($data) {
+        $this->data = $data;
+        $this->updates = [];
+        $this->isNew = false;
     }
 
     /**
-     * Indicates if this model is has any changes
-     * @return type
+     * Indicates if this model is a new Model or hase data from the database
+     * @return boolean
      */
-    public function isChanged() {
-        return count($this->updates) !== 0;
+    public function isNew() {
+        return $this->isNew;
     }
 
     /**
