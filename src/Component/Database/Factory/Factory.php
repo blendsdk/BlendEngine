@@ -55,14 +55,18 @@ abstract class Factory {
         $this->fieldConverter = null;
     }
 
-    public function createNewModel(array $record = []) {
+    public function insert(Model $model) {
+        $record = $this->convertFromModel($model->getData());
+    }
+
+    public function createModel(array $record = []) {
         return $this->container->get('model', [
                     'record' => $this->convertFromRecord($record)
         ]);
     }
 
-    protected function convertFromModel(Model $model) {
-        return $model->getData();
+    protected function convertFromModel(array $data) {
+        return $data;
     }
 
     protected function convertFromRecord(array $record) {

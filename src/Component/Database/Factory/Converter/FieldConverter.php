@@ -13,6 +13,9 @@ namespace Blend\Component\Database\Factory\Converter;
 
 use Blend\Component\Database\Factory\Converter\IConverter;
 use Blend\Component\Exception\InvalidConfigException;
+use Blend\Component\DI\Container;
+
+use Blend\Component\Model\Model;
 
 if (!defined('FIELD_CONVERT_TO_DB')) {
     define('FIELD_CONVERT_TO_DB', 1);
@@ -34,6 +37,9 @@ abstract class FieldConverter {
     protected $cachedConverter = [];
     protected $options = [];
 
+    const DIR_FROM_RECORD = 'toModel';
+    const DIR_FROM_MODEL = 'toDbRecord';
+
     public function __construct(array $options = array()) {
         $this->options = $options;
     }
@@ -43,25 +49,35 @@ abstract class FieldConverter {
     }
 
     public function fromRecord(array &$record, $field, $type) {
-        if (isset($this->cachedConverter[$field])) {
-            $converters = $this->cachedConverter[$field];
-        } else {
-            $converters = [];
-            foreach ([$type, $field] as $item) {
-                if (isset($this->converters[$item])) {
-                    $converters[] = $this->converters[$item];
+        return $this->convert($record, $field, $type, self::DIR_FROM_RECORD);
+    }
+
+    public function fromModel(array &$record, $field, $type) {
+        return $this->convert($record, $field, $type, self::DIR_FROM_MODEL);
+    }
+
+    public function convert(array &$record, $field, $type, $direction) {
+        if (array_key_exists($field, $record)) {
+            if (isset($this->cachedConverter[$field])) {
+                $converters = $this->cachedConverter[$field];
+            } else {
+                $converters = [];
+                foreach ([$type, $field] as $item) {
+                    if (isset($this->converters[$item])) {
+                        $converters[] = $this->converters[$item];
+                    }
+                }
+                if (count($converters) !== 0) {
+                    $this->cachedConverter[$field] = $converters;
+                } else {
+                    throw new InvalidConfigException("Unable to find field converter [{$type}] for [{$field}]!");
                 }
             }
-            if (count($converters) !== 0) {
-                $this->cachedConverter[$field] = $converters;
-            } else {
-                throw new InvalidConfigException("Unable to find field converter [{$type}] for [{$field}]!");
+            foreach ($converters as $converter) {
+                $record[$field] = call_user_func([$converter, $direction], $record[$field]);
             }
         }
-        foreach ($converters as $converter) {
-            $record[$field] = call_user_func_array($converter
-                    , [FIELD_CONVERT_TO_MODEL, $record[$field], $record]);
-        }
+        return $record;
     }
 
 }
