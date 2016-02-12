@@ -44,6 +44,18 @@ class SQLString {
     }
 
     /**
+     * Appends a string to the current buffer
+     * @param string $str The string to append
+     * @param boolean $spaceBefore
+     * @param boolean $spaceAfter
+     * @return \Blend\Component\Database\SQL\SQLString
+     */
+    public function append($str, $spaceBefore = false, $spaceAfter = false) {
+        $this->str .= ($spaceBefore ? ' ' : '') . $str . ($spaceAfter ? ' ' : '');
+        return $this;
+    }
+
+    /**
      * Casts a string to a type (aaa::varchar)
      * @param string $type
      * @return \Blend\Component\Database\SQLString
