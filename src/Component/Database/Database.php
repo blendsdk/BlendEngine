@@ -76,7 +76,7 @@ class Database extends \PDO {
      * @throws DatabaseQueryException
      */
     public function executeQuery($sql, array $params = array()
-    , StatementResult &$statementResult = null
+    , StatementResult $statementResult = null
     , $resultType = \PDO::FETCH_ASSOC) {
 
         $statement = $this->prepare($sql);
@@ -152,6 +152,39 @@ class Database extends \PDO {
                         , array_values($params)
                         , $statementResult
                         , $resultType);
+    }
+
+    public function update($table_name, array $params, $condition
+    , array $cparams, StatementResult &$statementResult = null
+    , $resultType = \PDO::FETCH_ASSOC) {
+
+        $setkeys = [];
+        $setparams = [];
+        foreach ($params as $field => $value) {
+            $param = ':sp_' . $field;
+            $setkeys[] = $field . '=' . $param;
+            $setparams[$param] = $value;
+        }
+
+        if (empty($condition)) {
+            throw new \InvalidArgumentException(
+            "The update statement need a condition to operate correctly. " .
+            "If you want to delete all the records " .
+            "from {$table_name} then use the truncate(...) method.");
+        }
+
+        if (empty($params)) {
+            throw new \InvalidArgumentException(
+            "Unable to determine which column to update! " .
+            "The \$params argument contains no data (the array is empty)!"
+            );
+        }
+
+        $sql = 'UPDATE '
+                . $table_name
+                . ' SET ' . implode(', ', $setkeys)
+                . ' WHERE ' . $condition . ' RETURNING *';
+        return $this->executeQuery($sql, array_merge($setparams, $cparams), $statementResult, $resultType);
     }
 
     /**
