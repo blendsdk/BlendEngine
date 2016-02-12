@@ -75,7 +75,10 @@ class Database extends \PDO {
      * @return mixed
      * @throws DatabaseQueryException
      */
-    public function executeQuery($sql, array $params = array(), StatementResult $statementResult = null, $resultType = \PDO::FETCH_ASSOC) {
+    public function executeQuery($sql, array $params = array()
+    , StatementResult &$statementResult = null
+    , $resultType = \PDO::FETCH_ASSOC) {
+
         $statement = $this->prepare($sql);
 
         if ($this->logger) {
@@ -117,12 +120,38 @@ class Database extends \PDO {
         if (intval($this->errorCode()) !== 0) {
             $exception = DatabaseQueryException::createFromStatement($this);
             if ($this->logger) {
-                $this->logger->error($exception->getMessage(), ['sql' => str_replace("\n", ' ', $sql)]);
+                $this->logger->error($exception->getMessage()
+                        , ['sql' => str_replace("\n", ' ', $sql)]);
             }
             throw $exception;
         } else {
             return true;
         }
+    }
+
+    /**
+     * Inserts a record into the database using an associative
+     * array (key => value pairs)
+     * @param string $table_name The name of the table to insert
+     * @param array $params An assiciative array containing key => value pairs
+     * @param StatementResult $statementResult The StatementResult
+     * @param number $resultType The PDO Fetch type
+     * @return array
+     */
+    public function insert($table_name, array $params
+    , StatementResult &$statementResult = null
+    , $resultType = \PDO::FETCH_ASSOC) {
+
+        $keys = str_repeat('?, ', count($params) - 1) . '?';
+        $sql = 'INSERT INTO '
+                . $table_name
+                . ' (' . implode(', ', array_keys($params))
+                . ') VALUES (' . $keys . ') RETURNING *';
+
+        return $this->executeQuery($sql
+                        , array_values($params)
+                        , $statementResult
+                        , $resultType);
     }
 
     /**
