@@ -53,6 +53,7 @@ class FactoryBuilder extends ClassBuilder {
         $def['uses'] = [
             'Blend\Component\Database\Database',
             'Blend\Component\Database\Factory\Factory',
+            'Blend\Component\Model\Model',
             $modelClass
         ];
         if (count($this->fieldConverterInfo) !== 0) {
