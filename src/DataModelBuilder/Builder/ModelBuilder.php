@@ -54,8 +54,8 @@ class ModelBuilder extends ClassBuilder {
             $this->resolveColumnConverter($schema, $relation, $column->getName(), $dbtype, $column->getFQCN());
             $properties[] = array(
                 'name' => $name,
-                'getter' => 'get' . str_identifier($name),
-                'setter' => 'set' . str_identifier($name),
+                'getter' => 'get' . str_identifier(strtolower($name)),
+                'setter' => 'set' . str_identifier(strtolower($name)),
                 'type' => $type
             );
         }

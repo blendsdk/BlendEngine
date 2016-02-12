@@ -36,4 +36,3 @@ create table sys_order_item (
     product_id integer not null references sys_product(product_id) on update cascade on delete cascade,
     order_item_amount numeric not null default 0    
 );
-

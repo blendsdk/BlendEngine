@@ -34,10 +34,10 @@ use <?php echo $use; ?>;
     protected function convertFromModel(array $data) {
 <?php foreach($converters as $field => $converterlist):?>
 <?php foreach($converterlist as $converter):?>
-    $this->fieldConverter->fromModel($data, '<?php echo $field;?>', <?php echo is_string($converter) ? "'{$converter}'" :  $converter; ?>);
+        $this->fieldConverter->fromModel($data, '<?php echo $field;?>', <?php echo is_string($converter) ? "'{$converter}'" :  $converter; ?>);
 <?php endforeach;?>
 <?php endforeach;?>
-         return $data;
+        return $data;
     }
 <?php endif;?>
 <?php endif;?>
