@@ -67,14 +67,16 @@ abstract class Factory {
      * Saved a Model in the database either by inserting or updating
      * @param Model $model The Model to save
      */
-    public function saveObject(Model $model) {
+    public function save(Model $model) {
         if ($model->isNew()) {
             $this->insertModel($model);
         } else {
             $this->updateModel($model);
         }
     }
+    
 
+    
     /**
      * Updates an existing Model (record) in the database and updates
      * the Model with the data return from the database. If the current

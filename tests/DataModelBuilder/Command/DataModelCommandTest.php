@@ -57,14 +57,14 @@ class DataModelCommandTest extends DatabaseTestBase {
         $user->setUserEmail('JOHNY@DOE.COM');
         $user->setUserPassword('test123');
         $user->setUserName('Johny');
-        $userFactory->saveObject($user);
+        $userFactory->save($user);
 
         $this->assertEquals('johny@doe.com', $user->getUserEmail());
         $this->assertEquals(sha1('test123'), $user->getUserPassword());
 
         $user->setUserEmail('johny@bravo.com');
         $user->setNullableColumn('it is not null now');
-        $userFactory->saveObject($user);
+        $userFactory->save($user);
     }
 
     public static function getTestingDatabaseConfig() {
