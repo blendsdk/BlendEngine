@@ -154,6 +154,18 @@ class Database extends \PDO {
                         , $resultType);
     }
 
+    /**
+     * Updates a record from the database using associative arrays as column
+     * setters
+     * @param string $table_name the name of the table to update
+     * @param array $params column setters. This is an associative array
+     * @param string $condition The WHERE clause
+     * @param array $cparams The WHERE clause paramaters
+     * @param StatementResult $statementResult The StatementResult
+     * @param integer $resultType The PDO Fetch type
+     * @return array The updated record result
+     * @throws \InvalidArgumentException
+     */
     public function update($table_name, array $params, $condition
     , array $cparams, StatementResult &$statementResult = null
     , $resultType = \PDO::FETCH_ASSOC) {
