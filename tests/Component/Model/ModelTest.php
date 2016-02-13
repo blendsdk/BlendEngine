@@ -24,13 +24,13 @@ class ModelTest extends \PHPUnit_Framework_TestCase {
 
         $m = new Model();
 
-        $this->assertFalse($m->isNew());
+        $this->assertTrue($m->isNew());
 
         $m2 = new Model(['firstname' => 'Johny', 'lastname' => 'Bravo', 'age' => 40, 'salary' => 500]);
         $this->assertFalse($m2->isNew());
 
         $m2->setValue('firstname', 'Peter');
-        $this->assertTrue($m2->isNew());
+        $this->assertFalse($m2->isNew());
 
         $this->assertEquals('Peter', $m2->getValue('firstname'));
         $this->assertEquals('Bravo', $m2->getValue('lastname'));
