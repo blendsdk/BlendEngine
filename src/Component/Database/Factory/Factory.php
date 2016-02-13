@@ -79,7 +79,7 @@ abstract class Factory {
         if (!$model->isNew()) {
             $stmtResult = new StatementResult();
 
-            list($condition, $conditionParameters) = $this->createCondition(
+            list($condition, $conditionParameters) = $this->createAndCondition(
                     $model->getInitial()
             );
 
@@ -110,7 +110,7 @@ abstract class Factory {
     protected function updateModel(Model $model) {
         $stmtResult = new StatementResult();
 
-        list($condition, $conditionParameters) = $this->createCondition(
+        list($condition, $conditionParameters) = $this->createAndCondition(
                 $model->getInitial()
         );
 
@@ -126,32 +126,6 @@ abstract class Factory {
             "The update operation did not return exactly one record! "
             . "The Model must have been changed or deleted by another operation!");
         }
-    }
-
-    /**
-     * Creates an condition from an associative array
-     * @param array $params
-     * @return array
-     */
-    private function createCondition(array $params) {
-        $condition = sqlstr('');
-        $conditionParameters = [];
-        $first = true;
-        foreach ($params as $field => $value) {
-            if (!$first) {
-                $condition->append(' AND ');
-            }
-            $condition->append($field);
-            if (is_null($value)) {
-                $condition->isNull();
-            } else {
-                $param = ':cc_' . $field;
-                $condition->equalsTo($param);
-                $conditionParameters[$param] = $value;
-            }
-            $first = false;
-        }
-        return [$condition, $conditionParameters];
     }
 
     /**
@@ -209,6 +183,32 @@ abstract class Factory {
      */
     protected function convertFromRecord(array $record) {
         return $record;
+    }
+
+    /**
+     * Creates an condition from an associative array
+     * @param array $params
+     * @return array
+     */
+    protected function createAndCondition(array $params) {
+        $condition = sqlstr('');
+        $conditionParameters = [];
+        $first = true;
+        foreach ($params as $field => $value) {
+            if (!$first) {
+                $condition->append(' AND ');
+            }
+            $condition->append($field);
+            if (is_null($value)) {
+                $condition->isNull();
+            } else {
+                $param = ':cc_' . $field;
+                $condition->equalsTo($param);
+                $conditionParameters[$param] = $value;
+            }
+            $first = false;
+        }
+        return [$condition, $conditionParameters];
     }
 
 }
