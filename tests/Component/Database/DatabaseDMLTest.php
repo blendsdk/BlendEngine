@@ -52,6 +52,21 @@ class DatabaseDMLTest extends DatabaseTestBase {
         $this->assertEquals(1, $sr->getAffectedRecords());
     }
 
+    public function testDelete() {
+
+        self::$currentDatabase->executeQuery('truncate table table2 cascade');
+
+        for ($a = 0; $a != 10; $a++) {
+            self::$currentDatabase->insert('table2', ['id' => $a + 1, 'field1' => 'f1' . $a, 'field2' => $a]);
+        }
+
+        $sr = new StatementResult();
+        $result = self::$currentDatabase->delete('table2', 'id in (2,4,6,8)', [], $sr);
+        $this->assertEquals(4, $sr->getAffectedRecords());
+
+        self::$currentDatabase->executeQuery('truncate table table2 cascade');
+    }
+
     public static function setUpSchema() {
         self::$currentDatabase->executeScript(file_get_contents(__DIR__ . '/scripts/schema.sql'));
     }

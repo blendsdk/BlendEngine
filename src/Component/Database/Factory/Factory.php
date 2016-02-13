@@ -74,9 +74,31 @@ abstract class Factory {
             $this->updateModel($model);
         }
     }
-    
 
-    
+    public function delete(Model $model) {
+        if (!$model->isNew()) {
+            $stmtResult = new StatementResult();
+
+            list($condition, $conditionParameters) = $this->createCondition(
+                    $model->getInitial()
+            );
+
+            $result = $this->database->delete($this->relation
+                    , $condition, $conditionParameters
+                    , $stmtResult);
+
+            if ($stmtResult->getAffectedRecords() === 1) {
+                $this->syncModel($model, $result[0]);
+            } else {
+                throw new \LogicException(
+                "The delete operation did not return exactly one record! "
+                . "The Model must have been changed or deleted by another operation!");
+            }
+        } else {
+            throw new \LogicException("Unable to delete an unsaved model!");
+        }
+    }
+
     /**
      * Updates an existing Model (record) in the database and updates
      * the Model with the data return from the database. If the current
@@ -87,23 +109,10 @@ abstract class Factory {
      */
     protected function updateModel(Model $model) {
         $stmtResult = new StatementResult();
-        $condition = sqlstr('');
-        $conditionParameters = [];
-        $first = true;
-        foreach ($model->getInitial() as $field => $value) {
-            if (!$first) {
-                $condition->append('AND', true, true);
-            }
-            $condition->append($field);
-            if (is_null($value)) {
-                $condition->isNull();
-            } else {
-                $param = ':up_' . $field;
-                $condition->equalsTo($param);
-                $conditionParameters[$param] = $value;
-            }
-            $first = false;
-        }
+
+        list($condition, $conditionParameters) = $this->createCondition(
+                $model->getInitial()
+        );
 
         $result = $this->database->update($this->relation
                 , $model->getUpdates()
@@ -115,8 +124,34 @@ abstract class Factory {
         } else {
             throw new \LogicException(
             "The update operation did not return exactly one record! "
-            . "The Model must have been changed by another operation!");
+            . "The Model must have been changed or deleted by another operation!");
         }
+    }
+
+    /**
+     * Creates an condition from an associative array
+     * @param array $params
+     * @return array
+     */
+    private function createCondition(array $params) {
+        $condition = sqlstr('');
+        $conditionParameters = [];
+        $first = true;
+        foreach ($params as $field => $value) {
+            if (!$first) {
+                $condition->append(' AND ');
+            }
+            $condition->append($field);
+            if (is_null($value)) {
+                $condition->isNull();
+            } else {
+                $param = ':cc_' . $field;
+                $condition->equalsTo($param);
+                $conditionParameters[$param] = $value;
+            }
+            $first = false;
+        }
+        return [$condition, $conditionParameters];
     }
 
     /**

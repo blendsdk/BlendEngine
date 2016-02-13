@@ -155,6 +155,34 @@ class Database extends \PDO {
     }
 
     /**
+     * Delets a record from the database using a custom condition and
+     * an associative array as condition parameters
+     * @param string $table_name The name of the table
+     * @param string $condition The WHERE condition
+     * @param mixed $cparams The condition parameters
+     * @param StatementResult $statementResult The StatementResult
+     * @param number $resultType The PDO Fetch type
+     * @return array The deleted record
+     */
+    public function delete($table_name, $condition, $cparams
+    , StatementResult &$statementResult = null
+    , $resultType = \PDO::FETCH_ASSOC) {
+        if (empty($condition)) {
+            throw new \InvalidArgumentException(
+            "The delete statement needs a condition to operate correctly. " .
+            "If you want to delete all the records " .
+            "from {$table_name} then use the truncate(...) method.");
+        }
+
+        $sql = 'DELETE FROM '
+                . $table_name
+                . ' WHERE '
+                . $condition
+                . ' RETURNING *';
+        return $this->executeQuery($sql, $cparams, $statementResult, $resultType);
+    }
+
+    /**
      * Updates a record from the database using associative arrays as column
      * setters
      * @param string $table_name the name of the table to update
@@ -180,9 +208,7 @@ class Database extends \PDO {
 
         if (empty($condition)) {
             throw new \InvalidArgumentException(
-            "The update statement need a condition to operate correctly. " .
-            "If you want to delete all the records " .
-            "from {$table_name} then use the truncate(...) method.");
+            "The update statement needs a condition to operate correctly. ");
         }
 
         if (empty($params)) {
