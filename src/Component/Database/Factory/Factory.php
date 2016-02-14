@@ -211,4 +211,123 @@ abstract class Factory {
         return [$condition, $conditionParameters];
     }
 
+    /**
+     * Gets all records from a relation providing an option to
+     * limit and order the results
+     * @param array $selectColumns
+     * @param type $orderDirective
+     * @param type $offsetLimitDirective
+     * @return type
+     */
+    public function getAll($selectColumns
+    , $orderDirective = null
+    , $offsetLimitDirective = null) {
+        return $this->getManyBy(
+                        $selectColumns
+                        , ['true' => true]
+                        , $orderDirective
+                        , $offsetLimitDirective);
+    }
+
+    /**
+     * Geta single record by params as condition and arguments
+     * @param array $params
+     */
+    protected function getOneBy(array $selectColumns, array $byColumns) {
+        list($condition, $conditionParams) = $this->createAndCondition($byColumns);
+        $sql = 'SELECT '
+                . implode(', ', $selectColumns)
+                . ' FROM ' . $this->relation
+                . ' WHERE ' . $condition;
+
+        $result = $this->database->executeQuery($sql, $conditionParams);
+        if (count($result) !== 0) {
+            return $this->container->get('model'
+                            , ['data' => $this->convertFromRecord($result[0])]);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Gets many records from a relation
+     * @param array $selectColumns columnt o select
+     * @param array $byColumns condition
+     * @param type $orderDirective
+     * @param type $offsetLimitDirective
+     * @return array
+     */
+    protected function getManyBy($selectColumns, array $byColumns
+    , $orderDirective = null, $offsetLimitDirective = null) {
+
+        if (is_null($selectColumns)) {
+            $selectColumns = ['*'];
+        } else if (!is_array($selectColumns)) {
+            $selectColumns = [$selectColumns];
+        }
+
+        list($condition, $conditionParams) = $this->createAndCondition($byColumns);
+        $sql = 'SELECT '
+                . implode(', ', $selectColumns)
+                . ' FROM ' . $this->relation
+                . ' WHERE ' . $condition
+                . $this->createOrderDirective($orderDirective)
+                . $this->createOffsetLimitDirective($offsetLimitDirective);
+
+        $result = $this->database->executeQuery($sql, $conditionParams);
+        return $this->recordsToModels($result);
+    }
+
+    /**
+     * Converts records to models
+     * @param array $records array of records
+     * @return array array of models
+     */
+    protected function recordsToModels(&$records) {
+        if (is_array($records) && count($records) !== 0) {
+            foreach ($records as $key => $record) {
+                $records[$key] = $this->container->get('model'
+                        , ['data' => $this->convertFromRecord($record)]);
+            }
+            return $records;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Creates an OFFSET ## LIMIT ## directive to be appended to s SQL query
+     * @param array $offsetLimitDirective
+     * @return string
+     */
+    protected function createOffsetLimitDirective($offsetLimitDirective) {
+        $sql = '';
+        if (is_array($offsetLimitDirective)) {
+            foreach (['limit', 'offset'] as $directive) {
+                if (isset($offsetLimitDirective[$directive])) {
+                    $sql .= ' '
+                            . strtoupper($directive)
+                            . ' ' . $offsetLimitDirective[$directive];
+                }
+            }
+        }
+        return $sql;
+    }
+
+    /**
+     * Creates an ORDER BY section to be appended to a SQL query
+     * @param array $orderDirective
+     * @return string
+     */
+    protected function createOrderDirective($orderDirective) {
+        $sql = '';
+        if (is_array($orderDirective) && count($orderDirective) !== 0) {
+            foreach ($orderDirective as $col => $orderType) {
+                $orderDirective[$col] = $col . ' ' . $orderType;
+            }
+            $sql .= ' ORDER BY ' . implode(', ', $orderDirective);
+        }
+        return $sql;
+    }
+
 }

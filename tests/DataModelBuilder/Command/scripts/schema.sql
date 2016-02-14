@@ -31,8 +31,28 @@ create table sys_order (
     order_date timestamp not null default now()
 );
 
+create index on sys_order (order_date);
+
 create table sys_order_item (
     order_item_id serial not null primary key,
     product_id integer not null references sys_product(product_id) on update cascade on delete cascade,
     order_item_amount numeric not null default 0    
+);
+
+
+create table one_pkey (
+    id serial primary key
+);
+
+
+create table two_pkey (
+    part1 integer not null,
+    part2 integer not null,
+    primary key(part1,part2)
+);
+
+create table two_ukey (
+    part1 integer not null,
+    part2 integer not null,
+    unique(part1,part2)
 );
