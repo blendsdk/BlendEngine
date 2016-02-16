@@ -52,8 +52,7 @@ use <?php echo $use; ?>;
 <?php if(isset($uniqueKeys)):?>
 <?php foreach($uniqueKeys as $key):?>
     /**
-     * Retuns a single model using:
-     * <?php echo $key['functionParams']."\n";?>
+     * Retuns a single <?php echo $modelClass?> model
 <?php foreach($key['functionParamsDoc'] as $param):?>
      * @param <?php echo $param[0].' '.$param[1]."\n"?>
 <?php endforeach;?>
@@ -64,14 +63,13 @@ use <?php echo $use; ?>;
     }
 
     /**
-     * Deletes a single model using:
-     * <?php echo $key['functionParams']."\n";?>
+     * Deletes a single record (<?php echo $classFQRN?>)
 <?php foreach($key['functionParamsDoc'] as $param):?>
      * @param <?php echo $param[0].' '.$param[1]."\n"?>
 <?php endforeach;?>
      * @return <?php echo $modelClass."\n"?>
      */
-    public function deleteOneBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
+    public function deleteBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
         return $this->deleteByOne([<?php echo $key['functionCallParam']?>]);
     }
 
