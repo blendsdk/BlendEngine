@@ -44,17 +44,17 @@ class SchemaReaderTest extends DatabaseTestBase {
         $keysSchema = $schemas['k'];
         $keySchemaRelations = $keysSchema->getRelations();
         $table_with_pk = $keySchemaRelations['table_with_pk'];
-        $keys = $table_with_pk->getLocalKeys();
+        $keys = $table_with_pk->getUniqueKeys();
         $this->assertArrayHasKey('PRIMARY KEY', $keys);
         $this->assertCount(1, $keys['PRIMARY KEY']);
 
         $table_with_two_pk = $keySchemaRelations['table_with_two_pk'];
-        $keys = $table_with_two_pk->getLocalKeys();
+        $keys = $table_with_two_pk->getUniqueKeys();
         $this->assertArrayHasKey('PRIMARY KEY', $keys);
         $this->assertCount(2, $keys['PRIMARY KEY']);
 
         $table_with_unique_key = $keySchemaRelations['table_with_unique_key'];
-        $keys = $table_with_unique_key->getLocalKeys();
+        $keys = $table_with_unique_key->getUniqueKeys();
         $this->assertCount(1, $keys);
     }
 
