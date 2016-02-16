@@ -17,6 +17,7 @@ use Blend\Component\Database\Factory\Converter\FieldConverter;
 use Blend\Component\Model\Model;
 use Blend\Component\Database\StatementResult;
 use Blend\Component\Exception\InvalidConfigException;
+use Blend\Component\Exception\DatabaseQueryException;
 
 /**
  * Factory is the base class for a model factory
@@ -244,6 +245,28 @@ abstract class Factory {
         if (count($result) !== 0) {
             return $this->container->get('model'
                             , ['data' => $this->convertFromRecord($result[0])]);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Geta single record by params as condition and arguments
+     * @param array $params
+     */
+    protected function deleteOneBy(array $byColumns) {
+        $stmtResult = new StatementResult();
+        list($condition, $conditionParams) = $this->createAndCondition($byColumns);
+        $result = $this->database->delete($this->relation
+                , $condition
+                , $conditionParams
+                , $stmtResult);
+        if ($stmtResult->getAffectedRecords() == 1) {
+            return $this->container->get('model'
+                            , ['data' => $this->convertFromRecord($result[0])]);
+        } else if ($stmtResult->getAffectedRecords() > 1) {
+            throw new DatabaseQueryException("The " . __FUNCTION__
+            . " deleted more than one record!");
         } else {
             return null;
         }

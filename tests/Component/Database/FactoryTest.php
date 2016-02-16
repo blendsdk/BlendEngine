@@ -48,6 +48,10 @@ class TesterFactory extends Factory {
         return $this->getAll($selectColumns, $orderDirective, $offsetLimitDirective);
     }
 
+    public function deleteOneByTest($byColumns) {
+        return $this->deleteOneBy($byColumns);
+    }
+
 }
 
 /**
@@ -56,6 +60,26 @@ class TesterFactory extends Factory {
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class FactoryTest extends DatabaseTestBase {
+
+    /**
+     * @expectedException \Blend\Component\Exception\DatabaseQueryException
+     */
+    public function testDeleteOnRecordMultiple() {
+        $factory = new TesterFactory(self::$currentDatabase);
+        $model = $factory->deleteOneByTest(['field3' => 0]);
+    }
+
+    public function testDeleteOnRecordNoDelete() {
+        $factory = new TesterFactory(self::$currentDatabase);
+        $model = $factory->deleteOneByTest(['id' => 9999]);
+        $this->assertNull($model);
+    }
+
+    public function testDeleteOneRecord() {
+        $factory = new TesterFactory(self::$currentDatabase);
+        $model = $factory->deleteOneByTest(['id' => 10]);
+        $this->assertEquals(10, $model->getId());
+    }
 
     public function testGetRecords() {
         $factory = new TesterFactory(self::$currentDatabase);

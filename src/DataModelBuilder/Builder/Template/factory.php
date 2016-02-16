@@ -41,7 +41,6 @@ use <?php echo $use; ?>;
     }
 <?php endif;?>
 <?php endif;?>
-
     /**
      * Returns a new instance of <?php echo $modelClass."\n"?>
      * @return <?php echo $modelClass."\n"?>
@@ -50,4 +49,32 @@ use <?php echo $use; ?>;
         return parent::newModel();
     }
 
+<?php if(isset($uniqueKeys)):?>
+<?php foreach($uniqueKeys as $key):?>
+    /**
+     * Retuns a single model using:
+     * <?php echo $key['functionParams']."\n";?>
+<?php foreach($key['functionParamsDoc'] as $param):?>
+     * @param <?php echo $param[0].' '.$param[1]."\n"?>
+<?php endforeach;?>
+     * @return <?php echo $modelClass."\n"?>
+     */
+    public function getBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
+        return $this->getByOne('*', [<?php echo $key['functionCallParam']?>]);
+    }
+
+    /**
+     * Deletes a single model using:
+     * <?php echo $key['functionParams']."\n";?>
+<?php foreach($key['functionParamsDoc'] as $param):?>
+     * @param <?php echo $param[0].' '.$param[1]."\n"?>
+<?php endforeach;?>
+     * @return <?php echo $modelClass."\n"?>
+     */
+    public function deleteOneBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
+        return $this->deleteByOne([<?php echo $key['functionCallParam']?>]);
+    }
+
+<?php endforeach;?>
+<?php endif;?>
 }
