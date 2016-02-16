@@ -86,10 +86,10 @@ class Relation extends Record {
      * Gets the keys local to this Relation
      * @return Column[]
      */
-    public function getLocalKeys() {
+    public function getUniqueKeys() {
         $result = array();
         $keys = array();
-        foreach (array('PRIMARY KEY', 'UNIQUE', 'VIEW') as $type) {
+        foreach (array('PRIMARY KEY', 'UNIQUE') as $type) {
             if (isset($this->keysByType[$type])) {
                 $keys = array_merge($keys, $this->keysByType[$type]);
             }
