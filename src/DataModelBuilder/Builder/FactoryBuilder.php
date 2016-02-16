@@ -64,8 +64,48 @@ class FactoryBuilder extends ClassBuilder {
             $def['fieldConverter'] = end($class);
         }
         $def['converters'] = $this->fieldConverterInfo;
+        $def['uniqueKeys'] = $this->createDefinitionsForKeys($this->relation->getUniqueKeys());
+        $def['multiKeys'] = $this->createDefinitionsForKeys($this->relation->getForeignKeys());
 
         return $def;
+    }
+
+    protected function createDefinitionsForKeys($keyName) {
+        $result = [];
+        $list = $this->relation->getUniqueKeys();
+        if (is_array($list) && count($list) !== 0) {
+            foreach ($list as $columns) {
+                $result[] = $this->createCallerDefinition($columns);
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Creates a caller definition based on an array with columns to be used
+     * to generate function parameters
+     * @param array $columns
+     * @return array
+     */
+    private function createCallerDefinition(array $columns) {
+        $functionName = [];
+        $functionParams = [];
+        $functionCallParam = [];
+        foreach ($columns as $column) {
+            $argName = '$' . strtolower($column->getName());
+            $colName = $column->getName();
+            /* @var $column \Blend\DataModelBuilder\Schema\Column */
+            $functionName[] = str_identifier(str_replace('_id', '_ID', $colName));
+            $functionParams[] = $argName;
+            $functionParamsDoc[] = [$column->getField('udt_name'), $argName];
+            $functionCallParam[] = "'$colName' => " . $argName;
+        }
+        return [
+            'functionName' => ucwords(implode('And', $functionName)),
+            'functionParams' => implode(', ', $functionParams),
+            'functionParamsDoc' => $functionParamsDoc,
+            'functionCallParam' => implode(', ', $functionCallParam)
+        ];
     }
 
 }
