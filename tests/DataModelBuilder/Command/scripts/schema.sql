@@ -38,3 +38,11 @@ create table sys_order_item (
     product_id integer not null references sys_product(product_id) on update cascade on delete cascade,
     order_item_amount numeric not null default 0    
 );
+
+
+create table sys_addess(
+    id serial not null primary key,
+    post_code varchar,
+    house_number varchar,
+    unique(post_code,house_number)
+);
