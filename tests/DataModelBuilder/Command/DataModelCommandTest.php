@@ -67,6 +67,29 @@ class DataModelCommandTest extends DatabaseTestBase {
         $userFactory->save($user);
     }
 
+    public function testFactoryViewGeneration() {
+        $app = $this->createApplication();
+        ProjectUtil::runCommand(self::$projectFolder, 'datamodel:generate', ['--configclass' => 'Blend\Tests\DataModelBuilder\Command\CustomizedModelConfig'], $app);
+        $loader = new ClassLoader();
+        $loader->addPsr4("DALTest\\", self::$projectFolder . '/src/');
+        $loader->register();
+        try {
+            $classRef = new \ReflectionClass('DALTest\Database\Common\Factory\SysSampleViewFactory');
+            $this->assertTrue($classRef->hasMethod('getBySecretKey'));
+            $this->assertTrue($classRef->hasMethod('getManyByField1AndGenerateSeries'));
+
+            $this->assertEquals(1, $classRef
+                            ->getMethod('getBySecretKey')
+                            ->getNumberOfParameters());
+
+            $this->assertEquals(2, $classRef
+                            ->getMethod('getManyByField1AndGenerateSeries')
+                            ->getNumberOfParameters());
+        } catch (\Exception $ex) {
+            $this->fail($ex->getMessage());
+        }
+    }
+
     public static function getTestingDatabaseConfig() {
         return [
             'username' => 'postgres',

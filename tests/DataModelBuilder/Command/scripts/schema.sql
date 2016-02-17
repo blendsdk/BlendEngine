@@ -51,6 +51,7 @@ create table sys_addess(
 create or replace view sys_sample_view as
 select
     md5(now()::text) as secret_key,
+    true as field1,
     *
 from
     generate_series(0,100);

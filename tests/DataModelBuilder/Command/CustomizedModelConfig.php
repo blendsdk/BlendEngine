@@ -25,7 +25,7 @@ class CustomizedModelConfig extends DefaultBuilderConfig {
 
     protected function registerModelFactoryMethods() {
         $this->addModelFactoryMethod('sys_sample_view', 'secret_key', self::MODEL_FACTORY_RETURN_SINGLE);
-        $this->addModelFactoryMethod('sys_sample_view', 'generate_series', self::MODEL_FACTORY_RETURN_MULTIPLE);
+        $this->addModelFactoryMethod('sys_sample_view', ['field1', 'generate_series'], self::MODEL_FACTORY_RETURN_MULTIPLE);
     }
 
     public function getConverterForField($schema, $relation, $column, $dbtype, $fqcn) {
