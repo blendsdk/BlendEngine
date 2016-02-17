@@ -92,4 +92,12 @@ class DefaultBuilderConfig extends BuilderConfig {
         return DefaultFieldConverter::class;
     }
 
+    /**
+     * Should return either a null meaning all or an array with FQRN of the
+     * relations for which a Schema object needs to be generated
+     */
+    public function getSchemaHelperListToGenerate() {
+        return null;
+    }
+
 }

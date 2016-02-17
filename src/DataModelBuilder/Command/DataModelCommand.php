@@ -22,8 +22,9 @@ use Blend\DataModelBuilder\Schema\SchemaReader;
 use Blend\DataModelBuilder\Schema\Schema;
 use Blend\DataModelBuilder\Schema\Relation;
 use Blend\DataModelBuilder\Builder\ModelBuilder;
-use Blend\DataModelBuilder\Builder\DateTimeConversionBuilder;
 use Blend\DataModelBuilder\Builder\FactoryBuilder;
+use Blend\DataModelBuilder\Builder\SchemaBuilder;
+use Blend\DataModelBuilder\Builder\DateTimeConversionBuilder;
 use Blend\Component\DI\Container;
 
 /**
@@ -41,6 +42,21 @@ class DataModelCommand extends Command {
      */
     private $config = null;
     private $templateFolder;
+
+    protected function needSchemaHelper(Relation $relation) {
+        $schemaHelperList = $this->config->getSchemaHelperListToGenerate();
+        $frqn = $relation->getFQRN();
+        $name = $relation->getName();
+        if ($schemaHelperList === null) {
+            return true;
+        } else if (is_array($schemaHelperList) && in_array($frqn, $schemaHelperList)) {
+            return true;
+        } else if (is_string($schemaHelperList) && ($schemaHelperList === $frqn || $schemaHelperList === $name)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     protected function generateClasses(Schema $schema) {
         /**
@@ -61,7 +77,7 @@ class DataModelCommand extends Command {
             $rootNamespace = $this->config->getModelRootNamespace();
             $appNamespace = $this->config->getApplicationNamespace();
             $converterInfo = null;
-            foreach ([ModelBuilder::class, FactoryBuilder::class] as $builderClass) {
+            foreach ([ModelBuilder::class, FactoryBuilder::class, SchemaBuilder::class] as $builderClass) {
                 /* @var $builderClass \Blend\DataModelBuilder\Builder\ClassBuilder */
                 $builder = $conatiner->get($builderClass, [
                     'relation' => $relation,
@@ -80,10 +96,17 @@ class DataModelCommand extends Command {
                     $builder->setCustomFactoryMethods($this->config->getModelFactoryMethods());
                 }
 
-                $builder->build($allowCustomize);
+                if (($builder instanceof SchemaBuilder) === false) {
+                    $builder->build($allowCustomize);
+                }
 
                 if ($builder instanceof ModelBuilder) {
                     $converterInfo = $builder->getFieldConverterInfo();
+                }
+
+                if ($builder instanceof SchemaBuilder &&
+                        $this->needSchemaHelper($relation)) {
+                    $builder->build(false);
                 }
             }
         }

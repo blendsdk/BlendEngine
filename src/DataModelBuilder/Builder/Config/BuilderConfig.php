@@ -28,6 +28,12 @@ abstract class BuilderConfig {
     protected $modelFactoryMethods;
 
     /**
+     * Should return either a null meaning all or an array with FQRN of the
+     * relations for which a Schema object needs to be generated
+     */
+    public abstract function getSchemaHelperListToGenerate();
+
+    /**
      * Should return the root namespace of your application
      */
     public abstract function getApplicationNamespace();
@@ -76,7 +82,7 @@ abstract class BuilderConfig {
      * This is usefull to create factory methods for data VIEWS
      */
     protected function registerModelFactoryMethods() {
-
+        return null;
     }
 
     /**
