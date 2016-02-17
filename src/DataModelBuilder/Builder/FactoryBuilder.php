@@ -62,6 +62,7 @@ class FactoryBuilder extends ClassBuilder {
             $class = explode('\\', $this->fieldConverterClass);
             $def['fieldConverter'] = end($class);
         }
+        
         $def['converters'] = $this->fieldConverterInfo;
         $def['uniqueKeys'] = $this->createDefinitionsForKeys($this->relation->getUniqueKeys());
         $def['multiKeys'] = $this->createDefinitionsForKeys($this->relation->getForeignKeys());
@@ -69,9 +70,8 @@ class FactoryBuilder extends ClassBuilder {
         return $def;
     }
 
-    protected function createDefinitionsForKeys($keyName) {
+    protected function createDefinitionsForKeys($list) {
         $result = [];
-        $list = $this->relation->getUniqueKeys();
         if (is_array($list) && count($list) !== 0) {
             foreach ($list as $columns) {
                 $result[] = $this->createCallerDefinition($columns);

@@ -49,7 +49,7 @@ use <?php echo $use; ?>;
         return parent::newModel();
     }
 
-<?php if(isset($uniqueKeys)):?>
+<?php if(isset($uniqueKeys) && count($uniqueKeys) !== 0):?>
 <?php foreach($uniqueKeys as $key):?>
     /**
      * Retuns a single <?php echo $modelClass?> model
@@ -72,6 +72,22 @@ use <?php echo $use; ?>;
     public function deleteBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
         return $this->deleteByOne([<?php echo $key['functionCallParam']?>]);
     }
+
+<?php endforeach;?>
+<?php endif;?>
+<?php if(isset($multiKeys) && count($multiKeys) !== 0):?>
+<?php foreach($multiKeys as $key):?>
+    /**
+     * Retuns a single <?php echo $modelClass?> model
+<?php foreach($key['functionParamsDoc'] as $param):?>
+     * @param <?php echo $param[0].' '.$param[1]."\n"?>
+<?php endforeach;?>
+     * @return <?php echo $modelClass."\n"?>
+     */
+    public function getManyBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
+        //return $this->getByOne('*', [<?php echo $key['functionCallParam']?>]);
+    }
+
 
 <?php endforeach;?>
 <?php endif;?>

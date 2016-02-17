@@ -89,8 +89,12 @@ class SchemaReader {
      * @param Relation $relation
      */
     protected function loadContraintsForRelation(Relation $relation) {
-        "select * from information_schema.table_constraints where constraint_type in ('UNIQUE','PRIMARY KEY','FOREIGN KEY') and table_schema = :table_schema and table_catalog = :table_catalog and table_name = :table_name";
-
+        
+        if($relation->getName() === 'sys_order_item') {
+            $a = 0;
+        }
+        
+        
         $constraint_type = ['UNIQUE', 'PRIMARY KEY', 'FOREIGN KEY'];
         $tableConstQuery = new SelectStatement();
         $tableConstQuery->from('information_schema.table_constraints')
@@ -102,17 +106,19 @@ class SchemaReader {
             ':table_schema' => $relation->getSchemaName(),
             ':table_name' => $relation->getName()
         );
+        
+        
 
         $constColumnQuery = new SelectStatement();
         $constColumnQuery->from('information_schema.constraint_column_usage')
                 ->where(sqlstr('table_schema')->equalsTo(':table_schema'))
-                ->andWhere(sqlstr('table_name')->equalsTo(':table_name'))
+                //->andWhere(sqlstr('table_name')->equalsTo(':table_name'))
                 ->andWhere(sqlstr('constraint_name')->equalsTo(':constraint_name'));
 
         foreach ($this->database->executeQuery($tableConstQuery, $tableConstQueryParams) as $tableConst) {
             $constColumnParams = array(
                 ':table_schema' => $tableConst['table_schema'],
-                ':table_name' => $tableConst['table_name'],
+                //':table_name' => $tableConst['table_name'],
                 ':constraint_name' => $tableConst['constraint_name'],
             );
             $constColumns = $this->database->executeQuery($constColumnQuery, $constColumnParams);
