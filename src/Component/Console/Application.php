@@ -27,7 +27,7 @@ class Application extends ApplicationBase {
 
     /**
      * Constructor
-     * @param type $script_dir This should always be the __DIR__ global variable
+     * @param type $projectFolder This should always be the __DIR__ global variable
      * @param type $name
      * @param type $version
      */
