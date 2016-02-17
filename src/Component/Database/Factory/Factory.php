@@ -291,6 +291,20 @@ abstract class Factory {
     }
 
     /**
+     * Retuns the count of record by a condition set in $byColumns
+     * @param array $byColumns
+     * @return type
+     */
+    protected function getCountBy(array $byCondition) {
+        list($condition, $conditionParams) = $this->createAndCondition($byColumns);
+        $sql = 'SELECT COUNT(1)'
+                . ' FROM ' . $this->relation
+                . ' WHERE ' . $condition;
+
+        return $this->database->executeScalar($sql, $conditionParams);
+    }
+
+    /**
      * Gets many records from a relation
      * @param array $selectColumns columnt o select
      * @param array $byColumns condition
