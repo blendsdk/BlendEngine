@@ -20,18 +20,31 @@ use Blend\Component\Database\SQL\SQLString;
  */
 abstract class Schema {
 
-    private $rel_alias;
+    protected $rel_alias;
+
     /**
      * @var SQLString; 
      */
-    private $rel_name;
+    protected $rel_name;
 
     public function __construct($rel_name, $rel_alias) {
-        $this->rel_name = sqlstr($rel_name);
+        $this->rel_name = $rel_name;
         $this->rel_alias = $rel_alias;
     }
 
-    public function RelationName() {
-        return $this->rel_name;
+    /**
+     * @return SQLString
+     */
+    public function RELATION() {
+        return sqlstr($this->rel_name);
     }
+
+    /**
+     * @param type $name
+     * @return SQLString
+     */
+    protected function column($name) {
+        return sqlstr($name)->dotPrefix($this->rel_alias);
+    }
+
 }
