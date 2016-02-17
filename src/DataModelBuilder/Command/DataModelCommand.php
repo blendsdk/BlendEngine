@@ -77,6 +77,7 @@ class DataModelCommand extends Command {
                         $builder->setFieldConverterClass($this->config->getFieldConverterClass());
                     }
                     $builder->setFieldConverterInfo($converterInfo);
+                    $builder->setCustomFactoryMethods($this->config->getModelFactoryMethods());
                 }
 
                 $builder->build($allowCustomize);

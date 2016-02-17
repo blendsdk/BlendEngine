@@ -47,3 +47,10 @@ create table sys_addess(
     house_number varchar,
     unique(post_code,house_number)
 );
+
+create or replace view sys_sample_view as
+select
+    md5(now()::text) as secret_key,
+    *
+from
+    generate_series(0,100);

@@ -22,11 +22,20 @@ use Blend\DataModelBuilder\Schema\Relation;
 class FactoryBuilder extends ClassBuilder {
 
     protected $modelRootNamespace;
+    protected $customFactoryMethods;
 
     public function __construct(Relation $relation, $includeSchema) {
         parent::__construct('factory', $relation, $includeSchema);
         $this->defaultBaseClassName = $this->classNamePostfix = 'Factory';
         $this->defaultBaseClassFQN = 'Blend\Component\Database\Factory\Factory';
+    }
+
+    /**
+     * Sets the custom factory methods list
+     * @param type $methods
+     */
+    public function setCustomFactoryMethods($methods) {
+        $this->customFactoryMethods = $methods;
     }
 
     /**
@@ -46,6 +55,7 @@ class FactoryBuilder extends ClassBuilder {
      * @return type
      */
     protected function preparBuildDefinition($def) {
+        $this->prepareCustomFactoryMethods();
         $modelClass = $this->applicationNamespace
                 . '\\' . $this->modelRootNamespace
                 . '\\Model\\' . $this->relation->getName(true);
@@ -62,12 +72,35 @@ class FactoryBuilder extends ClassBuilder {
             $class = explode('\\', $this->fieldConverterClass);
             $def['fieldConverter'] = end($class);
         }
-        
+
         $def['converters'] = $this->fieldConverterInfo;
-        $def['uniqueKeys'] = $this->createDefinitionsForKeys($this->relation->getUniqueKeys());
-        $def['multiKeys'] = $this->createDefinitionsForKeys($this->relation->getForeignKeys());
+        $def['uniqueKeys'] = array_merge(
+                $this->createDefinitionsForKeys($this->relation->getUniqueKeys())
+                , $this->createDefinitionsForKeys($this->relation->getCustomKeys('CUSTOM_SINGLE'))
+        );
+        $def['multiKeys'] = array_merge(
+                $this->createDefinitionsForKeys($this->relation->getForeignKeys())
+                , $this->createDefinitionsForKeys($this->relation->getCustomKeys('CUSTOM_MULTI'))
+        );
+        $def['is_writable'] = $this->relation->writable();
 
         return $def;
+    }
+
+    protected function prepareCustomFactoryMethods() {
+        $relName = $this->relation->getFQRN();
+        if (isset($this->customFactoryMethods[$relName])) {
+            foreach ($this->customFactoryMethods[$relName] as $methodDef) {
+                $constraint_name = md5(serialize($methodDef));
+                foreach ($methodDef['columns'] as $column) {
+                    $keyColumn = [
+                        'constraint_name' => $constraint_name,
+                        'column_name' => $column
+                    ];
+                    $this->relation->addKeyColumn($keyColumn, 'CUSTOM_' . ($methodDef['type'] === 's' ? 'SINGLE' : 'MULTI'));
+                }
+            }
+        }
     }
 
     protected function createDefinitionsForKeys($list) {

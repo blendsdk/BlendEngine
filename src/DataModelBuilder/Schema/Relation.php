@@ -66,6 +66,23 @@ class Relation extends Record {
     }
 
     /**
+     * Gets the custom keys to this Relation
+     * @return Column[]
+     */
+    public function getCustomKeys($type) {
+        $result = array();
+        $keys = array();
+        if (isset($this->keysByType[$type])) {
+            $keys = array_merge($keys, $this->keysByType[$type]);
+        }
+
+        foreach ($keys as $key) {
+            $result[$key] = $this->keys[$key];
+        }
+        return $result;
+    }
+
+    /**
      * Gets the foreign keys to this Relation
      * @return Column[]
      */

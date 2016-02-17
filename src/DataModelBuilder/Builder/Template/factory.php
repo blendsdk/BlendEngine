@@ -61,6 +61,7 @@ use <?php echo $use; ?>;
     public function getBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
         return $this->getByOne(self::ALL_COLUMNS, [<?php echo $key['functionCallParam']?>]);
     }
+<?php if($is_writable):?>
 
     /**
      * Deletes a single record (<?php echo $classFQRN?>)
@@ -72,6 +73,7 @@ use <?php echo $use; ?>;
     public function deleteBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
         return $this->deleteByOne([<?php echo $key['functionCallParam']?>]);
     }
+<?php endif;?>
 
 <?php endforeach;?>
 <?php endif;?>
@@ -87,6 +89,7 @@ use <?php echo $use; ?>;
     public function getManyBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
         return $this->getManyBy(self::ALL_COLUMNS, [<?php echo $key['functionCallParam']?>]);
     }
+<?php if($is_writable):?>
 
     /**
      * Deletes <?php echo $modelClass?> models
@@ -98,7 +101,8 @@ use <?php echo $use; ?>;
     public function deleteManyBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
         return $this->getManyBy(self::ALL_COLUMNS, [<?php echo $key['functionCallParam']?>]);
     }
-
+<?php endif;?>
+    
 <?php endforeach;?>
 <?php endif;?>
 }
