@@ -78,6 +78,10 @@ abstract class Factory {
         }
     }
 
+    /**
+     * Deletes a Model from the database
+     * @param Model $model The Model that was deleted
+     */
     public function delete(Model $model) {
         if (!$model->isNew()) {
             $stmtResult = new StatementResult();
@@ -292,16 +296,25 @@ abstract class Factory {
 
     /**
      * Retuns the count of record by a condition set in $byColumns
-     * @param array $byColumns
-     * @return type
+     * @param array $byCondition
+     * @return integer
      */
-    protected function getCountBy(array $byCondition) {
-        list($condition, $conditionParams) = $this->createAndCondition($byColumns);
-        $sql = 'SELECT COUNT(1)'
+    protected function countBy(array $byCondition) {
+        list($condition, $conditionParams) = $this->createAndCondition($byCondition);
+        $sql = 'SELECT COUNT(true)'
                 . ' FROM ' . $this->relation
                 . ' WHERE ' . $condition;
 
         return $this->database->executeScalar($sql, $conditionParams);
+    }
+
+    /**
+     * Retuns the count of all records in the relation
+     * @return integer
+     */
+    protected function countAll() {
+        $sql = 'SELECT COUNT(true) FROM ' . $this->relation;
+        return $this->database->executeScalar($sql);
     }
 
     /**

@@ -36,6 +36,14 @@ class TesterFactory extends Factory {
         $this->relation = 'public.table1';
     }
 
+    public function countAllTest() {
+        return $this->countAll();
+    }
+
+    public function countByTest(array $byCondition) {
+        return $this->countBy($byCondition);
+    }
+
     public function getOneByTest($selectColumns, $byColumns) {
         return $this->getOneBy($selectColumns, $byColumns);
     }
@@ -64,6 +72,16 @@ class TesterFactory extends Factory {
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class FactoryTest extends DatabaseTestBase {
+
+    public function testCountAll() {
+        $factory = new TesterFactory(self::$currentDatabase);
+        $this->assertEquals(100, $factory->countAllTest());
+    }
+
+    public function testCountBy() {
+        $factory = new TesterFactory(self::$currentDatabase);
+        $this->assertEquals(9, $factory->countByTest(['field3' => 0]));
+    }
 
     public function testDeleteManyRecordsNoResult() {
         $stmtResult = new StatementResult();
