@@ -71,7 +71,9 @@ class SQLString {
      * @return \Blend\Component\Database\SQLString
      */
     public function dotPrefix($prefix) {
-        $this->str = $prefix . '.' . $this->str;
+        if (!empty($prefix)) {
+            $this->str = $prefix . '.' . $this->str;
+        }
         return $this;
     }
 
