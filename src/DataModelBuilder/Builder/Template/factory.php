@@ -59,7 +59,7 @@ use <?php echo $use; ?>;
      * @return <?php echo $modelClass."\n"?>
      */
     public function getBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
-        return $this->getByOne('*', [<?php echo $key['functionCallParam']?>]);
+        return $this->getByOne(self::ALL_COLUMNS, [<?php echo $key['functionCallParam']?>]);
     }
 
     /**
@@ -78,16 +78,26 @@ use <?php echo $use; ?>;
 <?php if(isset($multiKeys) && count($multiKeys) !== 0):?>
 <?php foreach($multiKeys as $key):?>
     /**
-     * Retuns a single <?php echo $modelClass?> model
+     * Returns <?php echo $modelClass?> models
 <?php foreach($key['functionParamsDoc'] as $param):?>
      * @param <?php echo $param[0].' '.$param[1]."\n"?>
 <?php endforeach;?>
      * @return <?php echo $modelClass."\n"?>
      */
     public function getManyBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
-        //return $this->getByOne('*', [<?php echo $key['functionCallParam']?>]);
+        return $this->getManyBy(self::ALL_COLUMNS, [<?php echo $key['functionCallParam']?>]);
     }
 
+    /**
+     * Deletes <?php echo $modelClass?> models
+<?php foreach($key['functionParamsDoc'] as $param):?>
+     * @param <?php echo $param[0].' '.$param[1]."\n"?>
+<?php endforeach;?>
+     * @return <?php echo $modelClass."\n"?>
+     */
+    public function deleteManyBy<?php echo $key['functionName'];?>(<?php echo $key['functionParams'];?>) {
+        return $this->getManyBy(self::ALL_COLUMNS, [<?php echo $key['functionCallParam']?>]);
+    }
 
 <?php endforeach;?>
 <?php endif;?>

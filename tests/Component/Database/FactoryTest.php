@@ -52,6 +52,10 @@ class TesterFactory extends Factory {
         return $this->deleteOneBy($byColumns);
     }
 
+    public function deleteManyByTest(array $byColumns, StatementResult $stmtResult = null) {
+        return $this->deleteManyBy($byColumns, $stmtResult);
+    }
+
 }
 
 /**
@@ -60,6 +64,22 @@ class TesterFactory extends Factory {
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class FactoryTest extends DatabaseTestBase {
+
+    public function testDeleteManyRecordsNoResult() {
+        $stmtResult = new StatementResult();
+        $factory = new TesterFactory(self::$currentDatabase);
+        $result = $factory->deleteManyByTest(['field3' => 9999], $stmtResult);
+        $this->assertEquals(0, $stmtResult->getAffectedRecords());
+        $this->assertCount(0, $result);
+    }
+
+    public function testDeleteManyRecords() {
+        $stmtResult = new StatementResult();
+        $factory = new TesterFactory(self::$currentDatabase);
+        $result = $factory->deleteManyByTest(['field3' => 0], $stmtResult);
+        $this->assertEquals(9, $stmtResult->getAffectedRecords());
+        $this->assertCount(9, $result);
+    }
 
     /**
      * @expectedException \Blend\Component\Exception\DatabaseQueryException

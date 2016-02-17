@@ -26,6 +26,8 @@ use Blend\Component\Exception\DatabaseQueryException;
  */
 abstract class Factory {
 
+    const ALL_COLUMNS = '*';
+
     /**
      * The name of the relation/view to operate
      * @var string
@@ -251,8 +253,8 @@ abstract class Factory {
     }
 
     /**
-     * Geta single record by params as condition and arguments
-     * @param array $params
+     * Deletes a single record by params as condition and arguments
+     * @param array $byColumns
      */
     protected function deleteOneBy(array $byColumns) {
         $stmtResult = new StatementResult();
@@ -273,6 +275,22 @@ abstract class Factory {
     }
 
     /**
+     * Deletes records by params as condition and arguments
+     * @param array $byColumns
+     */
+    protected function deleteManyBy(array $byColumns
+    , StatementResult $stmtResult = null) {
+
+        list($condition, $conditionParams) = $this->createAndCondition($byColumns);
+        $result = $this->database->delete($this->relation
+                , $condition
+                , $conditionParams
+                , $stmtResult);
+
+        return $this->recordsToModels($result);
+    }
+
+    /**
      * Gets many records from a relation
      * @param array $selectColumns columnt o select
      * @param array $byColumns condition
@@ -284,7 +302,7 @@ abstract class Factory {
     , $orderDirective = null, $offsetLimitDirective = null) {
 
         if (is_null($selectColumns)) {
-            $selectColumns = ['*'];
+            $selectColumns = [self::ALL_COLUMNS];
         } else if (!is_array($selectColumns)) {
             $selectColumns = [$selectColumns];
         }
@@ -314,7 +332,7 @@ abstract class Factory {
             }
             return $records;
         } else {
-            return null;
+            return $records;
         }
     }
 
