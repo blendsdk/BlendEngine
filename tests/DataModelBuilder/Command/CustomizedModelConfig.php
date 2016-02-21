@@ -19,6 +19,10 @@ use Blend\Component\Database\Factory\Converter\DefaultFieldConverter as C;
  */
 class CustomizedModelConfig extends DefaultBuilderConfig {
 
+    public function getSchemaHelperListToGenerate() {
+        return ['sys_user', 'aggrigations'];
+    }
+
     public function getCustomizedRelationList() {
         return ['sys_order'];
     }

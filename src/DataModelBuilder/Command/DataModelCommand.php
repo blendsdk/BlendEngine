@@ -49,7 +49,7 @@ class DataModelCommand extends Command {
         $name = $relation->getName();
         if ($schemaHelperList === null) {
             return true;
-        } else if (is_array($schemaHelperList) && in_array($frqn, $schemaHelperList)) {
+        } else if (is_array($schemaHelperList) && (in_array($frqn, $schemaHelperList) || in_array($name, $schemaHelperList))) {
             return true;
         } else if (is_string($schemaHelperList) && ($schemaHelperList === $frqn || $schemaHelperList === $name)) {
             return true;
@@ -58,7 +58,20 @@ class DataModelCommand extends Command {
         }
     }
 
+    protected function cleanBeforeBuild(Schema $schema) {
+        $rootPath = $this->config->getTargetRootFolder()
+                . '/' . $this->config->getModelRootNamespace()
+                . (!$schema->isSingle() ? '/' . $schema->getName(true) : '');
+        $schemaPath = $rootPath . '/Schema';
+        if ($this->fileSystem->exists($schemaPath)) {
+            $this->fileSystem->remove($schemaPath);
+        }
+    }
+
     protected function generateClasses(Schema $schema) {
+
+        $this->cleanBeforeBuild($schema);
+
         /**
          * To build the Models and Factory classes we use the following strategy:
          * First we build a model and gather the $converterInfo, then when we

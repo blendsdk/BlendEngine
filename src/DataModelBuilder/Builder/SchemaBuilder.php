@@ -23,6 +23,8 @@ class SchemaBuilder extends ClassBuilder {
 
     public function __construct(Relation $relation, $includeSchema) {
         parent::__construct('schema', $relation, $includeSchema);
+        $this->defaultBaseClassName = 'Schema';
+        $this->defaultBaseClassFQN = 'Blend\Component\Database\Factory\Schema';
     }
 
     /**
@@ -37,11 +39,13 @@ class SchemaBuilder extends ClassBuilder {
     protected function createBuildDefinition($allowCustomize) {
         return array(
             array(
-                'className' => strtoupper($this->relation->getName() . '_SCHEMA'),
+                'className' => $this->relation->getName(true) . 'Schema',
                 'classNamespace' => $this->rootNamespace,
                 'classBaseClass' => $this->defaultBaseClassName,
-                'uses' => [$this->defaultBaseClassFQN],
-                'generate' => true
+                'uses' => [
+                    $this->defaultBaseClassFQN,
+                    'Blend\Component\Database\SQL\SQLString'
+                ],
             )
         );
     }
@@ -52,9 +56,10 @@ class SchemaBuilder extends ClassBuilder {
             $name = $column->getName();
             $dbtype = $column->getField('data_type');
             $properties[] = array(
-                'name' => strtoupper($name),
+                'name' => $name,
                 'column' => $name,
-                'type' => $column->getField('data_type')
+                'type' => $column->getField('data_type'),
+                'getter' => strtoupper($name),
             );
         }
         $def['props'] = $properties;

@@ -2,21 +2,27 @@
 
 namespace <?php echo $appNamespace . '\\' . $classNamespace ?>;
 
+<?php foreach ($uses as $use): ?>
+use <?php echo $use; ?>;
+<?php endforeach; ?>
+
 /**
  * <?php echo $className ?> is a helper class representng the "<?php echo $classFQRN; ?>" relation
  */
-class <?php echo $className ?> {
+class <?php echo $className ?> extends <?php echo $classBaseClass; ?> {
 
-    /**
-     * @var string the sys_actuall_planning_detail_view schema
-     */
-    const TABLE_NAME = '<?php echo $classFQRN;?>';
+    public function __construct($rel_alias) {
+        parent::__construct('<?php echo $classFQRN; ?>', $rel_alias);
+    }
 <?php foreach ($props as $prop): ?>
 
     /**
-     * @var <?php echo str_replace(' ','&nbsp;',$prop['type'])?> the <?php echo $prop['column']?> column
+     * The <?php echo $prop['name']?> column
+     * @return SQLString
      */
-    const <?php echo $prop['name']?> = '<?php echo $prop['column']?>';
+    public function <?php echo $prop['getter']?>() {
+        return $this->column('<?php echo $prop['name']?>');
+    }
 <?php endforeach; ?>
 
 }

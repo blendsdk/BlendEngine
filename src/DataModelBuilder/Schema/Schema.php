@@ -35,8 +35,16 @@ class Schema extends Record {
         return $this->record['is_single'];
     }
 
-    public function getName() {
-        return $this->getString('schema_name');
+    public function getName($prettify = false) {
+        $name = $this->getString('schema_name');
+        if ($prettify) {
+            if ($name == 'public') {
+                $name = 'common';
+            }
+            return str_identifier($name);
+        } else {
+            return $this->getString('schema_name');
+        }
     }
 
     /**
