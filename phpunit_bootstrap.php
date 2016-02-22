@@ -38,6 +38,17 @@ if (!function_exists('is_windows')) {
 
 }
 
+if (!function_exists('catch_output')) {
+
+    function catch_output(callable $callback) {
+        ob_start();
+        ob_implicit_flush(false);
+        call_user_func($callback);
+        return ob_get_clean();
+    }
+
+}
+
 $tempFolder = dirname(__FILE__) . '/temp';
 if (!file_exists($tempFolder)) {
     mkdir($tempFolder, 0777, true);
