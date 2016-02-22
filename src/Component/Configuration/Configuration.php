@@ -28,7 +28,6 @@ class Configuration {
      * @var \ArrayAccess
      */
     private $params;
-    private $level;
 
     /**
      * Retuns a parameters value of null of the parameter does not exist
@@ -52,39 +51,61 @@ class Configuration {
         return array_key_exists($name, $this->params);
     }
 
-    public function __construct($fname) {
-        $this->level = 0;
-        if (file_exists($fname)) {
-            $this->params = $this->array_flat(include($fname));
-            $this->loadEnvironment($fname);
-        } else {
-            throw new FileNotFoundException($fname, 500);
-        }
+    public function __construct(array $configArray = []) {
+        $this->params = [];
+        $this->flatten_config($configArray, $this->params);
     }
 
-    protected function loadEnvironment($filename) {
-        $envfile = dirname($filename) . '/.env.php';
-        if (file_exists($envfile)) {
-            $this->params = array_merge($this->params, $this->array_flat(include($envfile)));
-        }
+    /**
+     * Mergs the current configuration with another array
+     * @param type $configArray
+     */
+    public function mergeWith($configArray) {
+        $all = [];
+        $this->flatten_config($configArray, $all);
+        $this->params = array_merge($this->params, $all);
     }
 
-    protected function array_flat($array, $prefix = '') {
-        $result = array();
-
-        foreach ($array as $key => $value) {
-            $new_key = $prefix . (empty($prefix) ? '' : '.') . $key;
-
-            if (is_array($value) && $this->level < 1) {
-                $this->level++;
-                $result = array_merge($result, $this->array_flat($value, $new_key));
-                $this->level--;
-            } else {
-                $result[$new_key] = $value;
+    /**
+     * Factory method for creating a configution for a PHP file and
+     * optionally an .env.php file
+     * @param type $filename
+     * @return \Blend\Component\Configuration\Configuration
+     * @throws FileNotFoundException
+     */
+    public static function createFromFile($filename) {
+        if (file_exists($filename)) {
+            $params = include($filename);
+            $config = new Configuration($params);
+            $envfile = dirname($filename) . '/.env.php';
+            if (file_exists($envfile)) {
+                $envparams = include($envfile);
+                $config->mergeWith($envparams);
             }
+            return $config;
+        } else {
+            throw new FileNotFoundException($filename, 500);
         }
+    }
 
-        return $result;
+    /**
+     * Flattens the oprovided array
+     * @param type $data
+     * @param type $all
+     * @param string $lastkey
+     */
+    protected function flatten_config($data, &$all, $lastkey = '') {
+        if (is_array_assoc($data)) {
+            if (!empty($lastkey)) {
+                $lastkey = $lastkey . '.';
+            }
+
+            foreach ($data as $key => $value) {
+                $this->flatten_config($value, $all, $lastkey . $key);
+            }
+        } else {
+            $all[$lastkey] = $data;
+        }
     }
 
 }
