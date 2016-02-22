@@ -65,7 +65,11 @@ abstract class Command extends CommandBase {
     protected function initContainer() {
         $this->container->singleton(Configuration::class, [
             'class' => Configuration::class,
-            'fname' => realpath($this->getApplication()->getProjectFolder() . '/config/config.php')
+            'factory' => function() {
+                $filename = realpath($this->getApplication()->getProjectFolder()
+                        . '/config/config.php');
+                return Configuration::createFromFile($filename);
+            }
         ]);
 
         $this->container->singleton(LoggerInterface::class, [
