@@ -14,7 +14,6 @@ namespace Blend\Component\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Blend\Component\DI\Container;
-use Blend\Component\Configuration\Configuration;
 
 /**
  * Application
@@ -34,24 +33,8 @@ abstract class Application {
 
     protected abstract function terminate(Request $request, Response $response);
 
-    public function __construct(Configuration $configuration) {
+    public function __construct() {
         $this->container = new Container();
-        $this->container->singleton(Configuration::class, [
-            'factory' => function() use($configuration) {
-                return $configuration;
-            }
-        ]);
-    }
-
-    /**
-     * Gets a configuration value defined in the application configuration
-     * @param type $name
-     * @param type $default
-     * @return type
-     */
-    public function getConfig($name, $default = null) {
-        return $this->container
-                        ->get(Configuration::class)->get($name, $default);
     }
 
     public function run(Request $request = null) {
