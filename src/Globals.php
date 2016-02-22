@@ -170,3 +170,19 @@ if (!function_exists('is_closure')) {
     }
 
 }
+
+if (!function_exists('is_array_assoc')) {
+
+    /**
+     * Check if the given array is an associative array
+     * @param type $arr
+     */
+    function is_array_assoc($arr) {
+        if (is_array($arr) && count($arr) !== 0) {
+            return array_keys($arr) !== range(0, count($arr) - 1);
+        } else {
+            return false;
+        }
+    }
+
+}

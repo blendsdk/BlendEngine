@@ -9,6 +9,19 @@ namespace Blend\Tests\Component\Globals;
  */
 class GlobalsTest extends \PHPUnit_Framework_TestCase {
 
+    public function testIsArrayAssoc() {
+        $this->assertFalse(is_array_assoc(null));
+        $this->assertFalse(is_array_assoc(true));
+        $this->assertFalse(is_array_assoc(false));
+        $this->assertFalse(is_array_assoc(1));
+        $this->assertFalse(is_array_assoc(''));
+        $this->assertFalse(is_array_assoc([]));
+        $this->assertFalse(is_array_assoc([1, 2, 3]));
+        $this->assertFalse(is_array_assoc(['1', '2', '3']));
+        $this->assertTrue(is_array_assoc(['a' => '1', '2', '3']));
+        $this->assertTrue(is_array_assoc(['a' => '1', 'b' => '2', 'c' => '3']));
+    }
+
     public function testStrIdentifier() {
         $this->assertEquals('getCustomerEmail()', str_identifier('customer_email', 'get', '()'));
     }
