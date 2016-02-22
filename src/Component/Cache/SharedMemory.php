@@ -76,17 +76,23 @@ class SharedMemory {
      * Reads data from shared memoty block
      * @return type
      */
-    public function read() {
-        $size = shmop_size($this->shmid);
-        $data = shmop_read($this->shmid, 0, $size);
-        return $data;
+    public function read($default = null) {
+        if (!is_null($this->shmid)) {
+            $size = shmop_size($this->shmid);
+            $data = shmop_read($this->shmid, 0, $size);
+            return $data;
+        } else {
+            return $default;
+        }
     }
 
     /**
      * Mark a shared memory block for deletion
      */
     public function delete() {
-        shmop_delete($this->shmid);
+        if (!is_null($this->shmid)) {
+            shmop_delete($this->shmid);
+        }
     }
 
     /**
