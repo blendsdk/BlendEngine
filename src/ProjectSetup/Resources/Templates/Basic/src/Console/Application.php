@@ -2,7 +2,7 @@
 
 namespace <?php echo $applicationNamespace;?>\Console;
 
-use Blend\Component\Console\Application;
+use Blend\Framework\Console\Application;
 use Blend\DataModelBuilder\Command\DataModelCommand;
 
 /**

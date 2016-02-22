@@ -11,7 +11,7 @@
 
 namespace Blend\Tests\DataModelBuilder\Command;
 
-use Blend\Component\Console\Application;
+use Blend\Framework\Console\Application;
 use Blend\DataModelBuilder\Command\DataModelCommand;
 use Blend\Tests\Component\Database\DatabaseTestBase;
 use Blend\Tests\ProjectUtil;

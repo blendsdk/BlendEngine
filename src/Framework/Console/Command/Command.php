@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Console\Command;
+namespace Blend\Framework\Console\Command;
 
 use Symfony\Component\Console\Command\Command as CommandBase;
 use Symfony\Component\Console\Input\InputOption;

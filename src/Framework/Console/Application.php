@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Console;
+namespace Blend\Framework\Console;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

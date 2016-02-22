@@ -11,7 +11,7 @@
 
 namespace Blend\ProjectSetup;
 
-use Blend\Component\Console\Application;
+use Blend\Framework\Console\Application;
 use Blend\ProjectSetup\Command\InitCommand;
 
 /**

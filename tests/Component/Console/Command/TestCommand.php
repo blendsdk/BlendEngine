@@ -11,7 +11,7 @@
 
 namespace Blend\Tests\Component\Console\Command;
 
-use Blend\Component\Console\Command\Command;
+use Blend\Framework\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Blend\Component\Configuration\Configuration;

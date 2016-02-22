@@ -11,7 +11,7 @@
 
 namespace Blend\Tests\Component\Console\Command;
 
-use Blend\Component\Console\Application;
+use Blend\Framework\Console\Application;
 use Blend\Tests\ProjectUtil;
 use Blend\Tests\Component\Console\Command\TestCommand;
 
