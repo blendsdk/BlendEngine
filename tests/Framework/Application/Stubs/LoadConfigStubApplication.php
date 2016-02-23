@@ -22,7 +22,7 @@ use Blend\Component\Configuration\Configuration;
 class LoadConfigStubApplication extends Application {
 
     public function run(\Symfony\Component\HttpFoundation\Request $request = null) {
-        $this->loadConfiguration();
+        $this->initialize($request);
     }
 
     public function testGetConfigValue($key, $default = null) {

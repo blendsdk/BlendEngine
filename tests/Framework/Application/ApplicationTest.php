@@ -54,13 +54,13 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $projectFolder = ProjectUtil::createNewProject($appName, true);
 
         $app = new Stubs\LoadConfigStubApplication($projectFolder);
-        $app->run();
+        $app->run(Request::create('/'));
         $this->assertEquals('5432', $app->testGetConfigValue('database.port'));
         $this->assertFileExists("{$projectFolder}/var/cache/config.cache");
 
         file_put_contents("{$projectFolder}/config/config.php", '');
         $app2 = new Stubs\LoadConfigStubApplication($projectFolder);
-        $app2->run();
+        $app2->run(Request::create('/'));
         $this->assertEquals('5432', $app2->testGetConfigValue('database.port'));
     }
 
