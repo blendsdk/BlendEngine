@@ -31,7 +31,9 @@ abstract class Application {
 
     protected abstract function handleRequestException(\Exception $ex, Request $request);
 
-    protected abstract function terminate(Request $request, Response $response);
+    protected abstract function finalize(Request $request, Response $response);
+
+    protected abstract function initialize(Request $request);
 
     public function __construct() {
         $this->container = new Container();
@@ -42,6 +44,7 @@ abstract class Application {
             if ($request === null) {
                 $request = Request::createFromGlobals();
             }
+            $this->initialize($request);
             $response = $this->handleRequest($request);
             if (!($request instanceof Response)) {
                 throw new \Exception(
@@ -51,8 +54,8 @@ abstract class Application {
         } catch (\Exception $ex) {
             $response = $this->handleRequestException($ex, $request);
         }
+        $this->finalize($request, $response);
         $response->send();
-        $this->terminate($request, $response);
     }
 
 }
