@@ -32,6 +32,24 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase {
         $this->fixturesFolder = dirname(__FILE__) . '/fixtures';
     }
 
+    public function testLoaderDumper() {
+        $conf = new TestConfiguration([
+            'key1' => 'value1',
+            'key2' => 2,
+            'key3' => [1, 2, 3, 4]
+        ]);
+        $dumpFile = sys_get_temp_dir() . '/' . uniqid() . '.cache';
+        $conf->dump($dumpFile);
+        $this->assertFileExists($dumpFile);
+
+        $conf2 = new TestConfiguration();
+        $conf2->load($dumpFile);
+        $this->assertEquals('value1', $conf->get('key1'));
+        $this->assertEquals(2, $conf->get('key2'));
+        $this->assertEquals([1, 2, 3, 4], $conf->get('key3'));
+        unlink($dumpFile);
+    }
+
     public function testConfigSanity() {
         $conf = new TestConfiguration();
         $this->assertTrue($conf instanceof Configuration);
