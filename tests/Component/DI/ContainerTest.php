@@ -25,6 +25,11 @@ use Blend\Tests\Component\DI\Stubs\Counter;
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase {
 
+    public function testContainSelf() {
+        $c = new Container();
+        $this->assertEquals($c, $c->get(Container::class));
+    }
+
     public function testSimpleClass() {
         $c = new Container();
         $bar = $c->get(Bar::class);

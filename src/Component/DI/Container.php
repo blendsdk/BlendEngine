@@ -30,6 +30,11 @@ class Container {
 
     public function __construct() {
         $this->classdefs = [];
+        $this->singleton(Container::class, [
+            'factory' => function() {
+                return $this;
+            }
+        ]);
     }
 
     /**
