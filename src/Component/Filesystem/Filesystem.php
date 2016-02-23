@@ -12,6 +12,7 @@
 namespace Blend\Component\Filesystem;
 
 use Symfony\Component\Filesystem\Filesystem as FilesystemBase;
+use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 /**
  * This class provides various filesystem related functionality
@@ -49,7 +50,7 @@ class Filesystem extends FilesystemBase {
         if (is_dir($folder) && is_writable($folder)) {
             return $folder;
         } else {
-            throw new \Exception(
+            throw new FileNotFoundException(
             "$folder does not exist or it is not writable"
             , 500);
         }
