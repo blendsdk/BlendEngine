@@ -22,15 +22,8 @@ use Symfony\Component\HttpFoundation\Request;
  */
 class ApplicationTest extends \PHPUnit_Framework_TestCase {
 
-    public function testSanity() {
-        $config = new Configuration();
-        $app = new Stubs\SanityApp($config);
-        $this->assertTrue($app instanceof Application);
-    }
-
     public function testInvalidResponse() {
-        $config = new Configuration([]);
-        $app = new Stubs\SanityApp($config);
+        $app = new Stubs\SanityApp();
         $result = catch_output(function() use ($app) {
             return $app->run(Request::create('http://example.com'));
         });

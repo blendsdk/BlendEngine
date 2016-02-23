@@ -22,11 +22,6 @@ use Blend\Component\DI\Container;
  */
 abstract class Application {
 
-    /**
-     * @var Container;
-     */
-    protected $container;
-
     protected abstract function handleRequest(Request $request);
 
     protected abstract function handleRequestException(\Exception $ex, Request $request);
@@ -34,10 +29,6 @@ abstract class Application {
     protected abstract function finalize(Request $request, Response $response);
 
     protected abstract function initialize(Request $request);
-
-    public function __construct() {
-        $this->container = new Container();
-    }
 
     public function run(Request $request = null) {
         try {
