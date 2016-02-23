@@ -68,7 +68,7 @@ class Application extends BaseApplication {
         }
 
         $cacheFile = $this->checkGetCacheFolder($this->rootFolder)
-                . '/cache/config.cache';
+                . '/config.cache';
 
         $this->container->singleton(Configuration::class, [
             'factory' => function() use ($cacheFile, $configFile) {
