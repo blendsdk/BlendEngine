@@ -54,9 +54,11 @@ class Application extends BaseApplication {
     }
 
     /**
-     * Loads the application configuration file and caches it if the case 
+     * Loads the application configuration file and caches it in the case
      * does not exist. This function internally chekcs for existance of the
-     * var/cache folder by calling checkGetCacheFolder
+     * var/cache folder by calling checkGetCacheFolder. The configuration
+     * object (Configuration::class) is then registered as singleton the the
+     * application container
      * @throws InvalidConfigException
      */
     protected function loadConfiguration() {
