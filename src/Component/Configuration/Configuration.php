@@ -108,4 +108,20 @@ class Configuration {
         }
     }
 
+    /**
+     * Load a previously dumped configuration parameters
+     * @param array $data
+     */
+    public function load($dumpFile) {
+        $this->params = unserialize(file_get_contents($dumpFile));
+    }
+
+    /**
+     * Dumps the current parameters to a file
+     * @param type $dumpFile
+     */
+    public function dump($dumpFile) {
+        file_put_contents($dumpFile, serialize($this->params));
+    }
+
 }
