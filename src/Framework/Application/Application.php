@@ -55,7 +55,8 @@ class Application extends BaseApplication {
 
     /**
      * Loads the application configuration file and caches it if the case 
-     * does not exist
+     * does not exist. This function internally chekcs for existance of the
+     * var/cache folder by calling checkGetCacheFolder
      * @throws InvalidConfigException
      */
     protected function loadConfiguration() {
@@ -66,23 +67,21 @@ class Application extends BaseApplication {
             . $configFile, 500);
         }
 
-        $cacheFile = $this->checkGetCacheFolder($this->rootFolder) 
-                . '/config.cache';
-        
-        if(file_exists($cacheFile)) {
-            $config = new Configuration();
-            $config->load($cacheFile);
-        } else {
-            $config = Configuration::createFromFile($configFile);
-            $config->dump($cacheFile);
-        }
-        
-        $this->container->singleton(Configuration::class,[
-            'factory' => function() use ($config) {
+        $cacheFile = $this->checkGetCacheFolder($this->rootFolder)
+                . '/cache/config.cache';
+
+        $this->container->singleton(Configuration::class, [
+            'factory' => function() use ($cacheFile, $configFile) {
+                if (file_exists($cacheFile)) {
+                    $config = new Configuration();
+                    $config->load($cacheFile);
+                } else {
+                    $config = Configuration::createFromFile($configFile);
+                    $config->dump($cacheFile);
+                }
                 return $config;
             }
         ]);
-        
     }
 
     protected function initialize(Request $request) {
