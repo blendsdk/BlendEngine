@@ -39,4 +39,20 @@ class Filesystem extends FilesystemBase {
         }
     }
 
+    /**
+     * Asserts if a folder exists and it is writable
+     * @param type $folder
+     * @return type
+     * @throws \Exception
+     */
+    public function assertFolderWritable($folder) {
+        if (is_dir($folder) && is_writable($folder)) {
+            return $folder;
+        } else {
+            throw new \Exception(
+            "$folder does not exist or it is not writable"
+            , 500);
+        }
+    }
+
 }

@@ -13,6 +13,29 @@ class FilesystemTests extends \PHPUnit_Framework_TestCase {
 
     protected $cleanup = array();
 
+    /**
+     * @expectedException \Exception
+     */
+    public function testAssertWritableException() {
+        $fs = new Filesystem();
+        if (!is_windows()) {
+            $fs->assertFolderWritable('/root');
+        } else {
+            //skip this test on Windows
+            throw new \Exception('');
+            ;
+        }
+    }
+
+    public function testAssertWritable() {
+        $fs = new Filesystem();
+        if (!is_windows()) {
+            $this->assertEquals('/tmp', $fs->assertFolderWritable('/tmp'));
+        } else {
+            $this->assertTrue(true);
+        }
+    }
+
     public function testEnsureFolder() {
         $fs = new Filesystem();
         $thisFolder = dirname(__FILE__);
