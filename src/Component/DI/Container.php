@@ -178,6 +178,8 @@ class Container {
             $callparams = $this->resolve($callsig, array_merge($defparams, $params));
             $args = array_intersect_key($callparams, $callsig);
             $this->checkCallArguments($callsig, $args, $refclass);
+            // array_merge here will sort the call params to the correct sort order
+            $args = array_merge($callsig, $args);
         }
 
         if ($singleton !== false) {
