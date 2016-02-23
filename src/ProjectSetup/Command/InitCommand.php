@@ -108,6 +108,7 @@ class InitCommand extends Command {
             'applicationNamespace' => $this->applicationName,
             'applicationPackageName' => get_current_user() . '/' . $lowerAppName,
             'applicationCommandClassName' => $this->applicationName . 'Application',
+            'applicationClassName' => $this->applicationName . 'Application',
             'applicationDatabaseName' => $lowerAppName,
             'currentUserName' => $gitInfo['user.name'],
             'currentUserEmail' => $gitInfo['user.email']
@@ -131,7 +132,8 @@ class InitCommand extends Command {
             'bin/app' => 'bin/' . $lowerName,
             'bin/app.bat' => 'bin/' . $lowerName . '.bat',
             'bin/app.php' => 'bin/' . $lowerName . '.php',
-            'src/Console/Application.php' => 'src/Console/' . $applicationCommandClassName . '.php'
+            'src/Console/Application.php' => 'src/Console/' . $applicationCommandClassName . '.php',
+            'src/Application.php' => 'src/' . $applicationClassName . '.php'
         );
 
         $this->renderTable = array(
@@ -142,7 +144,8 @@ class InitCommand extends Command {
             'bin/app.bat',
             'bin/app.php',
             'composer.json',
-            'src/Console/Application.php'
+            'src/Console/Application.php',
+            'src/Application.php'
         );
     }
 
@@ -159,12 +162,19 @@ class InitCommand extends Command {
                 $output->writeln('<info>Generating ' . $this->applicationName . ' :)</info>');
                 $this->generateWithTemplate($template, $output);
                 $this->runCompass($output);
+                $this->createVarFolders();
             } else {
                 $output->writeln("<error>The requested template [" . $template . '] does not exist!</error>');
             }
         } else {
             $output->writeln("<error>Looks like the " . $this->workFolder . ' is not empty!</error>');
         }
+    }
+
+    private function createVarFolders() {
+        $fs = new Filesystem();
+        $cacheFolder = $this->workFolder . '/var/cache';
+        $fs->ensureFolder($cacheFolder, 0777);
     }
 
     /**
