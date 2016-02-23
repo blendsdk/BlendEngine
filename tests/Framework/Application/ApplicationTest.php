@@ -10,6 +10,7 @@
  */
 
 namespace Blend\Tests\Framework\Application;
+
 use Blend\Tests\ProjectUtil;
 use Composer\Autoload\ClassLoader;
 use Blend\Component\DI\Container;
@@ -22,45 +23,45 @@ use Symfony\Component\HttpFoundation\Response;
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class ApplicationTest extends \PHPUnit_Framework_TestCase {
-    
+
     /**
      * @var ClassLoader 
      */
     protected $currentLoader;
+
     /**
      * @var Container; 
      */
     protected $container;
-    
+
     public function autoLoadProject($projectFolder) {
-        if($this->currentLoader) {
+        if ($this->currentLoader) {
             $this->currentLoader->unregister();
             $this->currentLoader = null;
         }
-        $path = explode(DIRECTORY_SEPARATOR,$projectFolder);
+        $path = explode(DIRECTORY_SEPARATOR, $projectFolder);
         $ns = end($path);
         $loader = new ClassLoader();
-        $loader->addPsr4($ns.'\\', $projectFolder . '/src/');
+        $loader->addPsr4($ns . '\\', $projectFolder . '/src/');
         $loader->register(true);
         $this->currentLoader = $loader;
         $this->container = new Container();
         return "{$ns}\\{$ns}Application";
     }
-    
+
     public function testLoadConfig() {
         $appName = 'LoadConfig';
-        $projectFolder = ProjectUtil::createNewProject($appName, true);   
-        
+        $projectFolder = ProjectUtil::createNewProject($appName, true);
+
         $app = new Stubs\LoadConfigStubApplication($projectFolder);
         $app->run();
-        $this->assertEquals('5432',$app->testGetConfigValue('database.port'));
+        $this->assertEquals('5432', $app->testGetConfigValue('database.port'));
         $this->assertFileExists("{$projectFolder}/var/cache/config.cache");
-        
+
         file_put_contents("{$projectFolder}/config/config.php", '');
         $app2 = new Stubs\LoadConfigStubApplication($projectFolder);
         $app2->run();
-        $this->assertEquals('5432',$app2->testGetConfigValue('database.port'));
-        
+        $this->assertEquals('5432', $app2->testGetConfigValue('database.port'));
     }
-    
+
 }
