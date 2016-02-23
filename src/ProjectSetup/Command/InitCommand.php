@@ -173,8 +173,13 @@ class InitCommand extends Command {
 
     private function createVarFolders() {
         $fs = new Filesystem();
-        $cacheFolder = $this->workFolder . '/var/cache';
-        $fs->ensureFolder($cacheFolder, 0777);
+        $folders = [
+            $this->workFolder . '/var/cache',
+            $this->workFolder . '/var/log'
+        ];
+        foreach ($folders as $folder) {
+            $fs->ensureFolder($folder, 0777);
+        }
     }
 
     /**

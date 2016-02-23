@@ -64,4 +64,14 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('5432', $app2->testGetConfigValue('database.port'));
     }
 
+    public function testLogger() {
+        $appName = 'LoggerConfig';
+        $projectFolder = ProjectUtil::createNewProject($appName, true);
+
+        $app = new Stubs\LoggerStubApplication($projectFolder);
+        $app->run(Request::create('/'));
+        $app->testLog('Hello World');
+        $this->assertFileExists("{$projectFolder}/var/log/loggerapp-" . date('Y-m-d') . ".log");
+    }
+
 }

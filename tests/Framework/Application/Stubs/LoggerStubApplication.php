@@ -13,20 +13,25 @@ namespace Blend\Tests\Framework\Application\Stubs;
 
 use Blend\Framework\Application\Application;
 use Blend\Component\Configuration\Configuration;
+use Monolog\Logger;
 
 /**
  * Description of LoadConfigStubApplication
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class LoadConfigStubApplication extends Application {
+class LoggerStubApplication extends Application {
+
+    protected $name = 'loggerapp';
 
     public function run(\Symfony\Component\HttpFoundation\Request $request = null) {
-        $this->loadConfiguration();
+        $this->debug = true;
+        $this->initialize($request);
     }
 
-    public function testGetConfigValue($key, $default = null) {
-        return $this->container->get(Configuration::class)->get($key, $default);
+    public function testLog($message) {
+        $logger = $this->container->get(Logger::class);
+        $logger->debug($message);
     }
 
 }
