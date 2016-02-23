@@ -28,16 +28,6 @@ class ApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue($app instanceof Application);
     }
 
-    public function testGetConfig() {
-        $config = new Configuration([
-            'name' => 'MyApp',
-            'version' => 1
-        ]);
-        $app = new Stubs\SanityApp($config);
-        $this->assertEquals('MyApp', $app->getConfig('name'));
-        $this->assertEquals(1, $app->getConfig('version'));
-    }
-
     public function testInvalidResponse() {
         $config = new Configuration([]);
         $app = new Stubs\SanityApp($config);

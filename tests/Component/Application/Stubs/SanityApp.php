@@ -26,13 +26,16 @@ class SanityApp extends Application {
         return new Response($ex->getMessage());
     }
 
+    protected function finalize(Request $request, Response $response) {
+        //
+    }
+
     protected function handleRequest(Request $request) {
-        
+        //
     }
 
-    protected function terminate(Request $request, Response $response) {
-        
+    protected function initialize(Request $request) {
+        //
     }
 
-//put your code here
 }
