@@ -30,9 +30,10 @@ class Container {
 
     public function __construct() {
         $this->classdefs = [];
+        $local = $this;
         $this->singleton(Container::class, [
-            'factory' => function() {
-                return $this;
+            'factory' => function() use($local) {
+                return $local;
             }
         ]);
     }
@@ -94,7 +95,17 @@ class Container {
      * @param array $config
      */
     public function singleton($interface, $config = array()) {
-        $this->define($interface, $config);
+        if (is_object($config)) {
+            $cfg = [
+                'factory' => function() use($config) {
+                    return $config;
+                }
+            ];
+            $this->define($interface, $cfg);
+        } else {
+            $this->define($interface, $config);
+        }
+
         $this->classdefs[$interface]['singleton'] = true;
     }
 
@@ -201,7 +212,11 @@ class Container {
     private function resolve($callsig, $callparams) {
         foreach ($callsig as $name => $type) {
             if (!isset($callparams[$name]) && !is_null($type)) {
-                $callparams[$name] = $this->get($type);
+                if ($type === Container::class) {
+                    $callparams[$name] = $this;
+                } else {
+                    $callparams[$name] = $this->get($type);
+                }
             }
         }
         return $callparams;
