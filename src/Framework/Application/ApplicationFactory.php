@@ -21,7 +21,11 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 
 /**
- * Description of ApplicationFactory
+ * ApplicationFactory creates an Application instance. By default
+ * the a Application will be instantiated with a RotatingFile logger that is
+ * instantiated by CommonLoggerFactory. You can set a differect Logger by
+ * implementing (or overriding CommonLoggerFactory)
+ * a new LoggerFactoryInterface and passing it to setLoggerFactory
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
@@ -30,7 +34,7 @@ class ApplicationFactory {
     private $container;
 
     /**
-     * @var Filesystem 
+     * @var Filesystem
      */
     private $filesystem;
     private $rootFolder;
@@ -38,12 +42,17 @@ class ApplicationFactory {
     private $debug;
 
     /**
-     * @var Configuration 
+     * @var Configuration
      */
     private $config;
 
     /**
-     * @var LoggerFactoryInterface 
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var LoggerFactoryInterface
      */
     private $loggerFactory;
 
@@ -52,13 +61,20 @@ class ApplicationFactory {
         $this->loggerFactory = null;
     }
 
+    /**
+     * Sets the LOggerFactory class name to be used when a Logger is created
+     * for this Application
+     * @param LoggerFactoryInterface $loggerFactory
+     */
     public function setLoggerFactory(LoggerFactoryInterface $loggerFactory) {
         $this->loggerFactory = $loggerFactory;
     }
 
     /**
-     * @param type $applicationClass
-     * @param type $rootFolder
+     * Creates an Application instance which is ready to run
+     * @param type $applicationClass The application classname
+     * @param type $rootFolder The rootfolder where the application ins sitting
+     * @param type $debug Wherher to run the application in debug mode
      * @return Application
      */
     public function create($applicationClass, $rootFolder, $debug = false) {
@@ -80,6 +96,9 @@ class ApplicationFactory {
         return $application;
     }
 
+    /**
+     * Build a Logger component.
+     */
     private function builLogger() {
         if ($this->loggerFactory === null) {
             $logFolder = $this->filesystem->assertFolderWritable(
@@ -99,8 +118,12 @@ class ApplicationFactory {
                 return $logger;
             }
         ]);
+        $this->logger = $logger;
     }
 
+    /**
+     * Builds a Configuration component
+     */
     private function buildConfigObject() {
         $configFile = $this->rootFolder . '/config/config.php';
         $cacheFile = $this->cacheFolder . '/config.cache';
