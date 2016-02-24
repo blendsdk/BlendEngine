@@ -62,6 +62,7 @@ class ApplicationFactory {
      * @return Application
      */
     public function create($applicationClass, $rootFolder, $debug = false) {
+
         $this->container = new Container();
         $this->debug = $debug;
         $this->rootFolder = $rootFolder;
@@ -70,13 +71,6 @@ class ApplicationFactory {
 
         $this->buildConfigObject();
         $this->builLogger();
-
-        $this->container->singleton(Filesystem::class, [
-            'factory' => function() {
-                return $this->filesystem;
-            }
-        ]);
-
 
         /* @var $application \Blend\Framework\Application\Application */
         $application = $this->container->get($applicationClass, [
