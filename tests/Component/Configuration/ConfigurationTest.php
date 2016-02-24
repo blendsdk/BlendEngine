@@ -125,7 +125,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testTestFileTest1() {
-        $conf = Configuration::createFromFile($this->fixturesFolder . '/test1.php');
+        $conf = Configuration::createFromFile($this->fixturesFolder . '/test1.json');
         $this->assertTrue($conf->has('section1.stringValue'));
         $this->assertTrue($conf->has('section1.numberValue'));
         $this->assertTrue($conf->has('section1.arrayValue'));
@@ -134,7 +134,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testTestFileAppWithEnv() {
-        $conf = Configuration::createFromFile($this->fixturesFolder . '/app.php');
+        $conf = Configuration::createFromFile($this->fixturesFolder . '/app.json');
         $this->assertEquals('app_production', $conf->get('database.database'));
     }
 
@@ -142,7 +142,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase {
      * @expectedException \Symfony\Component\Filesystem\Exception\FileNotFoundException
      */
     public function testTestFileMissing() {
-        $conf = Configuration::createFromFile($this->fixturesFolder . '/aaaa.php');
+        $conf = Configuration::createFromFile($this->fixturesFolder . '/aaaa.json');
     }
 
 }

@@ -16,7 +16,7 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 /**
  * The Configuration class provides an option to read the application
  * configuration parameters In BlendEngine. This class also will look
- * for a file called the ".env.php" which can be used to overwrite the
+ * for a file called the ".env.json" which can be used to overwrite the
  * configuration parameters with environment specific values
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -68,18 +68,18 @@ class Configuration {
 
     /**
      * Factory method for creating a configution for a PHP file and
-     * optionally an .env.php file
+     * optionally an .env.json file
      * @param type $filename
      * @return \Blend\Component\Configuration\Configuration
      * @throws FileNotFoundException
      */
     public static function createFromFile($filename) {
         if (file_exists($filename)) {
-            $params = include($filename);
+            $params = json_decode(file_get_contents($filename), true);
             $config = new Configuration($params);
-            $envfile = dirname($filename) . '/.env.php';
+            $envfile = dirname($filename) . '/.env.json';
             if (file_exists($envfile)) {
-                $envparams = include($envfile);
+                $envparams = json_decode(file_get_contents($envfile), true);
                 $config->mergeWith($envparams);
             }
             return $config;

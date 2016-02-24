@@ -139,7 +139,7 @@ class InitCommand extends Command {
         $this->renderTable = array(
             'phpunit.xml.dist',
             'tests/README',
-            'config/config.php',
+            'config/config.json',
             'bin/app',
             'bin/app.bat',
             'bin/app.php',

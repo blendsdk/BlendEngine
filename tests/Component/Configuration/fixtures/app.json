@@ -1,0 +1,7 @@
+{
+    "database": {
+        "username": "postgres",
+        "password": "postgres",
+        "database": "app_devel"
+    }
+}
