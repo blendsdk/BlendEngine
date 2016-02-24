@@ -45,11 +45,9 @@ class Application extends BaseApplication {
      */
     protected $config;
 
-    public function __construct(Container $container
-    , Configuration $config
+    public function __construct(Configuration $config
     , LoggerInterface $logger
     , $rootFolder) {
-        $this->container = $container;
         $this->rootFolder = $rootFolder;
         $this->config = $config;
         $this->logger = $logger;
