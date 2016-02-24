@@ -25,9 +25,17 @@ use Blend\Tests\Component\DI\Stubs\Counter;
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase {
 
+    public function testObjectAsSingleton() {
+        $c = new Container();
+        $c->singleton(Counter::class, new Counter());
+        $c->get(Counter::class)->next();
+        $this->assertEquals(2, $c->get(Counter::class)->next());
+    }
+
     public function testContainSelf() {
         $c = new Container();
-        $this->assertEquals($c, $c->get(Container::class));
+        $x = $c->get(Container::class);
+        $this->assertEquals($c, $x);
     }
 
     public function testSimpleClass() {
