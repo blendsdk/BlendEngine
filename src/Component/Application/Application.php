@@ -28,14 +28,17 @@ abstract class Application {
 
     protected abstract function finalize(Request $request, Response $response);
 
-    protected abstract function initialize(Request $request);
+    protected abstract function initialize();
+
+    public function __construct() {
+        $this->initialize();
+    }
 
     public function run(Request $request = null) {
         try {
             if ($request === null) {
                 $request = Request::createFromGlobals();
             }
-            $this->initialize($request);
             $response = $this->handleRequest($request);
             if (!($response instanceof Response)) {
                 throw new \Exception(

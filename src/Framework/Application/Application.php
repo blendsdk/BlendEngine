@@ -25,48 +25,37 @@ use Blend\Component\Configuration\Configuration;
  */
 class Application extends BaseApplication {
 
+    const APP_ROOT_FOLDER = 'APP_ROOT_FOLDER';
+
     /**
      * @var Container
      */
     protected $container;
 
-    /**
-     * @var string
-     */
-    protected $rootFolder;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
-     * @var Configuration
-     */
-    protected $config;
-
     public function __construct(Configuration $config
     , LoggerInterface $logger
     , $rootFolder) {
-        $this->rootFolder = $rootFolder;
-        $this->config = $config;
-        $this->logger = $logger;
+
+        $this->container = new Container();
+        $this->container->singleton(Application::APP_ROOT_FOLDER, $rootFolder);
+        $this->container->singleton(LoggerInterface::class, $logger);
+        $this->container->singleton(Configuration::class, $config);
     }
 
     protected function finalize(Request $request, Response $response) {
-        
+
     }
 
     protected function handleRequest(Request $request) {
-        
+
     }
 
     protected function handleRequestException(\Exception $ex, Request $request) {
-        
+
     }
 
-    protected function initialize(Request $request) {
-        
+    protected function initialize() {
+
     }
 
 }

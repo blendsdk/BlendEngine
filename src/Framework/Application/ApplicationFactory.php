@@ -93,6 +93,8 @@ class ApplicationFactory {
             'rootFolder' => $rootFolder
         ]);
 
+        file_put_contents($rootFolder . '/var/cache/' . crc32($applicationClass) . '.cache', serialize($application));
+
         return $application;
     }
 
