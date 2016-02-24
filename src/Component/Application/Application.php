@@ -37,7 +37,7 @@ abstract class Application {
             }
             $this->initialize($request);
             $response = $this->handleRequest($request);
-            if (!($request instanceof Response)) {
+            if (!($response instanceof Response)) {
                 throw new \Exception(
                 'The handleRequest did not return a valid Response object'
                 );
