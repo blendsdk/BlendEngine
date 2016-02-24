@@ -49,6 +49,15 @@ if (!function_exists('catch_output')) {
 
 }
 
+if (!function_exists('measure_time')) {
+
+    function measure_time(callable $callback) {
+        $start = microtime(true);
+        return [call_user_func($callback),  (microtime(true) - $start)];
+    }
+
+}
+
 $tempFolder = dirname(__FILE__) . '/temp';
 if (!file_exists($tempFolder)) {
     mkdir($tempFolder, 0777, true);
