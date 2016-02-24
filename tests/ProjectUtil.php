@@ -87,4 +87,20 @@ class ProjectUtil {
         return $projectFolder;
     }
 
+    /**
+     * Creates and registers an ClassLoder for a given project
+     * @param type $projectFolder
+     * @return type
+     */
+    public static function initProjectClassLoader($projectFolder, $ns = null) {
+        if ($ns === null) {
+            $path = explode(DIRECTORY_SEPARATOR, $projectFolder);
+            $ns = end($path);
+        }
+        $loader = new ClassLoader();
+        $loader->addPsr4($ns . '\\', $projectFolder . '/src/');
+        $loader->register(true);
+        return ["{$ns}\\{$ns}Application", $loader];
+    }
+
 }
