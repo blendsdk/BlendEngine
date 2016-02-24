@@ -55,7 +55,7 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         $this->assertFileExists($projectFolder . '/var/log/application-' . date('Y-m-d') . '.log');
         $this->assertFileExists($configCache);
 
-        unlink($projectFolder . '/config/config.php');
+        unlink($projectFolder . '/config/config.json');
 
         $app2 = $factory->create($clazz, $projectFolder);
         $this->assertTrue($app2 instanceof \Blend\Framework\Application\Application);

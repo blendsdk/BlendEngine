@@ -173,7 +173,7 @@ class DataModelCommand extends Command {
 
     /**
      * Load the Schema information from the database that is configured in the
-     * config.php
+     * config.json
      * @return boolean
      */
     protected function loadDatabaseSchema() {

@@ -1,0 +1,7 @@
+{
+    "section1": {
+        "stringValue": "abc",
+        "numberValue": 123,
+        "arrayValue": [1, 2, 3]
+    }
+}

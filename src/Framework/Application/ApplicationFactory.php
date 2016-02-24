@@ -125,7 +125,7 @@ class ApplicationFactory {
      * Builds a Configuration component
      */
     private function buildConfigObject() {
-        $configFile = $this->rootFolder . '/config/config.php';
+        $configFile = $this->rootFolder . '/config/config.json';
         $cacheFile = $this->cacheFolder . '/config.cache';
         if ($this->filesystem->exists($cacheFile) && !$this->debug) {
             $config = new Configuration();

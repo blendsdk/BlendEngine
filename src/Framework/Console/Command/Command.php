@@ -67,7 +67,7 @@ abstract class Command extends CommandBase {
             'class' => Configuration::class,
             'factory' => function() {
                 $filename = realpath($this->getApplication()->getProjectFolder()
-                        . '/config/config.php');
+                        . '/config/config.json');
                 return Configuration::createFromFile($filename);
             }
         ]);
