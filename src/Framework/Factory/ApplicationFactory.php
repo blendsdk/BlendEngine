@@ -36,8 +36,20 @@ class ApplicationFactory implements ObjectFactoryInterface {
      * @var Filesystem
      */
     private $filesystem;
+
+    /**
+     * @var string
+     */
     private $rootFolder;
+
+    /**
+     * @var boolean
+     */
     private $debug;
+
+    /**
+     * @var string
+     */
     private $applicationClass;
 
     /**
@@ -56,6 +68,16 @@ class ApplicationFactory implements ObjectFactoryInterface {
     private $loggerFactory;
 
     /**
+     * @var string
+     */
+    private $cacheFolder;
+
+    /**
+     * @var string
+     */
+    private $appCacheName;
+
+    /**
      * Creates an Application instance by default injecting the CommonLoggerFactory
      * if none provided to $loggerFactory
      * @param string $applicationClass
@@ -69,47 +91,56 @@ class ApplicationFactory implements ObjectFactoryInterface {
         $this->rootFolder = $rootFolder;
         $this->debug = $debug;
         $this->loggerFactory = $loggerFactory;
+        // Set the default factory
+        if ($this->loggerFactory === null) {
+            $this->loggerFactory = CommonLoggerFactory::class;
+        }
+        $this->cacheFolder = $rootFolder . '/var/cache';
+        $this->appCacheName = $this->cacheFolder
+                . '/' . crc32($applicationClass) . '.cache';
     }
 
     public function create() {
 
-        $this->filesystem->assertFolderWritable(
-                $this->rootFolder . '/var/cache');
-
-        if ($this->loggerFactory === null) {
-            $this->loggerFactory = CommonLoggerFactory::class;
+        if (($application = $this->loadFromCache()) === null) {
+            $this->createConfiguration();
+            $this->createLogger();
+            $application = $this->createApplication();
+            if ($this->debug === false) {
+                file_put_contents($this->appCacheName, serialize($application));
+            }
         }
 
+        return $application;
+    }
 
-        $this->config = (new ConfigurationFactory($this->rootFolder, $this->debug))
-                ->create();
+    private function loadFromCache() {
+        // Check the cache folder anyways!
+        $this->filesystem->assertFolderWritable(
+                $this->rootFolder . '/var/cache');
+        if ($this->debug === false && $this->filesystem->exists($this->appCacheName)) {
+            return unserialize(file_get_contents($this->appCacheName));
+        } else {
+            return null;
+        }
+    }
 
-        $this->builLogger();
-
-        /* @var $application \Blend\Framework\Application\Application */
-
+    private function createApplication() {
         $args = [
             $this->config,
             $this->logger,
             $this->rootFolder
         ];
-
-        $application = (new \ReflectionClass($this->applicationClass))
-                ->newInstanceArgs($args);
-
-        file_put_contents($this->rootFolder
-                . '/var/cache/'
-                . crc32($this->applicationClass)
-                . '.cache'
-                , serialize($application));
-
-        return $application;
+        return (new \ReflectionClass($this->applicationClass))
+                        ->newInstanceArgs($args);
     }
 
-    /**
-     * Build a Logger component.
-     */
-    private function builLogger() {
+    private function createConfiguration() {
+        $this->config = (new ConfigurationFactory($this->rootFolder, $this->debug))
+                ->create();
+    }
+
+    private function createLogger() {
 
         $logFolder = $this->filesystem->assertFolderWritable(
                 $this->rootFolder . '/var/log');
