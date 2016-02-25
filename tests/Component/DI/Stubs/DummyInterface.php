@@ -9,16 +9,12 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Framework\Logger;
+namespace Blend\Tests\Component\DI\Stubs;
 
 /**
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface LoggerFactoryInterface {
-
-    /**
-     * @return \Psr\Log\LoggerInterface
-     */
-    public function buildLogger($defaultLevel);
+interface DummyInterface {
+    //put your code here
 }

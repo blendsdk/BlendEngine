@@ -9,34 +9,37 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Framework\Logger;
+namespace Blend\Framework\Factory;
 
-use Blend\Framework\Logger\LoggerFactoryInterface;
-use Monolog\Logger;
+use Blend\Component\DI\ObjectFactoryInterface;
 use Monolog\Handler\RotatingFileHandler;
+use Monolog\Logger;
+use Psr\Log\LogLevel;
 
 /**
  * Description of CommonLoggerFactory
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class CommonLoggerFactory implements LoggerFactoryInterface {
+class CommonLoggerFactory implements ObjectFactoryInterface {
 
     protected $logFolder;
     protected $name;
     protected $maxFiles;
+    protected $level;
 
-    public function __construct($logFolder, $name, $maxFiles) {
+    public function __construct($logFolder, $logName, $logMaxFiles = 10, $logLevel = LogLevel::WARNING) {
         $this->logFolder = $logFolder;
-        $this->name = $name;
-        $this->maxFiles = $maxFiles;
+        $this->name = $logName;
+        $this->maxFiles = $logMaxFiles;
+        $this->level = $logLevel;
     }
 
-    public function buildLogger($defaultLevel) {
+    public function create() {
         $logger = new Logger($this->name);
         $rotatingFileHandler = new RotatingFileHandler(
                 $this->logFolder . '/' . $this->name . '.log'
-                , $this->maxFiles, $defaultLevel);
+                , $this->maxFiles, $this->level);
         $logger->pushHandler($rotatingFileHandler);
         return $logger;
     }

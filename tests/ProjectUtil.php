@@ -48,11 +48,9 @@ class ProjectUtil {
             $loader->register(true);
 
             $c = new Container();
-            $c->define('app', [
-                'class' => $app,
-                'scriptPath' => $projectFolder . '/bin'
-            ]);
-
+            $c->defineSingletonWithInterface('app'
+                    , $app
+                    , ['scriptPath' => $projectFolder . '/bin']);
             $app = $c->get('app');
         }
         $commandTester = new CommandTester($app->find($commandName));

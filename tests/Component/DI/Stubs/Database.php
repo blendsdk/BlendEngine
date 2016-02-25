@@ -12,20 +12,20 @@
 namespace Blend\Tests\Component\DI\Stubs;
 
 /**
- * Description of Counter
+ * Description of Database
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Counter {
+class Database {
 
-    protected $count;
+    private $info;
 
-    public function __construct($start) {
-        $this->count = $start;
+    public function __construct(array $DATABASE_CONNECTION_INFO) {
+        $this->info = $DATABASE_CONNECTION_INFO;
     }
 
-    public function increment() {
-        return ( ++$this->count);
+    public function getUsername() {
+        return $this->info['username'];
     }
 
 }

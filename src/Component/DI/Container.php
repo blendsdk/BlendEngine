@@ -11,262 +11,296 @@
 
 namespace Blend\Component\DI;
 
-use ReflectionClass;
-use ReflectionFunction;
+use \ReflectionClass;
+use Blend\Component\DI\ObjectFactoryInterface;
 use Blend\Component\Exception\InvalidConfigException;
 
 /**
- * This class implements a constructor-only dependency injection conatiner
+ * Conatiner provides a basic constructor based Dependecy Injection Container
  *
- * @author gevikb@gmail.com <Gevik Babakhani>
+ * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class Container {
 
     /**
-     * Array of class/interface definitions indexed by the interface name
      * @var array
      */
-    protected $classdefs;
+    protected $definitions;
 
     public function __construct() {
-        $this->classdefs = [];
-        $local = $this;
-        $this->singleton(Container::class, [
-            'factory' => function() use($local) {
-                return $local;
+        $this->definitions = [];
+    }
+
+    /**
+     * Checks to see if an interface is already defined
+     * @param string $interface
+     * @return boolean
+     */
+    public function isDefined($interface) {
+        return array_key_exists($interface, $this->definitions);
+    }
+
+    /**
+     * Gets an object from the container using an interface name. If the object
+     * by the given interface name does not exist, the container will
+     * automatically define the interface as class (defineClass(....)) and then
+     * it returns a new instance of that class
+     * @param string $interface
+     * @param array $params
+     * @return mixed
+     */
+    public function get($interface, array $params = []) {
+        if (!$this->isDefined($interface)) {
+            $this->defineClass($interface, $params);
+        }
+        list($kind, $type, $defParams, $defCtorParams, $callSignature, $reflection) = array_values($this->definitions[$interface]);
+        if ($kind === 'x') {
+            return $defParams[0];
+        } else {
+            $callArgs = [];
+            if (!empty($callSignature)) {
+                $resolved = $this->resolve($callSignature, array_merge($defCtorParams, $defParams, $params));
+                $callArgs = array_intersect_key($resolved, $callSignature); // clear unwanted params
+                $this->assertNotMissingArguments($callSignature, $callArgs, $interface);
             }
+            // array_merge here will sort the call params to the correct sort order
+            $obj = $this->createNewInstance($reflection, array_merge($callSignature, $callArgs));
+            if ($kind === 's') {
+                unset($this->definitions[$interface]);
+                $this->setScalar($interface, $obj);
+            }
+            return $obj;
+        }
+    }
+
+    /**
+     * Sets a list of scalers into the conatiner
+     * @param array $scalars
+     * @throws InvalidConfigException
+     */
+    public function setScalars(array $scalars) {
+        if (!is_array_assoc($scalars)) {
+            throw new InvalidConfigException('The \$scalars argument must be an associatibe array!');
+        }
+        foreach ($scalars as $name => $value) {
+            $this->setScalar($name, $value);
+        }
+    }
+
+    /**
+     * Sets a scalar into the container
+     * @param string $name
+     * @param mixed $value
+     */
+    public function setScalar($name, $value) {
+        $this->define($name, [
+            'kind' => 'x',
+            'type' => gettype($value),
+            'params' => [$value]
         ]);
     }
 
     /**
-     * Check if an interface is alreay defined
+     * Defines a singleton with an interface and creation paramaters
      * @param string $interface
-     * @return bool
+     * @param string $className
+     * @param array $params
      */
-    protected function isDefined($interface) {
-        return isset($this->classdefs[$interface]);
+    public function defineSingletonWithInterface($interface, $className, array $params = []) {
+        $this->define($interface, [
+            'kind' => 's',
+            'type' => $className,
+            'params' => $params
+        ]);
     }
 
     /**
-     * Extracts information about a given class
-     * @param string $classname
-     * @return array
-     * @throws InvalidConfigException
+     * Defines a singleton with creation paramaters
+     * @param string $className
+     * @param array $params
      */
-    private function reflect($classname) {
-        $defparams = [];
-        $callsig = [];
-        if (!is_closure($classname)) {
-            $ref = new ReflectionClass($classname);
-
-            if ($ref->isInterface()) {
-                throw new InvalidConfigException("$classname is an interface!");
-            }
-
-            if ($ctor = $ref->getConstructor()) {
-                list($defparams, $callsig) = $this->reflectParameters($ctor);
-            }
-        } else {
-            $ref = new ReflectionFunction($classname);
-            list($defparams, $callsig) = $this->reflectParameters($ref);
-        }
-
-        return [$defparams, $callsig, $ref];
+    public function defineSingleton($className, array $params = []) {
+        $this->define($className, [
+            'kind' => 's',
+            'type' => $className,
+            'params' => $params
+        ]);
     }
 
+    /**
+     * Defines a class with an interface and creation paramaters
+     * @param string $interface
+     * @param string $className
+     * @param array $params
+     */
+    public function defineClassWithInterface($interface, $className, array $params = []) {
+        $this->define($interface, [
+            'kind' => 'c',
+            'type' => $className,
+            'params' => $params
+        ]);
+    }
+
+    /**
+     * Defines a class with creation paramaters
+     * @param type $className
+     * @param array $params
+     */
+    public function defineClass($className, array $params = []) {
+        $this->define($className, [
+            'kind' => 'c',
+            'type' => $className,
+            'params' => $params
+        ]);
+    }
+
+    /**
+     * Defines an interface. This function is called by other define... methods
+     * @param type $interface
+     * @param array $data
+     */
+    private function define($interface, array $data = []) {
+        $this->assertNotExists($interface);
+        list($kind, $type, $params) = array_values($data);
+        if ($kind === 'c' || $kind === 's') {
+            list($defaultCallParams, $callSignature, $reflection) = $this->reflect($type);
+            $this->definitions[$interface] = array_merge($data, [
+                'defCtorParams' => $defaultCallParams,
+                'callSignature' => $callSignature,
+                'reflection' => $reflection,
+            ]);
+        } else {
+            $this->definitions[$interface] = array_merge($data, [
+                'defCtorParams' => [],
+                'callSignature' => [],
+                'reflection' => null,
+            ]);
+        }
+    }
+
+    /**
+     * Reflects a type to get the constructor and its call arguments
+     * @param string $type
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    private function reflect($type) {
+        $ref = new \ReflectionClass($type);
+        $defaultCallParams = [];
+        $callSignature = [];
+        $constructor = null;
+        if ($ref->isInterface()) {
+            throw new InvalidConfigException(
+            "Interface type [$type] cannot be defined in the DI Container!");
+        }
+
+        if ($constructor = $ref->getConstructor()) {
+            list($defaultCallParams, $callSignature) = $this->reflectParameters($constructor);
+        }
+
+        return [$defaultCallParams, $callSignature, $ref];
+    }
+
+    /**
+     * Reflects a \ReflectionFunction
+     * @param \ReflectionFunction $ref
+     * @return mixed
+     */
     private function reflectParameters($ref) {
-        $defparams = [];
-        $callsig = [];
+        $defaultParameters = [];
+        $callSignature = [];
         if ($ref->getNumberOfParameters() !== 0) {
             foreach ($ref->getParameters() as $param) {
                 if ($param->isDefaultValueAvailable()) {
-                    $defparams[$param->name] = $param->getDefaultValue();
+                    $defaultParameters[$param->name] = $param->getDefaultValue();
                 }
-                $callsig[$param->name] = $param->getClass() ? $param->getClass()->name : null;
+                $callSignature[$param->name] = $param->getClass() ? $param->getClass()->name : null;
             }
         }
-        return [$defparams, $callsig];
+        return [$defaultParameters, $callSignature];
     }
 
     /**
-     * The same at the define(...) method, only defining a class to act as a
-     * singleton
-     * @param string $interface
-     * @param array $config
-     */
-    public function singleton($interface, $config = array()) {
-        if (is_object($config)) {
-            $cfg = [
-                'factory' => function() use($config) {
-                    return $config;
-                }
-            ];
-            $this->define($interface, $cfg);
-        } else {
-            $this->define($interface, $config);
-        }
-
-        $this->classdefs[$interface]['singleton'] = true;
-    }
-
-    /**
-     * Defines a class/interface in this container. The interface can also be
-     * a class name.
-     * @param string $interface The name of the class or interface to be defined
-     * in this container. The base way to set this parameter is to use the PHP
-     * Class::class nonation
-     *
-     * @param array $config The configuration parameters for the given interface
-     * In case of defining a class by it's interface a key/value pair
-     * that is 'class' => 'ClassName' is required. The remaining key/value pairs
-     * are going to be used as default call parameters when creating an instanse
-     * for this class
-     *
+     * Creates a new instance of a reflection type
+     * @param ReflectionClass $reflection
+     * @param array $callArgs
+     * @return mixed
      * @throws InvalidConfigException
      */
-    public function define($interface, array $config = array()) {
+    private function createNewInstance(\ReflectionClass $reflection, array $callArgs) {
 
+        if (empty($callArgs)) {
+            $instance = $reflection->newInstance();
+        } else {
+            $instance = $reflection->newInstanceArgs($callArgs);
+        }
+
+        if ($reflection->implementsInterface(ObjectFactoryInterface::class)) {
+            $instance = call_user_func([$instance, 'create']);
+            if ($instance === null) {
+                throw new InvalidConfigException($reflection->getName() . '->create() did not reaturn an object instance');
+            }
+        }
+        return $instance;
+    }
+
+    /**
+     * Check to see if the interface alreay exists, in which case it throws
+     * an InvalidConfigException
+     * @param string $interface
+     * @throws InvalidConfigException
+     */
+    private function assertNotExists($interface) {
         if ($this->isDefined($interface)) {
             throw new InvalidConfigException("$interface already exists in this container!");
         }
-
-        if (is_string($config)) {
-            $config = ['class' => $config];
-        }
-
-        $classname = $this->extractConfig('class', -1, $interface, $config);
-        $singleton = $this->extractConfig('singleton', true, false, $config);
-        $factory = $this->extractConfig('factory', -1, null, $config);
-
-        list($defaultparams, $callsig, $refclass) = $this->reflect(is_null($factory) ? $classname : $factory);
-
-        return $this->classdefs[$interface] = [
-            'singleton' => $singleton,
-            'callsig' => $callsig,
-            'refclass' => $refclass,
-            'defparams' => array_merge($defaultparams, $config),
-            'factory' => $factory
-        ];
     }
 
     /**
-     * This function is used to extract.normalize the configuration argument
-     * when defining a class/interface
+     * Checks if the privided args matches the goven call signature
+     * @param array $callsig
+     * @param array $args
      * @param string $name
-     * @param mixed $return
-     * @param mixed $default
-     * @param array $config
-     * @return mixed
-     */
-    private function extractConfig($name, $return, $default, &$config) {
-        if (isset($config[$name])) {
-            $r = $return === -1 ? $config[$name] : $return;
-            unset($config[$name]);
-            return $r;
-        } else {
-            return $default;
-        }
-    }
-
-    /**
-     * Retrives an new instance of a given interface. In case of a singleton
-     * it returns the same instanse
-     * @param string $interface The interface name to instantiate
-     * @param array $params The parameters that are used to create the new
-     * object
-     * @return mixed The newly created object
-     */
-    public function get($interface, array $params = array()) {
-
-        list($singleton, $callsig, $refclass, $defparams, $factory) = array_values(
-                (
-                $this->isDefined($interface) ? $this->classdefs[$interface] : $this->define($interface)
-                )
-        );
-
-        $args = [];
-        if (count($callsig) !== 0 && is_bool($singleton)) {
-            $callparams = $this->resolve($callsig, array_merge($defparams, $params));
-            $args = array_intersect_key($callparams, $callsig);
-            $this->checkCallArguments($callsig, $args, $refclass);
-            // array_merge here will sort the call params to the correct sort order
-            $args = array_merge($callsig, $args);
-        }
-
-        if ($singleton !== false) {
-            if ($singleton === true) {
-                $this->classdefs[$interface]['singleton'] = $this->newInstanceArgs($refclass, $args, $factory);
-            }
-            return $this->classdefs[$interface]['singleton'];
-        } else {
-            return $this->newInstanceArgs($refclass, $args, $factory);
-        }
-    }
-
-    /**
-     * Resolves the call dependencies
-     * @param mixed $callsig
-     * @param mixed $callparams
-     * @return type
-     */
-    private function resolve($callsig, $callparams) {
-        foreach ($callsig as $name => $type) {
-            if (!isset($callparams[$name]) && !is_null($type)) {
-                if ($type === Container::class) {
-                    $callparams[$name] = $this;
-                } else {
-                    $callparams[$name] = $this->get($type);
-                }
-            }
-        }
-        return $callparams;
-    }
-
-    /**
-     * Check if the call arguments are correct in count and name
-     * @param type $callsig
-     * @param type $args
-     * @param type $refclass
      * @throws \InvalidArgumentException
      */
-    private function checkCallArguments($callsig, $args, $refclass) {
+    private function assertNotMissingArguments($callsig, $args, $name) {
         $missing = array_diff(array_keys($callsig), array_keys($args));
         $missingCnt = count($missing);
         if ($missingCnt !== 0) {
             $missingArgs = implode(', ', $missing);
             $sigArgs = implode(', ', array_keys($callsig));
-            throw new \InvalidArgumentException("Missing {$missingCnt} ($missingArgs) for {$refclass->name}::__construct({$sigArgs})");
+            throw new \InvalidArgumentException("Missing {$missingCnt} ($missingArgs) for {$name}::__construct({$sigArgs})");
         }
     }
 
     /**
-     * Creates a new instance from a ReflectionClass and parameters that was
-     * provided from the class definition
+     * Resolves the dependencies of a call signature
+     * @param array $callSignature
+     * @param array $callParams
+     * @return array
+     */
+    private function resolve(array $callSignature, array $callParams) {
+        foreach ($callSignature as $name => $type) {
+            if (!isset($callParams[$name])) {
+                if ($this->isDefined($name) || $this->isDefined($type) || !$this->isBuiltInType($type)) {
+                    $callParams[$name] = $this->get(is_null($type) ? $name : $type);
+                }
+            }
+        }
+        return $callParams;
+    }
+
+    /**
+     * Check if the given type is a built-in PHP type
      *
-     * @param type $refclass
-     * @param type $callargs
-     * @param type $factory
+     * @param type $type
      * @return type
      */
-    private function newInstanceArgs($refclass, $callargs, $factory) {
-        $args = [];
-        foreach ($callargs as $name => $value) {
-            if (is_callable($value)) {
-                $args[$name] = call_user_func_array($value, [$this]);
-            } else {
-                $args[$name] = $value;
-            }
-        }
-
-        if (is_callable($factory)) {
-            return call_user_func_array($factory, [$args, $this]);
-        } else {
-            if (count($args) === 0) {
-                return $refclass->newInstance();
-            } else {
-                return $refclass->newInstanceArgs($args);
-            }
-        }
+    private function isBuiltInType($type) {
+        /**
+         * @todo Update for PHP7
+         */
+        return is_null($type);
     }
 
 }

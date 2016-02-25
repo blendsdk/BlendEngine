@@ -9,23 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Tests\Component\DI\Stubs;
+namespace Blend\Component\DI;
 
 /**
- * Description of Counter
+ * ObjectFactoryInterface
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Counter {
+interface ObjectFactoryInterface {
 
-    protected $count;
-
-    public function __construct($start) {
-        $this->count = $start;
-    }
-
-    public function increment() {
-        return ( ++$this->count);
-    }
-
+    public function create();
 }
