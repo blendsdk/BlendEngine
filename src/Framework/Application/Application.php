@@ -25,8 +25,6 @@ use Blend\Component\Configuration\Configuration;
  */
 class Application extends BaseApplication {
 
-    const APP_ROOT_FOLDER = 'APP_ROOT_FOLDER';
-
     /**
      * @var Container
      */
@@ -36,9 +34,9 @@ class Application extends BaseApplication {
     , LoggerInterface $logger
     , $rootFolder) {
 
+        $config->mergeWith(['app.root.folder' => $rootFolder]);
         $this->container = new Container();
         $this->container->setScalars([
-            Application::APP_ROOT_FOLDER => $rootFolder,
             LoggerInterface::class => $logger,
             Configuration::class => $config
         ]);
