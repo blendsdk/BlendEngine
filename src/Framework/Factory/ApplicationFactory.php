@@ -55,6 +55,14 @@ class ApplicationFactory implements ObjectFactoryInterface {
      */
     private $loggerFactory;
 
+    /**
+     * Creates an Application instance by default injecting the CommonLoggerFactory
+     * if none provided to $loggerFactory
+     * @param string $applicationClass
+     * @param string $rootFolder
+     * @param boolean $debug
+     * @param string $loggerFactory
+     */
     public function __construct($applicationClass, $rootFolder, $debug = false, $loggerFactory = null) {
         $this->filesystem = new Filesystem();
         $this->applicationClass = $applicationClass;
@@ -63,13 +71,6 @@ class ApplicationFactory implements ObjectFactoryInterface {
         $this->loggerFactory = $loggerFactory;
     }
 
-    /**
-     * Creates an Application instance which is ready to run
-     * @param type $applicationClass The application classname
-     * @param type $rootFolder The rootfolder where the application ins sitting
-     * @param type $debug Wherher to run the application in debug mode
-     * @return Application
-     */
     public function create() {
 
         $this->filesystem->assertFolderWritable(
