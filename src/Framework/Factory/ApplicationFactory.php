@@ -20,6 +20,7 @@ use Blend\Component\Filesystem\Filesystem;
 use Blend\Framework\Factory\ConfigurationFactory;
 use Blend\Framework\Factory\CommonLoggerFactory;
 use Blend\Component\DI\ObjectFactoryInterface;
+use Blend\Framework\Application\Application;
 
 /**
  * ApplicationFactory creates an Application instance. By default
@@ -78,6 +79,11 @@ class ApplicationFactory implements ObjectFactoryInterface {
     private $appCacheName;
 
     /**
+     * @var boolean
+     */
+    private $memoryCache;
+
+    /**
      * Creates an Application instance by default injecting the CommonLoggerFactory
      * if none provided to $loggerFactory
      * @param string $applicationClass
@@ -98,23 +104,57 @@ class ApplicationFactory implements ObjectFactoryInterface {
         $this->cacheFolder = $rootFolder . '/var/cache';
         $this->appCacheName = $this->cacheFolder
                 . '/' . crc32($applicationClass) . '.cache';
+        $this->memoryCache = extension_loaded('apcu');
     }
 
     public function create() {
-
         if (($application = $this->loadFromCache()) === null) {
             $this->createConfiguration();
             $this->createLogger();
             $application = $this->createApplication();
-            if ($this->debug === false) {
-                file_put_contents($this->appCacheName, serialize($application));
-            }
+            $this->saveToCache($application);
         }
 
         return $application;
     }
 
+    private function saveToCache(Application $application) {
+        if (!$this->debug) {
+            if ($this->memoryCache) {
+                apcu_clear_cache();
+                if (apcu_add($this->appCacheName, serialize($application))) {
+                    return;
+                } else {
+                    $this->logger->warning('Unable to cache the application in memory!');
+                }
+            } else {
+                $this->filesystem->assertFolderWritable($this->cacheFolder);
+                file_put_contents($this->appCacheName, serialize($application));
+            }
+        }
+    }
+
     private function loadFromCache() {
+        if (!$this->debug) {
+            if ($this->memoryCache) {
+                if (apcu_exists($this->appCacheName)) {
+                    $success = false;
+                    $app = apcu_fetch($this->appCacheName, $success);
+                    if ($success) {
+                        return unserialize($app);
+                    }
+                }
+            } else {
+                $this->filesystem->assertFolderWritable($this->cacheFolder);
+                if ($this->filesystem->exists($this->appCacheName)) {
+                    return unserialize(file_get_contents($this->appCacheName));
+                }
+            }
+        }
+        return null;
+    }
+
+    private function z_loadFromCache() {
         // Check the cache folder anyways!
         $this->filesystem->assertFolderWritable(
                 $this->rootFolder . '/var/cache');
@@ -125,6 +165,10 @@ class ApplicationFactory implements ObjectFactoryInterface {
         }
     }
 
+    /**
+     * Creates an Application component
+     * @return \Blend\Framework\Application\Application
+     */
     private function createApplication() {
         $args = [
             $this->config,
@@ -135,11 +179,17 @@ class ApplicationFactory implements ObjectFactoryInterface {
                         ->newInstanceArgs($args);
     }
 
+    /**
+     * Creates a Configuration component
+     */
     private function createConfiguration() {
         $this->config = (new ConfigurationFactory($this->rootFolder, $this->debug))
                 ->create();
     }
 
+    /**
+     * Creates a Logger component
+     */
     private function createLogger() {
 
         $logFolder = $this->filesystem->assertFolderWritable(
