@@ -29,7 +29,7 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
      * @expectedException \Symfony\Component\Filesystem\Exception\FileNotFoundException
      */
     public function testNoCacheFolder() {
-        $factory = new ApplicationFactory(DummyApplication::class, '/', 'dummy');
+        $factory = new ApplicationFactory(DummyApplication::class, '/', true);
         $factory->create();
     }
 
