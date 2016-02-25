@@ -94,7 +94,7 @@ class ApplicationFactory implements ObjectFactoryInterface {
     public function __construct($applicationClass, $rootFolder, $debug = false, $loggerFactory = null) {
         $this->filesystem = new Filesystem();
         $this->applicationClass = $applicationClass;
-        $this->rootFolder = $rootFolder;
+        $this->rootFolder = realpath($rootFolder);
         $this->debug = $debug;
         $this->loggerFactory = $loggerFactory;
         // Set the default factory
@@ -114,15 +114,19 @@ class ApplicationFactory implements ObjectFactoryInterface {
             $application = $this->createApplication();
             $this->saveToCache($application);
         }
-
         return $application;
     }
 
+    /**
+     * Caches the application either to file or memory using APCU
+     * if it is availble
+     * @param Application $application
+     */
     private function saveToCache(Application $application) {
         if (!$this->debug) {
             if ($this->memoryCache) {
                 apcu_clear_cache();
-                if (apcu_add($this->appCacheName, serialize($application))) {
+                if (apcu_add($this->appCacheName, $application)) {
                     return;
                 } else {
                     $this->logger->warning('Unable to cache the application in memory!');
@@ -134,6 +138,11 @@ class ApplicationFactory implements ObjectFactoryInterface {
         }
     }
 
+    /**
+     * Loads a previously cached application either from memory or disk if
+     * possible
+     * @return Application|null
+     */
     private function loadFromCache() {
         if (!$this->debug) {
             if ($this->memoryCache) {
@@ -141,7 +150,7 @@ class ApplicationFactory implements ObjectFactoryInterface {
                     $success = false;
                     $app = apcu_fetch($this->appCacheName, $success);
                     if ($success) {
-                        return unserialize($app);
+                        return $app;
                     }
                 }
             } else {
@@ -152,17 +161,6 @@ class ApplicationFactory implements ObjectFactoryInterface {
             }
         }
         return null;
-    }
-
-    private function z_loadFromCache() {
-        // Check the cache folder anyways!
-        $this->filesystem->assertFolderWritable(
-                $this->rootFolder . '/var/cache');
-        if ($this->debug === false && $this->filesystem->exists($this->appCacheName)) {
-            return unserialize(file_get_contents($this->appCacheName));
-        } else {
-            return null;
-        }
     }
 
     /**
