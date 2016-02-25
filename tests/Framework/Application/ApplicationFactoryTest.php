@@ -13,7 +13,7 @@ namespace Blend\Tests\Framework\Application;
 
 use Blend\Tests\ProjectUtil;
 use Blend\Component\Filesystem\Filesystem;
-use Blend\Framework\Application\ApplicationFactory;
+use Blend\Framework\Factory\ApplicationFactory;
 use Blend\Tests\Framework\Application\Stubs\DummyApplication;
 
 /**
@@ -29,37 +29,37 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
      * @expectedException \Symfony\Component\Filesystem\Exception\FileNotFoundException
      */
     public function testNoCacheFolder() {
-        $factory = new ApplicationFactory();
-        $factory->create(DummyApplication::class, '/', 'dummy');
+        $factory = new ApplicationFactory(DummyApplication::class, '/', 'dummy');
+        $factory->create();
     }
 
     /**
      * @expectedException \Symfony\Component\Filesystem\Exception\FileNotFoundException
      */
     public function testWithNoConfigFile() {
-        $factory = new ApplicationFactory();
+
         $fs = new Filesystem();
         $appdir = sys_get_temp_dir() . '/' . uniqid();
         $fs->mkdir($appdir . '/var/cache');
         self::$cleanup[] = $appdir;
-        $factory->create(DummyApplication::class, $appdir);
+        $factory = new ApplicationFactory(DummyApplication::class, $appdir);
+        $factory->create();
     }
 
     public function testFactorySanity() {
         $appName = 'App1';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
-        $factory = new ApplicationFactory();
-        $factory->create($clazz, $projectFolder, true);
+        $factory = new ApplicationFactory($clazz, $projectFolder);
+        $factory->create();
         $configCache = $projectFolder . '/var/cache/config.cache';
-        $this->assertFileExists($projectFolder . '/var/log/application-' . date('Y-m-d') . '.log');
         $this->assertFileExists($configCache);
 
         unlink($projectFolder . '/config/config.json');
 
-        $app2 = $factory->create($clazz, $projectFolder);
+        $factory = new ApplicationFactory($clazz, $projectFolder);
+        $app2 = $factory->create();
         $this->assertTrue($app2 instanceof \Blend\Framework\Application\Application);
-
         $loader->unregister();
     }
 

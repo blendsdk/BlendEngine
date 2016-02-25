@@ -34,7 +34,7 @@ class SanityApp extends Application {
         //
     }
 
-    protected function initialize(Request $request) {
+    protected function initialize() {
         //
     }
 

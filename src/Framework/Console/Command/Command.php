@@ -17,22 +17,23 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Blend\Component\DI\Container;
 use Blend\Component\Configuration\Configuration;
-use Monolog\Logger;
-use \Monolog\Handler\StreamHandler;
+use Blend\Framework\Factory\ConfigurationFactory;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Blend\Framework\Factory\CommonLoggerFactory;
 use Blend\Component\Filesystem\Filesystem;
 
 /**
- * CommandBase in the base class for all application level command in 
+ * CommandBase in the base class for all application level command in
  * BlendEngine.
- * 
+ *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 abstract class Command extends CommandBase {
 
     /**
      * DI Container for handling services and object
-     * @var Container; 
+     * @var Container;
      */
     protected $container;
 
@@ -63,26 +64,20 @@ abstract class Command extends CommandBase {
      * Initializes the DI container
      */
     protected function initContainer() {
-        $this->container->singleton(Configuration::class, [
-            'class' => Configuration::class,
-            'factory' => function() {
-                $filename = realpath($this->getApplication()->getProjectFolder()
-                        . '/config/config.json');
-                return Configuration::createFromFile($filename);
-            }
+
+        $this->container->setScalars([
+            'rootFolder' => $this->getApplication()->getProjectFolder(),
+            'logFolder' => $this->getApplication()->getProjectFolder() . '/var/log',
+            'logName' => 'console',
+            'logLevel' => LogLevel::DEBUG
         ]);
 
-        $this->container->singleton(LoggerInterface::class, [
-            'factory' => function() {
-                $fs = new Filesystem();
-                $logfolder = $this->getApplication()->getProjectFolder() . '/var/log';
-                $logname = $this->getApplication()->getName() . '-console';
-                $fs->ensureFolder($logfolder);
-                $log = new Logger($logname);
-                $log->pushHandler(new StreamHandler($logfolder . '/' . $logname . '.log', Logger::DEBUG));
-                return $log;
-            }
-        ]);
+        $this->container->defineSingletonWithInterface(Configuration::class
+                , ConfigurationFactory::class);
+
+
+        $this->container->defineSingletonWithInterface(
+                LoggerInterface::class, CommonLoggerFactory::class);
     }
 
     /**

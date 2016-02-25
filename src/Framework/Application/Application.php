@@ -37,9 +37,11 @@ class Application extends BaseApplication {
     , $rootFolder) {
 
         $this->container = new Container();
-        $this->container->singleton(Application::APP_ROOT_FOLDER, $rootFolder);
-        $this->container->singleton(LoggerInterface::class, $logger);
-        $this->container->singleton(Configuration::class, $config);
+        $this->container->setScalars([
+            Application::APP_ROOT_FOLDER => $rootFolder,
+            LoggerInterface::class => $logger,
+            Configuration::class => $config
+        ]);
     }
 
     protected function finalize(Request $request, Response $response) {

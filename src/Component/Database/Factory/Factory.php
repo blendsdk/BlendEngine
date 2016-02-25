@@ -60,9 +60,7 @@ abstract class Factory {
         $this->database = $database;
         $this->modelClass = $modelClass;
         $this->container = new Container();
-        $this->container->define('model', [
-            'class' => $modelClass
-        ]);
+        $this->container->defineClassWithInterface('model', $modelClass);
         $this->fieldConverter = null;
     }
 
