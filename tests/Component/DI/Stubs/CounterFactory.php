@@ -11,21 +11,18 @@
 
 namespace Blend\Tests\Component\DI\Stubs;
 
+use Blend\Component\DI\ObjectFactoryInterface;
+use Blend\Tests\Component\DI\Stubs\Counter;
+
 /**
- * Description of Counter
+ * Description of CounterFactory
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Counter {
+class CounterFactory implements ObjectFactoryInterface {
 
-    protected $count;
-
-    public function __construct($start) {
-        $this->count = $start;
-    }
-
-    public function increment() {
-        return ( ++$this->count);
+    public function create() {
+        return new Counter(0);
     }
 
 }

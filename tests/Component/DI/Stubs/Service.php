@@ -11,21 +11,26 @@
 
 namespace Blend\Tests\Component\DI\Stubs;
 
+use Blend\Tests\Component\DI\Stubs\Database;
+
 /**
- * Description of Counter
+ * Description of Service
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Counter {
+class Service {
 
-    protected $count;
+    /**
+     * @var Database;
+     */
+    protected $database;
 
-    public function __construct($start) {
-        $this->count = $start;
+    public function __construct(Database $database) {
+        $this->database = $database;
     }
 
-    public function increment() {
-        return ( ++$this->count);
+    public function getUsername() {
+        return $this->database->getUsername();
     }
 
 }

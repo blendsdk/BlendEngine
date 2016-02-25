@@ -12,20 +12,14 @@
 namespace Blend\Tests\Component\DI\Stubs;
 
 /**
- * Description of Counter
+ * Description of ClassWithConstructorAndDefaultParams
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Counter {
+class ClassWithConstructorAndDefaultParams {
 
-    protected $count;
-
-    public function __construct($start) {
-        $this->count = $start;
-    }
-
-    public function increment() {
-        return ( ++$this->count);
+    public function __construct($param1, $param2 = null, $param3 = []) {
+        ;
     }
 
 }

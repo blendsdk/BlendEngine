@@ -12,11 +12,26 @@
 namespace Blend\Tests\Component\DI;
 
 use Blend\Component\DI\Container;
-use Blend\Tests\Component\DI\Stubs\Foo;
-use Blend\Tests\Component\DI\Stubs\IBazInterface;
-use Blend\Tests\Component\DI\Stubs\Baz;
-use Blend\Tests\Component\DI\Stubs\Bar;
+use Blend\Tests\Component\DI\Stubs\DummyInterface;
+use Blend\Tests\Component\DI\Stubs\ClassWithNoConstructor;
+use Blend\Tests\Component\DI\Stubs\ClassWithConstructorParams;
+use Blend\Tests\Component\DI\Stubs\ClassWithConstructorAndDefaultParams;
 use Blend\Tests\Component\DI\Stubs\Counter;
+use Blend\Tests\Component\DI\Stubs\Service;
+use Blend\Tests\Component\DI\Stubs\DatabaseFactory;
+use Blend\Tests\Component\DI\Stubs\CounterFactory;
+
+class TestContainer extends Container {
+
+    public function getDefinition($interface) {
+        return $this->definitions[$interface];
+    }
+
+    public function clear() {
+        $this->definitions = [];
+    }
+
+}
 
 /**
  * Test class for ContainerTest
@@ -25,139 +40,96 @@ use Blend\Tests\Component\DI\Stubs\Counter;
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase {
 
-    public function testObjectAsSingleton() {
-        $c = new Container();
-        $c->singleton(Counter::class, new Counter());
-        $c->get(Counter::class)->next();
-        $this->assertEquals(2, $c->get(Counter::class)->next());
-    }
-
-    public function testContainSelf() {
-        $c = new Container();
-        $x = $c->get(Container::class);
-        $this->assertEquals($c, $x);
-    }
-
-    public function testSimpleClass() {
-        $c = new Container();
-        $bar = $c->get(Bar::class);
-        $this->assertTrue($bar instanceof Bar);
-    }
-
-    public function testMissingArgs() {
-        $c = new Container();
-        $obj = $c->get(Foo::class);
-        $this->assertTrue($obj instanceof Foo);
-        $this->assertTrue($obj->bar instanceof Bar);
-    }
-
     /**
      * @expectedException \Blend\Component\Exception\InvalidConfigException
      */
-    public function testInterfaceOnly() {
+    public function testDefineInterface() {
         $c = new Container();
-        $c->get(IBazInterface::class);
+        $c->defineClass(DummyInterface::class);
+    }
+
+    public function testDefineClassWithNoConstructor() {
+        $c = new TestContainer();
+        $clazz = ClassWithNoConstructor::class;
+        $c->defineClass($clazz);
+        list($kind, $type, $params, $defCtorParams, $callSig, $reflection) = array_values($c->getDefinition($clazz));
+        $this->assertCount(0, $defCtorParams);
+        $this->assertCount(0, $callSig);
+    }
+
+    public function testDefineClassConstructorParams() {
+
+        $c = new TestContainer();
+        $clazz = ClassWithConstructorParams::class;
+        $c->defineClass($clazz);
+        list($kind, $type, $params, $defCtorParams, $callSig, $reflection) = array_values($c->getDefinition($clazz));
+        $this->assertEquals(['param1', 'param2', 'param3'], array_keys($callSig));
+
+        $c->clear();
+        $c->defineClass($clazz, ['param2' => 2]);
+        list($kind, $type, $params, $defCtorParams, $callSig, $reflection) = array_values($c->getDefinition($clazz));
+        $this->assertEquals(['param2' => 2], $params);
+    }
+
+    public function testClassWithConstructorAndDefaultParams() {
+        $c = new TestContainer();
+        $clazz = ClassWithConstructorAndDefaultParams::class;
+        $c->defineClass($clazz);
+        list($kind, $type, $params, $defCtorParams, $callSig, $reflection) = array_values($c->getDefinition($clazz));
+        $this->assertEquals(['param2' => null, 'param3' => []], $defCtorParams);
+    }
+
+    public function testGetScalarAndObject() {
+        $c = new Container();
+        $c->setScalar('database_host', '127.0.0.1');
+        $this->assertEquals('127.0.0.1', $c->get('database_host'));
+    }
+
+    public function testGetClassWithNoConstructor() {
+        $c = new Container();
+        $obj = $c->get(ClassWithNoConstructor::class);
+        $this->assertInstanceOf(ClassWithNoConstructor::class, $obj);
     }
 
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testMissingCallArgument() {
+    public function testMissingCtorParameter() {
         $c = new Container();
-        $c->get(Baz::class);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testWithNonExistantArgument() {
-        $c = new Container();
-        $c->get(Baz::class, ['arg1' => 1]);
-    }
-
-    public function testWithBuiltinArgument() {
-        $c = new Container();
-        $obj = $c->get(Baz::class, ['count' => 10]);
-        $this->assertEquals(10, $obj->count);
-    }
-
-    public function testWithClassInCallArgument() {
-        $bar = new Bar();
-        $bar->bar = 'barbar';
-        $c = new Container();
-        $obj = $c->get(Foo::class, ['bar' => $bar]);
-        $this->assertEquals('barbar', $obj->bar->bar);
-    }
-
-    public function testWithClassFactory() {
-        $c = new Container();
-        $c->define(Bar::class, [
-            'factory' => function() {
-                $bar = new Bar();
-                $bar->bar = 'factory';
-                return $bar;
-            }
-        ]);
-        $foo = $c->get(Foo::class);
-        $this->assertEquals('factory', $foo->bar->bar);
+        $c->get(Counter::class);
     }
 
     public function testSingleton() {
         $c = new Container();
-        $counter1 = $c->singleton('seq', [
-            'class' => Counter::class
-        ]);
-        $counter1 = $c->get('seq');
-        $this->assertEquals(1, $counter1->next());
-        $counter1->next();
-
-        $another = $c->get('seq');
-        $this->assertEquals(3, $another->next());
+        $c->defineSingleton(Counter::class, ['start' => 9]);
+        $c->get(Counter::class)->increment();
+        $this->assertEquals(11, $c->get(Counter::class)->increment());
     }
 
-    public function testCallableArgs() {
-        $local = 0;
+    public function testGetCorrectDependency() {
         $c = new Container();
-
-        $c->define(Baz::class, [
-            'count' => function() use(&$local) {
-                $local += 1;
-                return $local;
-            }
-        ]);
-
-        $obj1 = $c->get(Baz::class);
-        $this->assertEquals(1, $obj1->count);
-        $obj2 = $c->get(Baz::class);
-        $this->assertEquals(2, $obj2->count);
+        /* @var $service Service */
+        $c->setScalar('DATABASE_CONNECTION_INFO', ['username' => 'postgres']);
+        $service = $c->get(Service::class);
+        $this->assertEquals('postgres', $service->getUsername());
     }
 
-    public function testSingletonWithFactory() {
+    public function testCreateByFactory() {
         $c = new Container();
-        $c->singleton(IBazInterface::class, [
-            'factory' => function($count, Container $container) {
-                $baz = new Baz($count);
-                return $baz;
-            }
-        ]);
-        $baz = $c->get(IBazInterface::class, [
-            'count' => 5
-        ]);
-        $this->assertTrue($baz instanceof Baz);
+        $c->setScalar('DATABASE_CONNECTION_INFO', ['username' => 'postgres']);
+        $obj = $c->get(DatabaseFactory::class);
+        $this->assertInstanceOf(Stubs\Database::class, $obj);
     }
 
-    public function testClassWithFacoryHavingParameters() {
+    public function testCreateSingletonByFactory() {
         $c = new Container();
-        $c->define(IBazInterface::class, [
-            'factory' => function($count, Container $container) {
-                $baz = new Baz($count);
-                return $baz;
-            }
-        ]);
-        $baz = $c->get(IBazInterface::class, [
-            'count' => 5
-        ]);
-        $this->assertTrue($baz instanceof Baz);
+        $c->defineSingletonWithInterface(Counter::class, CounterFactory::class);
+
+        $o1 = $c->get(Counter::class);
+        $o1->increment();
+
+        $o2 = $c->get(Counter::class);
+        $this->assertEquals(2, $o2->increment());
     }
 
 }
