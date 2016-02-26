@@ -72,8 +72,9 @@ abstract class Command extends CommandBase {
             'logLevel' => LogLevel::DEBUG
         ]);
 
+        // By setting to the debug mode we ignore the cached config
         $this->container->defineSingletonWithInterface(Configuration::class
-                , ConfigurationFactory::class);
+                , ConfigurationFactory::class, ['debug' => true]);
 
 
         $this->container->defineSingletonWithInterface(
