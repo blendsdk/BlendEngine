@@ -32,40 +32,45 @@ class ServeCommand extends Command {
                 ->addOption('port'
                         , 'p'
                         , InputOption::VALUE_OPTIONAL
-                        , 'The port to serve the application on.', $this->port)
+                        , 'The port to serve the application on.', $port)
                 ->addOption('host'
                         , 'H'
                         , InputOption::VALUE_OPTIONAL
                         , 'The host address to serve the application on.'
-                        , '0.0.0.0')
-                ->addOption('name'
-                        , 'n'
-                        , InputOption::VALUE_OPTIONAL
-                        , 'Name of the application to run'
-                        , strtolower($this->getConfig('name')));
+                        , '0.0.0.0');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $base = ProcessUtils::escapeArgument($this->getApplication()->getProjectFolder());
         $binary = ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
 
-        if (($scriptName = $this->findApplication($input->getOption('name'))) !== false) {
+        if (($scriptName = $this->findApplication()) !== false) {
             $host = $input->getOption('host');
             $port = $input->getOption('port');
-            $output->writeln("<warn>Running the application on $host:$port</warn>");
-        } else {
-            $output->writeln("<error>Unable to find the $scriptName!");
+            $output->writeln("<warn>Running the application on $host:$port using $scriptName</warn>");
+            passthru("{$binary} -S {$host}:{$port} {$base}/web/$scriptName");
         }
     }
 
-    private function findApplication($name) {
-        $sctipyName = $name . '_dev.php';
-        $file = $this->getApplication()->getProjectFolder()
-                . '/web/'
-                . $sctipyName;
-        if (file_exists($sctipyName)) {
-            return $sctipyName;
+    /**
+     * Try to find the application script using the config
+     * @return string|boolean
+     */
+    private function findApplication() {
+        $name = $this->getConfig('name', null);
+        if (!is_null($name)) {
+            $scriptName = strtolower($name) . '_dev.php';
+            $file = $this->getApplication()->getProjectFolder()
+                    . '/web/'
+                    . $scriptName;
+            if (file_exists($file)) {
+                return $scriptName;
+            } else {
+                $this->output->writeln("<error>Unable to find the $file!");
+                return false;
+            }
         } else {
+            $this->output->writeln("<error>No application name is found in the config.json file!");
             return false;
         }
     }
