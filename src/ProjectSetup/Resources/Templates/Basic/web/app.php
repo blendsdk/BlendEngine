@@ -1,8 +1,12 @@
-<?php
+<?php print_php_header() ?>
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+include __DIR__ . '/../vendor/autoload.php';
 
+date_default_timezone_set("Europe/Amsterdam");
+
+use <?php echo $applicationNamespace.'\\'.$applicationClassName;?>;
+use Blend\Framework\Factory\ApplicationFactory;
+
+(new ApplicationFactory(<?php echo $applicationClassName;?>::class, __DIR__ . '/..'))
+        ->create()
+        ->run();
