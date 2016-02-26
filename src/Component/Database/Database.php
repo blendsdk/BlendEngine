@@ -21,7 +21,7 @@ use Blend\Component\Exception\DatabaseQueryException;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Database extends \PDO {
+class Database {
 
     /**
      * @var string
@@ -34,6 +34,27 @@ class Database extends \PDO {
     private $logger;
 
     /**
+     * @var \PDO
+     */
+    private $connection;
+
+    /**
+     * @var string
+     */
+    private $username;
+
+    /**
+     * @var string
+     */
+    private $password;
+
+    /**
+     *
+     * @var string
+     */
+    private $dsn;
+
+    /**
      * Retrives the name of the current database
      * @return string
      */
@@ -41,12 +62,21 @@ class Database extends \PDO {
         return $this->databaseName;
     }
 
+    private function connect() {
+        if ($this->connection === null) {
+            $this->connection = new \PDO($this->dsn
+                    , $this->username
+                    , $this->password);
+        }
+    }
+
     public function __construct(array $config = array(), LoggerInterface $logger = null) {
         $this->logger = $logger;
         $config = $this->normalizeConfig($config);
         $this->databaseName = $config['database'];
-        $dsn = "pgsql:host={$config['host']};dbname={$this->databaseName};port={$config['port']}";
-        parent::__construct($dsn, $config['username'], $config['password']);
+        $this->dsn = "pgsql:host={$config['host']};dbname={$this->databaseName};port={$config['port']}";
+        $this->username = $config['username'];
+        $this->password = $config['password'];
     }
 
     /**
@@ -79,7 +109,8 @@ class Database extends \PDO {
     , StatementResult $statementResult = null
     , $resultType = \PDO::FETCH_ASSOC) {
 
-        $statement = $this->prepare($sql);
+        $this->connect();
+        $statement = $this->connection->prepare($sql);
 
         if ($this->logger) {
             $this->logger->debug($sql, $params);
@@ -116,8 +147,9 @@ class Database extends \PDO {
         if ($this->logger) {
             $this->logger->debug($sql);
         }
-        $this->exec($sql);
-        if (intval($this->errorCode()) !== 0) {
+        $this->connect();
+        $this->connection->exec($sql);
+        if (intval($this->connection->errorCode()) !== 0) {
             $exception = DatabaseQueryException::createFromStatement($this);
             if ($this->logger) {
                 $this->logger->error($exception->getMessage()
