@@ -26,9 +26,11 @@ class Container {
      * @var array
      */
     protected $definitions;
+    protected $byInterfaceIndex;
 
     public function __construct() {
         $this->definitions = [];
+        $this->byInterfaceIndex = [];
     }
 
     /**
@@ -38,6 +40,18 @@ class Container {
      */
     public function isDefined($interface) {
         return array_key_exists($interface, $this->definitions);
+    }
+
+    public function getByInterface($interface) {
+        if (isset($this->byInterfaceIndex[$interface])) {
+            $result = [];
+            foreach ($this->byInterfaceIndex[$interface] as $item) {
+                $result[] = $this->get($item);
+            }
+            return $result;
+        } else {
+            return [];
+        }
     }
 
     /**
@@ -163,12 +177,18 @@ class Container {
         $this->assertNotExists($interface);
         list($kind, $type, $params) = array_values($data);
         if ($kind === 'c' || $kind === 's') {
-            list($defaultCallParams, $callSignature, $reflection) = $this->reflect($type);
+            list($defaultCallParams, $callSignature, $reflection, $interfaces) = $this->reflect($type);
             $this->definitions[$interface] = array_merge($data, [
                 'defCtorParams' => $defaultCallParams,
                 'callSignature' => $callSignature,
                 'reflection' => $reflection,
             ]);
+            foreach ($interfaces as $item) {
+                if (!isset($this->byInterfaceIndex)) {
+                    $this->byInterfaceIndex[$item] = [];
+                }
+                $this->byInterfaceIndex[$item][] = $interface;
+            }
         } else {
             $this->definitions[$interface] = array_merge($data, [
                 'defCtorParams' => [],
@@ -198,7 +218,7 @@ class Container {
             list($defaultCallParams, $callSignature) = $this->reflectParameters($constructor);
         }
 
-        return [$defaultCallParams, $callSignature, $ref];
+        return [$defaultCallParams, $callSignature, $ref, $ref->getInterfaceNames()];
     }
 
     /**
