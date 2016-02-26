@@ -133,7 +133,9 @@ class InitCommand extends Command {
             'bin/app.bat' => 'bin/' . $lowerName . '.bat',
             'bin/app.php' => 'bin/' . $lowerName . '.php',
             'src/Console/Application.php' => 'src/Console/' . $applicationCommandClassName . '.php',
-            'src/Application.php' => 'src/' . $applicationClassName . '.php'
+            'src/Application.php' => 'src/' . $applicationClassName . '.php',
+            'web/app_dev.php' => 'web/' . $lowerName . '_dev.php',
+            'web/app.php' => 'web/' . $lowerName . '.php'
         );
 
         $this->renderTable = array(
@@ -145,7 +147,9 @@ class InitCommand extends Command {
             'bin/app.php',
             'composer.json',
             'src/Console/Application.php',
-            'src/Application.php'
+            'src/Application.php',
+            'web/app_dev.php',
+            'web/app.php'
         );
     }
 
