@@ -33,6 +33,7 @@ class Application extends BaseApplication {
     public function __construct(Configuration $config
     , LoggerInterface $logger
     , $rootFolder) {
+        parent::__construct();
         date_default_timezone_set($config->get('timezone', 'UTC'));
         $config->mergeWith(['app.root.folder' => $rootFolder]);
         $this->container = new Container();
