@@ -33,7 +33,7 @@ class Application extends BaseApplication {
     public function __construct(Configuration $config
     , LoggerInterface $logger
     , $rootFolder) {
-
+        date_default_timezone_set($config->get('timezone', 'UTC'));
         $config->mergeWith(['app.root.folder' => $rootFolder]);
         $this->container = new Container();
         $this->container->setScalars([
@@ -43,19 +43,19 @@ class Application extends BaseApplication {
     }
 
     protected function finalize(Request $request, Response $response) {
-
+        //
     }
 
     protected function handleRequest(Request $request) {
-
+        //
     }
 
     protected function handleRequestException(\Exception $ex, Request $request) {
-
+        //
     }
 
     protected function initialize() {
-
+        //
     }
 
 }
