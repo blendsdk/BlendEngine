@@ -71,6 +71,11 @@ class LocalCache {
      * @return mixed
      */
     public function withCache($name, callable $callback) {
+
+        if (isset($_SERVER) && isset($_SERVER['REQUEST_URI'])) {
+            $name = $name . $_SERVER['REQUEST_URI'];
+        }
+
         if ($this->debug === false) {
             $cacheFile = $this->cacheFolder . '/' . crc32($name) . '.cache';
             if ($this->memoryCache === true) {
