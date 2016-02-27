@@ -22,6 +22,7 @@ use Blend\Component\Configuration\Configuration;
 use Blend\Component\Routing\RouteProviderInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Application
@@ -90,7 +91,9 @@ abstract class Application extends BaseApplication {
     }
 
     protected function handleRequest(Request $request) {
-        $this->getRoutes();
+        $routes = $this->collectRoutes();
+        $eventListeners = $this->collectEventListeners();
+
         $context = new RequestContext();
         $context->fromRequest($request);
         $matcher = new UrlMatcher($this->routeCollection, $context);
@@ -106,15 +109,30 @@ abstract class Application extends BaseApplication {
         return new Response($ex->getMessage(), 500);
     }
 
-    protected function getRoutes() {
-        $this->routeCollection = $this->localCache->withCache(__CLASS__ . __FUNCTION__, function() {
-            $collection = new RouteCollection();
-            $services = $this->container->getByInterface(RouteProviderInterface::class);
-            foreach ($services as $service) {
-                $service->loadRoutes($collection);
-            }
-            return $collection;
-        });
+    protected function collectEventListeners() {
+        return $this->localCache->withCache(__CLASS__ . __FUNCTION__, function() {
+                    $result = [];
+                    /* @var $service EventSubscriberInterface[] */
+                    $services = $this->container->getByInterface(EventSubscriberInterface::class);
+                    foreach ($services as $service) {
+                        $events = call_user_func([$service, 'getSubscribedEvents']);
+                        foreach ($events as $event => $priority) {
+                            $result[$event][$priority][] = $service;
+                        }
+                    }
+                    return $result;
+                });
+    }
+
+    protected function collectRoutes() {
+        return $this->localCache->withCache(__CLASS__ . __FUNCTION__, function() {
+                    $collection = new RouteCollection();
+                    $services = $this->container->getByInterface(RouteProviderInterface::class);
+                    foreach ($services as $service) {
+                        $service->loadRoutes($collection);
+                    }
+                    return $collection;
+                });
     }
 
 }
