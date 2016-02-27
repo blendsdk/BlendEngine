@@ -19,7 +19,7 @@ use Blend\Component\Cache\LocalCache;
 use Blend\Component\Application\Application as BaseApplication;
 use Blend\Component\DI\ServiceContainer;
 use Blend\Component\Configuration\Configuration;
-use Blend\Component\Routing\RouteProvidesInterface;
+use Blend\Component\Routing\RouteProviderInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 
@@ -109,7 +109,7 @@ abstract class Application extends BaseApplication {
     protected function getRoutes() {
         $this->routeCollection = $this->localCache->withCache(__CLASS__ . __FUNCTION__, function() {
             $collection = new RouteCollection();
-            $services = $this->container->getByInterface(RouteProvidesInterface::class);
+            $services = $this->container->getByInterface(RouteProviderInterface::class);
             foreach ($services as $service) {
                 $service->loadRoutes($collection);
             }

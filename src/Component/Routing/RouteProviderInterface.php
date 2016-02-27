@@ -17,7 +17,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface RouteProvidesInterface {
+interface RouteProviderInterface {
 
     public function loadRoutes(RouteCollection $collection);
 }
