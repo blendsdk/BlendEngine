@@ -19,6 +19,8 @@ use Blend\Component\Application\Application as BaseApplication;
 use Blend\Component\DI\ServiceContainer;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\Routing\RouteProvidesInterface;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\Matcher\UrlMatcher;
 
 /**
  * Application
@@ -80,11 +82,18 @@ abstract class Application extends BaseApplication {
 
     protected function handleRequest(Request $request) {
         $this->getRoutes();
-        return new Response('Hello');
+        $context = new RequestContext();
+        $context->fromRequest($request);
+        $matcher = new UrlMatcher($this->routeCollection, $context);
+        $pathInfo = $request->getPathInfo();
+        $parameters = $matcher->match($request->getPathInfo());
+        list($controllerName, $action) = $parameters['_controller'];
+        $controller = $this->container->get($controllerName);
+        return call_user_func_array([$controller, $action], $parameters);
     }
 
     protected function handleRequestException(\Exception $ex, Request $request) {
-        //
+        return new Response($ex->getMessage(), 500);
     }
 
     protected function getRoutes() {
