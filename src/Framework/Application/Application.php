@@ -107,7 +107,7 @@ abstract class Application extends BaseApplication {
     }
 
     protected function getRoutes() {
-        $this->routeCollection = $this->localCache->withCache(__FILE__, function() {
+        $this->routeCollection = $this->localCache->withCache(__CLASS__ . __FUNCTION__, function() {
             $collection = new RouteCollection();
             $services = $this->container->getByInterface(RouteProvidesInterface::class);
             foreach ($services as $service) {
