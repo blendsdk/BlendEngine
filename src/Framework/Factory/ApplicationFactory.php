@@ -13,8 +13,8 @@ namespace Blend\Framework\Factory;
 
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
-use Blend\Component\DI\Container;
 use Symfony\Component\HttpFoundation\Request;
+use Blend\Component\DI\Container;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\Filesystem\Filesystem;
 use Blend\Framework\Factory\ConfigurationFactory;
