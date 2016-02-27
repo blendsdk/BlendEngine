@@ -249,6 +249,12 @@ class Container {
      */
     private function createNewInstance(\ReflectionClass $reflection, array $callArgs) {
 
+        /**
+         * ReReflect the $reclection. This is needed because PHP fails to
+         * serialize ReclectionObjects after deserialization
+         */
+        $reflection = new ReflectionClass($reflection->name);
+
         if (empty($callArgs)) {
             $instance = $reflection->newInstance();
         } else {
