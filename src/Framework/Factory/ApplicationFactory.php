@@ -124,7 +124,8 @@ class ApplicationFactory implements ObjectFactoryInterface {
     private function createLocalCache() {
         $cacheFolder = $this->rootFolder . '/var/cache';
         $this->filesystem->assertFolderWritable($cacheFolder);
-        $this->localCache = new LocalCache($cacheFolder, $this->logger);
+        $this->localCache = new LocalCache($cacheFolder
+                , $this->logger, $this->debug);
     }
 
     /**
