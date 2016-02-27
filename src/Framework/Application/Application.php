@@ -113,6 +113,7 @@ abstract class Application extends BaseApplication {
             foreach ($services as $service) {
                 $service->loadRoutes($collection);
             }
+            return $collection;
         });
     }
 

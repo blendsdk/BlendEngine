@@ -16,7 +16,6 @@ use Psr\Log\LoggerInterface;
 use Blend\Component\DI\Container;
 use Blend\Component\Cache\LocalCache;
 use Symfony\Component\HttpFoundation\Request;
-use Blend\Component\DI\Container;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\Filesystem\Filesystem;
 use Blend\Framework\Factory\ConfigurationFactory;
@@ -119,6 +118,9 @@ class ApplicationFactory implements ObjectFactoryInterface {
                         ->newInstanceArgs($args);
     }
 
+    /**
+     * Create a local cache provider
+     */
     private function createLocalCache() {
         $cacheFolder = $this->rootFolder . '/var/cache';
         $this->filesystem->assertFolderWritable($cacheFolder);
