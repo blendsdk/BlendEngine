@@ -22,7 +22,10 @@ use Blend\Component\Configuration\Configuration;
 use Blend\Component\Routing\RouteProviderInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Blend\Framework\Service\ControllerResolverService;
 
 /**
  * Application
@@ -51,6 +54,11 @@ abstract class Application extends BaseApplication {
      */
     protected $localCache;
 
+    /**
+     * @var EventDispatcher
+     */
+    protected $eventDispatcher;
+
     public function __construct(Configuration $config
     , LoggerInterface $logger
     , LocalCache $localCache
@@ -73,10 +81,13 @@ abstract class Application extends BaseApplication {
 
         date_default_timezone_set($config->get('timezone', 'UTC'));
         $this->container = new ServiceContainer();
+        $this->eventDispatcher = new EventDispatcher();
+        $this->container->defineClass(ControllerResolverService::class);
         $this->container->setScalars([
             LoggerInterface::class => $logger,
             Configuration::class => $config,
-            LocalCache::class => $this->localCache
+            LocalCache::class => $this->localCache,
+            EventDispatcherInterface::class => $this->eventDispatcher
         ]);
 
         if (!$this->container->loadServicesFromFile($this->rootFolder
@@ -84,19 +95,26 @@ abstract class Application extends BaseApplication {
             $logger->notice(
                     "No service description file found!");
         }
+        $this->initializeEventDispatcher();
+    }
+
+    protected function initializeEventDispatcher() {
+        $services = $this->container->getByInterface(EventSubscriberInterface::class);
+        foreach ($services as $subscriber) {
+            $this->eventDispatcher->addSubscriber($subscriber);
+        }
     }
 
     protected function finalize(Request $request, Response $response) {
-//
+
     }
 
     protected function handleRequest(Request $request) {
         $routes = $this->collectRoutes();
-        $eventListeners = $this->collectEventListeners();
 
         $context = new RequestContext();
         $context->fromRequest($request);
-        $matcher = new UrlMatcher($this->routeCollection, $context);
+        $matcher = new UrlMatcher($routes, $context);
         $pathInfo = $request->getPathInfo();
         $parameters = $matcher->match($request->getPathInfo());
         list($controllerName, $action) = $parameters['_controller'];
@@ -105,23 +123,7 @@ abstract class Application extends BaseApplication {
     }
 
     protected function handleRequestException(\Exception $ex, Request $request) {
-        $this->getRoutes();
         return new Response($ex->getMessage(), 500);
-    }
-
-    protected function collectEventListeners() {
-        return $this->localCache->withCache(__CLASS__ . __FUNCTION__, function() {
-                    $result = [];
-                    /* @var $service EventSubscriberInterface[] */
-                    $services = $this->container->getByInterface(EventSubscriberInterface::class);
-                    foreach ($services as $service) {
-                        $events = call_user_func([$service, 'getSubscribedEvents']);
-                        foreach ($events as $event => $priority) {
-                            $result[$event][$priority][] = $service;
-                        }
-                    }
-                    return $result;
-                });
     }
 
     protected function collectRoutes() {
