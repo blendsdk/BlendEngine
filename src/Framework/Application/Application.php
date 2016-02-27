@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouteCollection;
+use Blend\Component\Cache\LocalCache;
 use Blend\Component\Application\Application as BaseApplication;
 use Blend\Component\DI\ServiceContainer;
 use Blend\Component\Configuration\Configuration;
@@ -44,8 +45,14 @@ abstract class Application extends BaseApplication {
      */
     protected $routeCollection;
 
+    /**
+     * @var LocalCache
+     */
+    protected $localCache;
+
     public function __construct(Configuration $config
     , LoggerInterface $logger
+    , LocalCache $localCache
     , $rootFolder) {
 
         /**
@@ -55,6 +62,7 @@ abstract class Application extends BaseApplication {
          */
         $this->rootFolder = $rootFolder;
         $this->routeCollection = new RouteCollection();
+        $this->localCache = $localCache;
         $config->mergeWith(['app.root.folder' => $rootFolder]);
         $this->initialize($logger, $config);
     }
@@ -66,7 +74,8 @@ abstract class Application extends BaseApplication {
         $this->container = new ServiceContainer();
         $this->container->setScalars([
             LoggerInterface::class => $logger,
-            Configuration::class => $config
+            Configuration::class => $config,
+            LocalCache::class => $this->localCache
         ]);
 
         if (!$this->container->loadServicesFromFile($this->rootFolder
@@ -77,7 +86,7 @@ abstract class Application extends BaseApplication {
     }
 
     protected function finalize(Request $request, Response $response) {
-        //
+//
     }
 
     protected function handleRequest(Request $request) {
@@ -93,14 +102,18 @@ abstract class Application extends BaseApplication {
     }
 
     protected function handleRequestException(\Exception $ex, Request $request) {
+        $this->getRoutes();
         return new Response($ex->getMessage(), 500);
     }
 
     protected function getRoutes() {
-        $services = $this->container->getByInterface(RouteProvidesInterface::class);
-        foreach ($services as $service) {
-            $service->loadRoutes($this->routeCollection);
-        }
+        $this->routeCollection = $this->localCache->withCache(__FILE__, function() {
+            $collection = new RouteCollection();
+            $services = $this->container->getByInterface(RouteProvidesInterface::class);
+            foreach ($services as $service) {
+                $service->loadRoutes($collection);
+            }
+        });
     }
 
 }

@@ -13,6 +13,8 @@ namespace Blend\Framework\Factory;
 
 use Psr\Log\LogLevel;
 use Psr\Log\LoggerInterface;
+use Blend\Component\DI\Container;
+use Blend\Component\Cache\LocalCache;
 use Symfony\Component\HttpFoundation\Request;
 use Blend\Component\DI\Container;
 use Blend\Component\Configuration\Configuration;
@@ -69,19 +71,9 @@ class ApplicationFactory implements ObjectFactoryInterface {
     private $loggerFactory;
 
     /**
-     * @var string
+     * @var LocalCache
      */
-    private $cacheFolder;
-
-    /**
-     * @var string
-     */
-    private $appCacheName;
-
-    /**
-     * @var boolean
-     */
-    private $memoryCache;
+    private $localCache;
 
     /**
      * Creates an Application instance by default injecting the CommonLoggerFactory
@@ -101,66 +93,15 @@ class ApplicationFactory implements ObjectFactoryInterface {
         if ($this->loggerFactory === null) {
             $this->loggerFactory = CommonLoggerFactory::class;
         }
-        $this->cacheFolder = $rootFolder . '/var/cache';
-        $this->appCacheName = $this->cacheFolder
-                . '/' . crc32($applicationClass) . '.cache';
-        $this->memoryCache = extension_loaded('apcu');
     }
 
     public function create() {
-        if (($application = $this->loadFromCache()) === null) {
-            $this->createConfiguration();
-            $this->createLogger();
-            $application = $this->createApplication();
-            $this->saveToCache($application);
-        }
-        return $application;
-    }
-
-    /**
-     * Caches the application either to file or memory using APCU
-     * if it is availble
-     * @param Application $application
-     */
-    private function saveToCache(Application $application) {
-        if (!$this->debug) {
-            if ($this->memoryCache) {
-                apcu_clear_cache();
-                if (apcu_add($this->appCacheName, $application)) {
-                    return;
-                } else {
-                    $this->logger->warning('Unable to cache the application in memory!');
-                }
-            } else {
-                $this->filesystem->assertFolderWritable($this->cacheFolder);
-                file_put_contents($this->appCacheName, serialize($application));
-            }
-        }
-    }
-
-    /**
-     * Loads a previously cached application either from memory or disk if
-     * possible
-     * @return Application|null
-     */
-    private function loadFromCache() {
-        if (!$this->debug) {
-            if ($this->memoryCache) {
-                if (apcu_exists($this->appCacheName)) {
-                    $success = false;
-                    $app = apcu_fetch($this->appCacheName, $success);
-                    if ($success) {
-                        return $app;
-                    }
-                }
-            } else {
-                $this->filesystem->assertFolderWritable($this->cacheFolder);
-                if ($this->filesystem->exists($this->appCacheName)) {
-                    return unserialize(file_get_contents($this->appCacheName));
-                }
-            }
-        }
-        return null;
+        $this->createConfiguration();
+        $this->createLogger();
+        $this->createLocalCache();
+        return $this->localCache->withCache($this->applicationClass, function() {
+                    return $this->createApplication();
+                });
     }
 
     /**
@@ -171,10 +112,17 @@ class ApplicationFactory implements ObjectFactoryInterface {
         $args = [
             $this->config,
             $this->logger,
-            $this->rootFolder
+            $this->localCache,
+            $this->rootFolder,
         ];
         return (new \ReflectionClass($this->applicationClass))
                         ->newInstanceArgs($args);
+    }
+
+    private function createLocalCache() {
+        $cacheFolder = $this->rootFolder . '/var/cache';
+        $this->filesystem->assertFolderWritable($cacheFolder);
+        $this->localCache = new LocalCache($cacheFolder, $this->logger);
     }
 
     /**
