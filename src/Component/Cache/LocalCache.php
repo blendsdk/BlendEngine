@@ -25,10 +25,29 @@ use Blend\Component\Exception\InvalidConfigException;
  */
 class LocalCache {
 
+    /**
+     * @var string
+     */
     protected $cacheFolder;
-    protected $memoryCache;
-    protected $filesystem;
+
+    /**
+     * @var boolean
+     */
     protected $debug;
+
+    /**
+     * @var boolean
+     */
+    protected $memoryCache;
+
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+
+    /**
+     * @var LoggerInterface
+     */
     protected $logger;
 
     public function __construct($cacheFolder, LoggerInterface $logger, $debug = false) {
