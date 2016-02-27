@@ -20,11 +20,18 @@ use Blend\Component\DI\Container;
  */
 class ServiceContainer extends Container {
 
+    /**
+     * Load services from a JSON configuration. The services will be registered
+     * as singletons inside the container
+     * @param type $filename
+     * @return boolean
+     */
     public function loadServicesFromFile($filename) {
         if (file_exists($filename)) {
+            $config = json_decode(file_get_contents($filename), true);
             foreach ($config as $interface => $serviceDescription) {
                 if (is_string($serviceDescription)) {
-                    $this->container->defineSingletonWithInterface($interface
+                    $this->defineSingletonWithInterface($interface
                             , $serviceDescription);
                 }
             }
