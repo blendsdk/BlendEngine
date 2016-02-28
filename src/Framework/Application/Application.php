@@ -22,10 +22,6 @@ use Blend\Component\Configuration\Configuration;
 use Blend\Component\Routing\RouteProviderInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
-use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Blend\Framework\Service\ControllerResolverService;
 
 /**
  * Application
@@ -54,11 +50,6 @@ abstract class Application extends BaseApplication {
      */
     protected $localCache;
 
-    /**
-     * @var EventDispatcher
-     */
-    protected $eventDispatcher;
-
     public function __construct(Configuration $config
     , LoggerInterface $logger
     , LocalCache $localCache
@@ -81,27 +72,17 @@ abstract class Application extends BaseApplication {
 
         date_default_timezone_set($config->get('timezone', 'UTC'));
         $this->container = new ServiceContainer();
-        $this->eventDispatcher = new EventDispatcher();
         $this->container->defineClass(ControllerResolverService::class);
         $this->container->setScalars([
             LoggerInterface::class => $logger,
             Configuration::class => $config,
-            LocalCache::class => $this->localCache,
-            EventDispatcherInterface::class => $this->eventDispatcher
+            LocalCache::class => $this->localCache
         ]);
 
         if (!$this->container->loadServicesFromFile($this->rootFolder
                         . '/config/services.json')) {
             $logger->notice(
                     "No service description file found!");
-        }
-        $this->initializeEventDispatcher();
-    }
-
-    protected function initializeEventDispatcher() {
-        $services = $this->container->getByInterface(EventSubscriberInterface::class);
-        foreach ($services as $subscriber) {
-            $this->eventDispatcher->addSubscriber($subscriber);
         }
     }
 
