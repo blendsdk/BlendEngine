@@ -98,9 +98,7 @@ class ApplicationFactory implements ObjectFactoryInterface {
         $this->createConfiguration();
         $this->createLogger();
         $this->createLocalCache();
-        return $this->localCache->withCache($this->applicationClass, function() {
-                    return $this->createApplication();
-                });
+        return $this->createApplication();
     }
 
     /**
