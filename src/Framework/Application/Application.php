@@ -72,7 +72,6 @@ abstract class Application extends BaseApplication {
 
         date_default_timezone_set($config->get('timezone', 'UTC'));
         $this->container = new ServiceContainer();
-        $this->container->defineClass(ControllerResolverService::class);
         $this->container->setScalars([
             LoggerInterface::class => $logger,
             Configuration::class => $config,
