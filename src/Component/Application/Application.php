@@ -13,7 +13,6 @@ namespace Blend\Component\Application;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Blend\Component\DI\Container;
 
 /**
  * Application
