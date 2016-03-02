@@ -16,7 +16,6 @@ use Blend\Component\Filesystem\Filesystem;
 use Blend\Framework\Factory\ApplicationFactory;
 use Blend\Tests\Framework\Application\Stubs\DummyApplication;
 use Symfony\Component\HttpFoundation\Request;
-use Blend\Tests\Framework\Application\Stubs\GreetingModule;
 use Blend\Tests\Framework\Application\Stubs\TestableApplication;
 use Blend\Tests\Framework\Application\Stubs\CustomRequestExceptionHandler;
 
@@ -81,7 +80,7 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         $app->run($request);
         self::$cleanup[] = $projectFolder;
     }
-    
+
     public function testNoRouteExistsException() {
         $appName = 'App13';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
@@ -89,13 +88,13 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         $factory = new ApplicationFactory($clazz, $projectFolder);
         $app = $factory->create();
         $request = Request::create("/notexists");
-        $output = catch_output(function() use($app,$request) {
-            $app->run($request);            
-        });        
+        $output = catch_output(function() use($app, $request) {
+            $app->run($request);
+        });
         $this->assertEquals('No routes found for "/notexists".', $output);
         self::$cleanup[] = $projectFolder;
     }
-    
+
     public function testCustomExceptionHandler() {
         $appName = 'App14';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
@@ -106,11 +105,11 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         $factory = new ApplicationFactory($clazz, $projectFolder);
         $app = $factory->create();
         $request = Request::create("/notexists");
-        $output = catch_output(function() use($app,$request) {
-            $app->run($request);            
-        });        
+        $output = catch_output(function() use($app, $request) {
+            $app->run($request);
+        });
         $this->assertEquals('Page not found /notexists', $output);
-        self::$cleanup[] = $projectFolder;        
+        self::$cleanup[] = $projectFolder;
     }
 
     public static function tearDownAfterClass() {

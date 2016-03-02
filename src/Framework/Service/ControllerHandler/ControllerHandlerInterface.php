@@ -9,17 +9,15 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\HttpKernel;
+namespace Blend\Framework\Service\ControllerHandler;
+
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Description of KernelEvents
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class KernelEvents {
+interface ControllerHandlerInterface {
 
-    const REQUEST = 'http.request';
-    const REQUEST_EXCEPTION = 'http.request.exception';
-    const CONTROLLER_RESPONSE = 'http.controller.response';
-
+    public function handle(Request $request, array $matchedRoute);
 }

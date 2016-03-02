@@ -21,7 +21,6 @@ use Blend\Component\HttpKernel\Event\GetResponseEvent;
 use Blend\Component\HttpKernel\Event\GetExceptionResponseEvent;
 use Blend\Component\DI\Container;
 use Blend\Component\HttpKernel\KernelEvents;
-use Blend\Framework\Service\ControllerResolverService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouteCollection;
@@ -30,6 +29,9 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Blend\Component\HttpKernel\Event\GetControllerResponseEvent;
+use Blend\Framework\Service\ControllerHandler\ControllerHandlerService;
+use Blend\Framework\Service\ControllerHandler\ControllerHandlerInterface;
 
 /**
  * Application
@@ -95,7 +97,7 @@ abstract class Application extends BaseApplication {
             LoggerInterface::class => $this->logger,
             Configuration::class => $config,
             LocalCache::class => $this->localCache,
-            EventDispatcher::class => $this->dispatcher,
+            EventDispatcherInterface::class => $this->dispatcher,
             Container::class => $this->container
         ]);
 
@@ -112,43 +114,48 @@ abstract class Application extends BaseApplication {
     }
 
     protected function handleRequest(Request $request) {
-        $this->container->setScalar(Request::class, $request);
-        $this->matchRequestToRoutes($request);
 
-        //$this->container->setScalar(Request::class, $request);
-//        /* @var $event GetResponseEvent */
-//        $responseEvent = $this->container->get(GetResponseEvent::class);
-//        $this->dispatcher->dispatch(KernelEvents::REQUEST, $responseEvent);
-//
-//        if($event->hasResponse()) {
-//            return $event->getResponse();
-//        }
-//
-//        /* @var $resolver ControllerResolverService */
-//        $resolver = $this->container->get(ControllerResolverService::class);
-//        $controller = $r
-//        try {
-//            $result = $resolver->runController();
-//            if($result instanceof Response) {
-//                return $result;
-//            } else {
-//                $
-//            }
-//        } catch (Exception $ex) {
-//
-//        }
-//
-//        $routeData = $this->matchRequestToRoutes($request);
-//        $routes = $this->collectRoutes();
-//
-//        $context = new RequestContext();
-//        $context->fromRequest($request);
-//        $matcher = new UrlMatcher($routes, $context);
-//        $pathInfo = $request->getPathInfo();
-//        $parameters = $matcher->match($request->getPathInfo());
-//        list($controllerName, $action) = $parameters['_controller'];
-//        $controller = $this->container->get($controllerName);
-//        return call_user_func_array([$controller, $action], $parameters);
+        $this->container->setScalar(Request::class, $request);
+
+        $matchedRoute = $this->matchRequestToRoutes($request);
+        $request->attributes->set('matchedRoute', $matchedRoute);
+
+        /* @var $event GetResponseEvent */
+        $responseEvent = $this->container->get(GetResponseEvent::class);
+        $this->dispatcher->dispatch(KernelEvents::REQUEST, $responseEvent);
+        if ($responseEvent->hasResponse()) {
+            return $responseEvent->getResponse();
+        }
+
+        $controllerHandler = $this->getControllerHandler();
+        $controllerResponse = $controllerHandler->handle($request, $matchedRoute);
+        if ($controllerResponse instanceof Response) {
+            return $controllerResponse;
+        }
+
+        /* @var $controllerResposeEvent GetControllerResponseEvent */
+        $controllerResposeEvent = $this->container->get(GetControllerResponseEvent::class, [
+            'controllerResponse' => $controllerResponse
+        ]);
+        $this->dispatcher->dispatch(KernelEvents::CONTROLLER_RESPONSE, $controllerResposeEvent);
+        if ($controllerResposeEvent->hasResponse()) {
+            return $controllerResposeEvent->getResponse();
+        }
+
+        return $controllerResponse;
+    }
+
+    /**
+     * Returns a controller handler Service
+     * @return ControllerHandlerInterface
+     */
+    protected function getControllerHandler() {
+        if (!$this->container->isDefined(ControllerHandlerInterface::class)) {
+            $this->container->defineSingletonWithInterface(
+                    ControllerHandlerInterface::class
+                    , ControllerHandlerService::class);
+        }
+        return $this->container->get(ControllerHandlerInterface::class);
     }
 
     /**
@@ -160,7 +167,7 @@ abstract class Application extends BaseApplication {
         $context = new RequestContext();
         $context->fromRequest($request);
         $matcher = new UrlMatcher($routes, $context);
-        $result = $matcher->match($request->getPathInfo());
+        return $matcher->match($request->getPathInfo());
     }
 
     protected function handleRequestException(\Exception $ex, Request $request) {
