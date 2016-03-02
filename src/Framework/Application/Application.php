@@ -30,6 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Blend\Component\HttpKernel\Event\GetControllerResponseEvent;
+use Blend\Component\HttpKernel\Event\GetFinalizeResponseEvent;
 use Blend\Framework\Service\ControllerHandler\ControllerHandlerHTMLService;
 use Blend\Framework\Service\ControllerHandler\ControllerHandlerInterface;
 
@@ -136,6 +137,13 @@ abstract class Application extends BaseApplication {
         $this->dispatcher->dispatch(KernelEvents::CONTROLLER_RESPONSE, $controllerResposeEvent);
         if ($controllerResposeEvent->hasResponse()) {
             return $controllerResposeEvent->getResponse();
+        }
+
+        if ($controllerResponse instanceof Response) {
+            $finalizeEvent = $this->container->get(GetFinalizeResponseEvent::class, [
+                'response' => $controllerResposeEvent
+            ]);
+            $this->dispatcher->dispatch(KernelEvents::FINALIZE_RESPONSE, $finalizeEvent);
         }
 
         return $controllerResponse;

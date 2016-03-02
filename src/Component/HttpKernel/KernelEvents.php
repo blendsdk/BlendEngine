@@ -21,5 +21,6 @@ class KernelEvents {
     const REQUEST = 'http.request';
     const REQUEST_EXCEPTION = 'http.request.exception';
     const CONTROLLER_RESPONSE = 'http.controller.response';
+    const FINALIZE_RESPONSE = 'http.finalize.response';
 
 }
