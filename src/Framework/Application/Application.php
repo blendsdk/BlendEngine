@@ -139,14 +139,14 @@ abstract class Application extends BaseApplication {
             return $controllerResposeEvent->getResponse();
         }
 
-        if ($controllerResponse instanceof Response) {
-            $finalizeEvent = $this->container->get(GetFinalizeResponseEvent::class, [
-                'response' => $controllerResposeEvent
-            ]);
-            $this->dispatcher->dispatch(KernelEvents::FINALIZE_RESPONSE, $finalizeEvent);
-        }
-
         return $controllerResponse;
+    }
+
+    protected function finalizeResponse(Response $response) {
+        $event = $this->container->get(GetFinalizeResponseEvent::class, [
+            'response' => $response
+        ]);
+        $this->dispatcher->dispatch(KernelEvents::FINALIZE_RESPONSE, $event);
     }
 
     /**

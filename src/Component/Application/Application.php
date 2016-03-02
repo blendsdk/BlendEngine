@@ -23,6 +23,8 @@ abstract class Application {
 
     protected abstract function handleRequest(Request $request);
 
+    protected abstract function finalizeResponse(Response $response);
+
     protected abstract function handleRequestException(\Exception $ex, Request $request);
 
     public function run(Request $request = null) {
@@ -39,6 +41,7 @@ abstract class Application {
         } catch (\Exception $ex) {
             $response = $this->handleRequestException($ex, $request);
         }
+        $this->finalizeResponse($response);
         $response->send();
     }
 
