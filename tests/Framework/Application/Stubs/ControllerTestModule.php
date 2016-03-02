@@ -33,6 +33,10 @@ class ControllerTestModule implements RouteProviderInterface {
         return new Response("Hello {$fname} {$lname} from {$request->getPathInfo()}");
     }
 
+    public function api($key, $value) {
+        return [$key => $value];
+    }
+
     public function loadRoutes(RouteCollection $collection) {
         $collection->add('no-response', new Route('/no-response'));
         $collection->add('ping', new Route('/ping', [
@@ -40,6 +44,9 @@ class ControllerTestModule implements RouteProviderInterface {
         ]));
         $collection->add('hello', new Route('/hello/{fname}/{lname}', [
             '_controller' => [self::class, 'hello']
+        ]));
+        $collection->add('api', new Route('/api/{key}/{value}', [
+            '_controller' => [self::class, 'api']
         ]));
     }
 

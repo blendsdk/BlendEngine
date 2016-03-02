@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Blend\Tests\Framework\Application\Stubs\ControllerTestModule;
 use Blend\Tests\Framework\Application\Stubs\TestableApplication;
 use Blend\Tests\Framework\Application\Stubs\CustomRequestExceptionHandler;
+use Blend\Framework\Service\ControllerHandler\ControllerHandlerInterface;
+use Blend\Framework\Service\ControllerHandler\ControllerHandlerJSONService;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -63,7 +65,7 @@ class ApplicationRequestKernelTest extends \PHPUnit_Framework_TestCase {
         $output = catch_output(function() use($app) {
             $app->run(Request::create("/ping"));
         });
-        $this->assertEquals($output, 'pong');
+        $this->assertContains('pong', $output);
 
         $factory = new ApplicationFactory($clazz, $projectFolder);
         $app = $factory->create();
@@ -71,7 +73,27 @@ class ApplicationRequestKernelTest extends \PHPUnit_Framework_TestCase {
             $request = Request::create("/hello/Johny/Bravo");
             $app->run($request);
         });
-        $this->assertEquals($output, 'Hello Johny Bravo from /hello/Johny/Bravo');
+        $this->assertContains('Hello Johny Bravo from /hello/Johny/Bravo', $output);
+        self::$cleanup[] = $projectFolder;
+    }
+
+    public function testJSONResponse() {
+        $appName = 'App15';
+        $projectFolder = ProjectUtil::createNewProject($appName, true);
+        list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
+        ProjectUtil::appendOrCreateServicesConfig($projectFolder, [
+            'custom-exception-handler' => CustomRequestExceptionHandler::class,
+            'controller-test-module' => ControllerTestModule::class,
+            ControllerHandlerInterface::class => ControllerHandlerJSONService::class
+        ]);
+        $factory = new ApplicationFactory($clazz, $projectFolder);
+        $app = $factory->create();
+
+        $output = catch_output(function() use($app) {
+            $request = Request::create("/api/hello/world");
+            $app->run($request);
+        });
+        $this->assertEquals('{"hello":"world"}', $output);
         self::$cleanup[] = $projectFolder;
     }
 

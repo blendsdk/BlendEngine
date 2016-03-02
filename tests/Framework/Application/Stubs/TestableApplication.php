@@ -10,16 +10,18 @@
  */
 
 namespace Blend\Tests\Framework\Application\Stubs;
+
 use Blend\Framework\Application\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
 /**
  * Description of TestableApplication
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class TestableApplication extends Application {
-    
+
     public function run(Request $request = null) {
         try {
             if ($request === null) {
@@ -34,12 +36,11 @@ class TestableApplication extends Application {
         } catch (\Exception $ex) {
             throw $this->handleRequestException($ex, $request);
         }
-        $this->finalize($request, $response);
         return $response;
     }
-    
+
     protected function handleRequestException(\Exception $ex, \Symfony\Component\HttpFoundation\Request $request) {
         return $ex;
-    }    
-    
+    }
+
 }

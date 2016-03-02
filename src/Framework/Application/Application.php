@@ -30,7 +30,7 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Blend\Component\HttpKernel\Event\GetControllerResponseEvent;
-use Blend\Framework\Service\ControllerHandler\ControllerHandlerService;
+use Blend\Framework\Service\ControllerHandler\ControllerHandlerHTMLService;
 use Blend\Framework\Service\ControllerHandler\ControllerHandlerInterface;
 
 /**
@@ -109,10 +109,6 @@ abstract class Application extends BaseApplication {
         $this->installEventSubscribers();
     }
 
-    protected function finalize(Request $request, Response $response) {
-
-    }
-
     protected function handleRequest(Request $request) {
 
         $this->container->setScalar(Request::class, $request);
@@ -153,7 +149,7 @@ abstract class Application extends BaseApplication {
         if (!$this->container->isDefined(ControllerHandlerInterface::class)) {
             $this->container->defineSingletonWithInterface(
                     ControllerHandlerInterface::class
-                    , ControllerHandlerService::class);
+                    , ControllerHandlerHTMLService::class);
         }
         return $this->container->get(ControllerHandlerInterface::class);
     }

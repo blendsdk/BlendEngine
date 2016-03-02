@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class ControllerHandlerService implements ControllerHandlerInterface {
+abstract class ControllerHandler implements ControllerHandlerInterface {
 
     /**
      * @var Container

@@ -25,8 +25,6 @@ abstract class Application {
 
     protected abstract function handleRequestException(\Exception $ex, Request $request);
 
-    protected abstract function finalize(Request $request, Response $response);
-
     public function run(Request $request = null) {
         try {
             if ($request === null) {
@@ -41,7 +39,6 @@ abstract class Application {
         } catch (\Exception $ex) {
             $response = $this->handleRequestException($ex, $request);
         }
-        $this->finalize($request, $response);
         $response->send();
     }
 
