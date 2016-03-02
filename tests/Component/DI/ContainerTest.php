@@ -20,6 +20,7 @@ use Blend\Tests\Component\DI\Stubs\Counter;
 use Blend\Tests\Component\DI\Stubs\Service;
 use Blend\Tests\Component\DI\Stubs\DatabaseFactory;
 use Blend\Tests\Component\DI\Stubs\CounterFactory;
+use Blend\Tests\Component\DI\Stubs\ClassWithMethods;
 
 class TestContainer extends Container {
 
@@ -130,6 +131,42 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
 
         $o2 = $c->get(Counter::class);
         $this->assertEquals(2, $o2->increment());
+    }
+
+    public function testCallMethodWithNoArgs() {
+        $c = new Container();
+        $result = $c->call(ClassWithMethods::class, 'noArgs');
+        $this->assertEquals('noArgs', $result);
+    }
+
+    public function testCallWithArgs() {
+        $c = new Container();
+        $result = $c->call(ClassWithMethods::class, 'withArgs', [
+            'arg1' => 'a',
+            'arg2' => 'b'
+        ]);
+        $this->assertEquals('ab', $result);
+    }
+
+    public function testCallDefWithArgs() {
+        $c = new Container();
+        $result = $c->call(ClassWithMethods::class, 'withDefaultArgs', [
+            'arg1' => 'a',
+            'arg3' => 'b'
+        ]);
+        $this->assertEquals(['a', 'arg2', 'b'], $result);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testCallWithMissingArgs() {
+        $c = new Container();
+        $result = $c->call(ClassWithMethods::class, 'withDefaultArgs', [
+            'arg2' => 2,
+            'arg3' => 3
+        ]);
+        $this->assertEquals(['a', 'arg2', 'b'], $result);
     }
 
 }

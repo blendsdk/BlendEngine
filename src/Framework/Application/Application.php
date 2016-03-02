@@ -12,16 +12,26 @@
 namespace Blend\Framework\Application;
 
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\RouteCollection;
 use Blend\Component\Cache\LocalCache;
 use Blend\Component\Application\Application as BaseApplication;
 use Blend\Component\DI\ServiceContainer;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\Routing\RouteProviderInterface;
+use Blend\Component\HttpKernel\Event\GetResponseEvent;
+use Blend\Component\HttpKernel\Event\GetExceptionResponseEvent;
+use Blend\Component\DI\Container;
+use Blend\Component\HttpKernel\KernelEvents;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Blend\Component\HttpKernel\Event\GetControllerResponseEvent;
+use Blend\Framework\Service\ControllerHandler\ControllerHandlerService;
+use Blend\Framework\Service\ControllerHandler\ControllerHandlerInterface;
 
 /**
  * Application
@@ -50,6 +60,16 @@ abstract class Application extends BaseApplication {
      */
     protected $localCache;
 
+    /**
+     * @var EventDispatcher
+     */
+    protected $dispatcher;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
     public function __construct(Configuration $config
     , LoggerInterface $logger
     , LocalCache $localCache
@@ -63,26 +83,30 @@ abstract class Application extends BaseApplication {
         $this->rootFolder = $rootFolder;
         $this->routeCollection = new RouteCollection();
         $this->localCache = $localCache;
+        $this->logger = $logger;
         $config->mergeWith(['app.root.folder' => $rootFolder]);
-        $this->initialize($logger, $config);
+        $this->initialize($config);
     }
 
-    protected function initialize(LoggerInterface $logger
-    , Configuration $config) {
+    protected function initialize(Configuration $config) {
 
         date_default_timezone_set($config->get('timezone', 'UTC'));
         $this->container = new ServiceContainer();
+        $this->dispatcher = new EventDispatcher();
         $this->container->setScalars([
-            LoggerInterface::class => $logger,
+            LoggerInterface::class => $this->logger,
             Configuration::class => $config,
-            LocalCache::class => $this->localCache
+            LocalCache::class => $this->localCache,
+            EventDispatcherInterface::class => $this->dispatcher,
+            Container::class => $this->container
         ]);
 
         if (!$this->container->loadServicesFromFile($this->rootFolder
                         . '/config/services.json')) {
-            $logger->notice(
+            $this->logger->notice(
                     "No service description file found!");
         }
+        $this->installEventSubscribers();
     }
 
     protected function finalize(Request $request, Response $response) {
@@ -90,20 +114,87 @@ abstract class Application extends BaseApplication {
     }
 
     protected function handleRequest(Request $request) {
-        $routes = $this->collectRoutes();
 
+        $this->container->setScalar(Request::class, $request);
+
+        $matchedRoute = $this->matchRequestToRoutes($request);
+        $request->attributes->set('matchedRoute', $matchedRoute);
+
+        /* @var $event GetResponseEvent */
+        $responseEvent = $this->container->get(GetResponseEvent::class);
+        $this->dispatcher->dispatch(KernelEvents::REQUEST, $responseEvent);
+        if ($responseEvent->hasResponse()) {
+            return $responseEvent->getResponse();
+        }
+
+        $controllerHandler = $this->getControllerHandler();
+        $controllerResponse = $controllerHandler->handle($request, $matchedRoute);
+        if ($controllerResponse instanceof Response) {
+            return $controllerResponse;
+        }
+
+        /* @var $controllerResposeEvent GetControllerResponseEvent */
+        $controllerResposeEvent = $this->container->get(GetControllerResponseEvent::class, [
+            'controllerResponse' => $controllerResponse
+        ]);
+        $this->dispatcher->dispatch(KernelEvents::CONTROLLER_RESPONSE, $controllerResposeEvent);
+        if ($controllerResposeEvent->hasResponse()) {
+            return $controllerResposeEvent->getResponse();
+        }
+
+        return $controllerResponse;
+    }
+
+    /**
+     * Returns a controller handler Service
+     * @return ControllerHandlerInterface
+     */
+    protected function getControllerHandler() {
+        if (!$this->container->isDefined(ControllerHandlerInterface::class)) {
+            $this->container->defineSingletonWithInterface(
+                    ControllerHandlerInterface::class
+                    , ControllerHandlerService::class);
+        }
+        return $this->container->get(ControllerHandlerInterface::class);
+    }
+
+    /**
+     * @param Request $request
+     * @return array
+     */
+    protected function matchRequestToRoutes(Request $request) {
+        $routes = $this->collectRoutes();
         $context = new RequestContext();
         $context->fromRequest($request);
         $matcher = new UrlMatcher($routes, $context);
-        $pathInfo = $request->getPathInfo();
-        $parameters = $matcher->match($request->getPathInfo());
-        list($controllerName, $action) = $parameters['_controller'];
-        $controller = $this->container->get($controllerName);
-        return call_user_func_array([$controller, $action], $parameters);
+        return $matcher->match($request->getPathInfo());
     }
 
     protected function handleRequestException(\Exception $ex, Request $request) {
-        return new Response($ex->getMessage(), 500);
+
+        /* @var $event  GetExceptionResponseEvent */
+        $event = $this->container->get(GetExceptionResponseEvent::class, [
+            'exception' => $ex
+        ]);
+
+        $this->dispatcher->dispatch(KernelEvents::REQUEST_EXCEPTION, $event);
+        if ($event->hasResponse()) {
+            $response = $event->getResponse();
+        } else {
+            $response = new Response($ex->getMessage(), 500);
+        }
+        $this->logger->error($ex->getMessage(), $ex->getTrace());
+        return $response;
+    }
+
+    /**
+     * Find and install the EventSubscribers
+     */
+    protected function installEventSubscribers() {
+        $subscribers = $this->container->getByInterface(EventSubscriberInterface::class);
+        foreach ($subscribers as $subscriber) {
+            $this->dispatcher->addSubscriber($subscriber);
+        }
     }
 
     protected function collectRoutes() {

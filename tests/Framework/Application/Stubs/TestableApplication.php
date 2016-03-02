@@ -9,24 +9,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Application;
-
+namespace Blend\Tests\Framework\Application\Stubs;
+use Blend\Framework\Application\Application;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-
 /**
- * Application
+ * Description of TestableApplication
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class Application {
-
-    protected abstract function handleRequest(Request $request);
-
-    protected abstract function handleRequestException(\Exception $ex, Request $request);
-
-    protected abstract function finalize(Request $request, Response $response);
-
+class TestableApplication extends Application {
+    
     public function run(Request $request = null) {
         try {
             if ($request === null) {
@@ -39,10 +32,14 @@ abstract class Application {
                 );
             }
         } catch (\Exception $ex) {
-            $response = $this->handleRequestException($ex, $request);
+            throw $this->handleRequestException($ex, $request);
         }
         $this->finalize($request, $response);
-        $response->send();
+        return $response;
     }
-
+    
+    protected function handleRequestException(\Exception $ex, \Symfony\Component\HttpFoundation\Request $request) {
+        return $ex;
+    }    
+    
 }

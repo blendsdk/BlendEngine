@@ -42,6 +42,11 @@ class Container {
         return array_key_exists($interface, $this->definitions);
     }
 
+    /**
+     * Retrives objects by their implemented interfaces
+     * @param string $interface
+     * @return array
+     */
     public function getByInterface($interface) {
         if (isset($this->byInterfaceIndex[$interface])) {
             $result = [];
@@ -51,6 +56,37 @@ class Container {
             return $result;
         } else {
             return [];
+        }
+    }
+
+    /**
+     * Calls a method on an interface
+     * @param string $interface
+     * @param string $method
+     * @param array $params method parameters
+     * @param array $interfaceParams parameters to pass to the class constructor
+     * @return mixed
+     */
+    public function call($interface, $method, array $params = [], array $interfaceParams = []) {
+        if (!$this->isDefined($interface)) {
+            $this->defineClass($interface);
+        }
+        list($defaultCallParams, $callSignature, $reflection, $interfaces) = $this->reflect($interface, $method);
+        $callArgs = $this->resolveCallParameters($interface, $callSignature, array_merge($defaultCallParams, $params), $method);
+        $object = $this->get($interface, $interfaceParams);
+        return call_user_func_array([$object, $method], array_values($callArgs));
+    }
+
+    /**
+     * Checks if a method exists in a ReflectionClass
+     * @param ReflectionClass $refclass
+     * @param string $method
+     * @throws \InvalidArgumentException
+     */
+    private function assertMethodExists(\ReflectionClass $refclass, $method) {
+        if (!$refclass->hasMethod($method)) {
+            throw new \InvalidArgumentException(
+            "{$refclass->name} does not a method called [$method]");
         }
     }
 
@@ -71,20 +107,33 @@ class Container {
         if ($kind === 'x') {
             return $defParams[0];
         } else {
-            $callArgs = [];
-            if (!empty($callSignature)) {
-                $resolved = $this->resolve($callSignature, array_merge($defCtorParams, $defParams, $params));
-                $callArgs = array_intersect_key($resolved, $callSignature); // clear unwanted params
-                $this->assertNotMissingArguments($callSignature, $callArgs, $interface);
-            }
-            // array_merge here will sort the call params to the correct sort order
-            $obj = $this->createNewInstance($reflection, array_merge($callSignature, $callArgs));
+            $callArgs = $this->resolveCallParameters($interface, $callSignature, array_merge($defCtorParams, $defParams, $params));
+            $obj = $this->createNewInstance($reflection, $callArgs);
             if ($kind === 's') {
                 unset($this->definitions[$interface]);
                 $this->setScalar($interface, $obj);
             }
             return $obj;
         }
+    }
+
+    /**
+     * Resolves call parameters based on input from class definition or
+     * a method call
+     * @param string $interface
+     * @param array $callSignature
+     * @param array $params
+     * @param string $method
+     * @return array
+     */
+    private function resolveCallParameters($interface, $callSignature, $params, $method = '__construct') {
+        $callArgs = [];
+        if (!empty($callSignature)) {
+            $resolved = $this->resolve($callSignature, $params);
+            $callArgs = array_intersect_key($resolved, $callSignature); // clear unwanted params
+            $this->assertNotMissingArguments($callSignature, $callArgs, $interface, $method);
+        }
+        return array_merge($callSignature, $callArgs);
     }
 
     /**
@@ -204,18 +253,23 @@ class Container {
      * @return mixed
      * @throws InvalidConfigException
      */
-    private function reflect($type) {
+    private function reflect($type, $method = null) {
         $ref = new \ReflectionClass($type);
         $defaultCallParams = [];
         $callSignature = [];
-        $constructor = null;
         if ($ref->isInterface()) {
             throw new InvalidConfigException(
             "Interface type [$type] cannot be defined in the DI Container!");
         }
 
-        if ($constructor = $ref->getConstructor()) {
-            list($defaultCallParams, $callSignature) = $this->reflectParameters($constructor);
+        if ($method === null) {
+            $method = $ref->getConstructor();
+        } else {
+            $this->assertMethodExists($ref, $method);
+            $method = $ref->getMethod($method);
+        }
+        if ($method) {
+            list($defaultCallParams, $callSignature) = $this->reflectParameters($method);
         }
 
         return [$defaultCallParams, $callSignature, $ref, $ref->getInterfaceNames()];
@@ -289,13 +343,13 @@ class Container {
      * @param string $name
      * @throws \InvalidArgumentException
      */
-    private function assertNotMissingArguments($callsig, $args, $name) {
+    private function assertNotMissingArguments($callsig, $args, $name, $methodName) {
         $missing = array_diff(array_keys($callsig), array_keys($args));
         $missingCnt = count($missing);
         if ($missingCnt !== 0) {
             $missingArgs = implode(', ', $missing);
             $sigArgs = implode(', ', array_keys($callsig));
-            throw new \InvalidArgumentException("Missing {$missingCnt} ($missingArgs) for {$name}::__construct({$sigArgs})");
+            throw new \InvalidArgumentException("Missing {$missingCnt} ($missingArgs) for {$name}::{$methodName}({$sigArgs})");
         }
     }
 

@@ -101,4 +101,17 @@ class ProjectUtil {
         return ["{$ns}\\{$ns}Application", $loader];
     }
 
+    public static function appendOrCreateServicesConfig($projectFolder, array $services = []) {
+        $servicesFile = $projectFolder . '/config/services.json';
+        $merge = [];
+        if (file_exists($servicesFile)) {
+            $merge = json_decode(file_get_contents($servicesFile), true);
+            if (!is_array($merge)) {
+                $merge = [];
+            }
+        }
+        $merge = array_merge($merge, $services);
+        file_put_contents($servicesFile, json_encode($merge));
+    }
+
 }
