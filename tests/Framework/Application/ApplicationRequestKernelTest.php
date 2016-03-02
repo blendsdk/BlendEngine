@@ -14,7 +14,6 @@ namespace Blend\Tests\Framework\Application;
 use Blend\Tests\ProjectUtil;
 use Blend\Component\Filesystem\Filesystem;
 use Blend\Framework\Factory\ApplicationFactory;
-use Blend\Tests\Framework\Application\Stubs\DummyApplication;
 use Symfony\Component\HttpFoundation\Request;
 use Blend\Tests\Framework\Application\Stubs\ControllerTestModule;
 use Blend\Tests\Framework\Application\Stubs\TestableApplication;
@@ -28,9 +27,9 @@ class ApplicationRequestKernelTest extends \PHPUnit_Framework_TestCase {
     static $cleanup = [];
 
     /**
-     * @expectedException \Symfony\Component\Routing\Exception\InvalidParameterException
+     * @large
      */
-    public function testNoControllerKeyPare() {
+    public function testNoControllerKeyPareError() {
         $appName = 'App15';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
@@ -38,16 +37,20 @@ class ApplicationRequestKernelTest extends \PHPUnit_Framework_TestCase {
             'custom-exception-handler' => CustomRequestExceptionHandler::class,
             'controller-test-module' => ControllerTestModule::class
         ]);
-        $factory = new ApplicationFactory(TestableApplication::class, $projectFolder);
+        $factory = new ApplicationFactory($clazz, $projectFolder);
         $app = $factory->create();
         $request = Request::create("/no-response");
         $output = catch_output(function() use($app, $request) {
             $app->run($request);
         });
+        $this->assertEquals('Server error', $output);
         self::$cleanup[] = $projectFolder;
     }
 
-    public function testControllerKeyPare() {
+    /**
+     * @large
+     */
+    public function testControllerHandlerWithActionParameters() {
         $appName = 'App16';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);

@@ -18,6 +18,7 @@ use Blend\Tests\Framework\Application\Stubs\DummyApplication;
 use Symfony\Component\HttpFoundation\Request;
 use Blend\Tests\Framework\Application\Stubs\TestableApplication;
 use Blend\Tests\Framework\Application\Stubs\CustomRequestExceptionHandler;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * Description of ApplicationFactoryTest
@@ -49,6 +50,9 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         $factory->create();
     }
 
+    /**
+     * @large
+     */
     public function testFactorySanity() {
         $appName = 'App1';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
@@ -68,6 +72,7 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
     }
 
     /**
+     * @large
      * @expectedException \Symfony\Component\Routing\Exception\ResourceNotFoundException
      */
     public function testNoRouteExists() {
@@ -81,6 +86,9 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         self::$cleanup[] = $projectFolder;
     }
 
+    /**
+     * @large
+     */
     public function testNoRouteExistsException() {
         $appName = 'App13';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
@@ -95,6 +103,9 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         self::$cleanup[] = $projectFolder;
     }
 
+    /**
+     * @large
+     */
     public function testCustomExceptionHandler() {
         $appName = 'App14';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
