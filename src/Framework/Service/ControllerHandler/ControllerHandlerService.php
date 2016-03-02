@@ -58,6 +58,11 @@ class ControllerHandlerService implements ControllerHandlerInterface {
         }
     }
 
+    /**
+     * Check the signature of the provided _controller
+     * @param array $controller
+     * @return boolean
+     */
     protected function isArrayDefinition($controller) {
         if (is_array($controller) && count($controller) == 2 && is_string($controller[0]) && is_string($controller[1])
         ) {
@@ -67,15 +72,12 @@ class ControllerHandlerService implements ControllerHandlerInterface {
         }
     }
 
-    protected function assertControllerAction(\ReflectionClass $ref, $action) {
-        if (!$ref->hasMethod($action)) {
-            $error = "{$ref->name} doe not have a method called $action! " .
-                    "You should check the Route creation!";
-            $this->logger->error($error, [$ref->name, $action]);
-            throw new InvalidParameterException($error);
-        }
-    }
-
+    /**
+     * Assert is the matched route contains a _controller key/pare
+     * @param Request $request
+     * @param array $matchedRoute
+     * @throws InvalidParameterException
+     */
     protected function assertControllerKey(Request $request, array $matchedRoute) {
         if (!array_key_exists('_controller', $matchedRoute)) {
             $error = "The matched route does not have a [_controller] " .
