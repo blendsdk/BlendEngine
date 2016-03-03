@@ -18,5 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface SessionProviderInterface {
 
+    public function getSession();
+
     public function initializeSession(Request $request);
 }

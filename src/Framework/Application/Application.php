@@ -29,6 +29,7 @@ use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Blend\Component\HttpKernel\Event\GetControllerResponseEvent;
 use Blend\Component\HttpKernel\Event\GetFinalizeResponseEvent;
 use Blend\Component\HttpKernel\ControllerHandler;
@@ -166,6 +167,8 @@ abstract class Application extends BaseApplication {
         /* @var $provider SessionProviderInterface */
         $provider = $this->container->get(SessionProviderInterface::class);
         $provider->initializeSession($request);
+        $this->container->setScalar(SessionInterface::class
+                , $provider->getSession());
     }
 
     protected function finalizeResponse(Response $response) {

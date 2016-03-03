@@ -44,4 +44,11 @@ class NativeSessionProvider implements SessionProviderInterface {
         $request->setSession($this->session);
     }
 
+    /**
+     * @return Session
+     */
+    public function getSession() {
+        return $this->session;
+    }
+
 }
