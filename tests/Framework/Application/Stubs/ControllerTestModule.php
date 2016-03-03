@@ -46,7 +46,8 @@ class ControllerTestModule implements RouteProviderInterface {
             '_controller' => [self::class, 'hello']
         ]));
         $collection->add('api', new Route('/api/{key}/{value}', [
-            '_controller' => [self::class, 'api']
+            '_controller' => [self::class, 'api'],
+            '_json_response' => true
         ]));
     }
 

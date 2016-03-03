@@ -18,8 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Blend\Tests\Framework\Application\Stubs\ControllerTestModule;
 use Blend\Tests\Framework\Application\Stubs\TestableApplication;
 use Blend\Tests\Framework\Application\Stubs\CustomRequestExceptionHandler;
-use Blend\Framework\Service\ControllerHandler\ControllerHandlerInterface;
-use Blend\Framework\Service\ControllerHandler\ControllerHandlerJSONService;
+use Blend\Component\HttpKernel\ControllerHandlerInterface;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -83,8 +82,7 @@ class ApplicationRequestKernelTest extends \PHPUnit_Framework_TestCase {
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
         ProjectUtil::appendOrCreateServicesConfig($projectFolder, [
             'custom-exception-handler' => CustomRequestExceptionHandler::class,
-            'controller-test-module' => ControllerTestModule::class,
-            ControllerHandlerInterface::class => ControllerHandlerJSONService::class
+            'controller-test-module' => ControllerTestModule::class
         ]);
         $factory = new ApplicationFactory($clazz, $projectFolder);
         $app = $factory->create();
