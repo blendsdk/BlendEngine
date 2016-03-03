@@ -31,8 +31,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Blend\Component\HttpKernel\Event\GetControllerResponseEvent;
 use Blend\Component\HttpKernel\Event\GetFinalizeResponseEvent;
-use Blend\Framework\Service\ControllerHandler\ControllerHandlerHTMLService;
-use Blend\Framework\Service\ControllerHandler\ControllerHandlerInterface;
+use Blend\Component\HttpKernel\ControllerHandler;
+use Blend\Component\HttpKernel\ControllerHandlerInterface;
 
 /**
  * Application
@@ -157,7 +157,7 @@ abstract class Application extends BaseApplication {
         if (!$this->container->isDefined(ControllerHandlerInterface::class)) {
             $this->container->defineSingletonWithInterface(
                     ControllerHandlerInterface::class
-                    , ControllerHandlerHTMLService::class);
+                    , ControllerHandler::class);
         }
         return $this->container->get(ControllerHandlerInterface::class);
     }

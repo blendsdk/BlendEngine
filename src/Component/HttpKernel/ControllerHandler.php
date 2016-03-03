@@ -9,13 +9,14 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Framework\Service\ControllerHandler;
+namespace Blend\Component\HttpKernel;
 
 use Blend\Component\DI\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
-use Blend\Framework\Service\ControllerHandler\ControllerHandlerInterface;
+use Blend\Component\HttpKernel\ControllerHandlerInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,7 +24,7 @@ use Psr\Log\LoggerInterface;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class ControllerHandler implements ControllerHandlerInterface {
+class ControllerHandler implements ControllerHandlerInterface {
 
     /**
      * @var Container
@@ -49,13 +50,27 @@ abstract class ControllerHandler implements ControllerHandlerInterface {
         $this->assertControllerKey($request, $matchedRoute);
         $controller = $matchedRoute['_controller'];
         if ($this->isArrayDefinition($controller)) {
-            return $this->container->call($controller[0], $controller[1], $matchedRoute);
+            $result = $this->container->call($controller[0], $controller[1], $matchedRoute);
+            if ($this->needJsonResponse($matchedRoute)) {
+                return new JsonResponse($result);
+            } else {
+                return new Response($result);
+            }
         } else {
             $error = "The _controller is has an invalid [controller,action] signature!" .
                     " You should check the Route creation!";
             $this->logger->error($error, ['matchedRoute' => $matchedRoute, $request->getPathInfo()]);
             throw new InvalidParameterException($error);
         }
+    }
+
+    /**
+     * Check if the Route is set to return a JSON response
+     * @param array $matchedRoute
+     * @return boolean
+     */
+    protected function needJsonResponse($matchedRoute) {
+        return isset($matchedRoute['_json_response']) && $matchedRoute['_json_response'] === true;
     }
 
     /**

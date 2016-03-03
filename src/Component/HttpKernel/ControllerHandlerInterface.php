@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Framework\Service\ControllerHandler;
+namespace Blend\Component\HttpKernel;
 
 use Symfony\Component\HttpFoundation\Request;
 
