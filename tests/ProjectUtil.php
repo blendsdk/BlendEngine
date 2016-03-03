@@ -82,6 +82,7 @@ class ProjectUtil {
         $fs->ensureFolder($projectFolder);
         $projectFolder = realpath($projectFolder);
         self::runCommand($projectFolder, 'project:init');
+        file_put_contents($projectFolder . '/config/services.json', json_encode([]));
         return $projectFolder;
     }
 
