@@ -34,4 +34,8 @@ class SanityApp extends Application {
         //
     }
 
+    protected function finalizeResponse(Response $response) {
+
+    }
+
 }
