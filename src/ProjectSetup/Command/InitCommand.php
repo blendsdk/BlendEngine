@@ -179,7 +179,8 @@ class InitCommand extends Command {
         $fs = new Filesystem();
         $folders = [
             $this->workFolder . '/var/cache',
-            $this->workFolder . '/var/log'
+            $this->workFolder . '/var/log',
+            $this->workFolder . '/var/session',
         ];
         foreach ($folders as $folder) {
             $fs->ensureFolder($folder, 0777);

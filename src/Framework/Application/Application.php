@@ -33,6 +33,9 @@ use Blend\Component\HttpKernel\Event\GetControllerResponseEvent;
 use Blend\Component\HttpKernel\Event\GetFinalizeResponseEvent;
 use Blend\Component\HttpKernel\ControllerHandler;
 use Blend\Component\HttpKernel\ControllerHandlerInterface;
+use Blend\Component\Session\SessionProviderInterface;
+use Blend\Component\Session\NativeSessionProvider;
+use Blend\Component\Filesystem\Filesystem;
 
 /**
  * Application
@@ -71,6 +74,11 @@ abstract class Application extends BaseApplication {
      */
     protected $logger;
 
+    /**
+     * @var Filesystem
+     */
+    protected $filesystem;
+
     public function __construct(Configuration $config
     , LoggerInterface $logger
     , LocalCache $localCache
@@ -94,12 +102,14 @@ abstract class Application extends BaseApplication {
         date_default_timezone_set($config->get('timezone', 'UTC'));
         $this->container = new ServiceContainer();
         $this->dispatcher = new EventDispatcher();
+        $this->filesystem = new Filesystem();
         $this->container->setScalars([
             LoggerInterface::class => $this->logger,
             Configuration::class => $config,
             LocalCache::class => $this->localCache,
             EventDispatcherInterface::class => $this->dispatcher,
-            Container::class => $this->container
+            Container::class => $this->container,
+            Filesystem::class => $this->filesystem
         ]);
 
         if (!$this->container->loadServicesFromFile($this->rootFolder
@@ -116,6 +126,8 @@ abstract class Application extends BaseApplication {
 
         $matchedRoute = $this->matchRequestToRoutes($request);
         $request->attributes->set('matchedRoute', $matchedRoute);
+
+        $this->initializeSession($request);
 
         /* @var $event GetResponseEvent */
         $responseEvent = $this->container->get(GetResponseEvent::class);
@@ -140,6 +152,20 @@ abstract class Application extends BaseApplication {
         }
 
         return $controllerResponse;
+    }
+
+    protected function initializeSession(Request $request) {
+        if (!$this->container->isDefined(SessionProviderInterface::class)) {
+            $savePath = $this->filesystem->assertFolderWritable($this->rootFolder . '/var/session');
+            $this->container->defineSingletonWithInterface(
+                    SessionProviderInterface::class
+                    , NativeSessionProvider::class
+                    , ['save_path' => $savePath]
+            );
+        }
+        /* @var $provider SessionProviderInterface */
+        $provider = $this->container->get(SessionProviderInterface::class);
+        $provider->initializeSession($request);
     }
 
     protected function finalizeResponse(Response $response) {
