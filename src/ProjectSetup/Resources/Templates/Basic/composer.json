@@ -7,7 +7,8 @@
     },
     "autoload": {
         "psr-4": {
-            "<?php echo $applicationName;?>\\": "src"
+            "<?php echo $applicationName;?>\\": "src",
+            "Acme\\": "src/Acme"
         },
         "files": [
             "src/Globals.php"
