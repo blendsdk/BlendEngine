@@ -186,3 +186,23 @@ if (!function_exists('is_array_assoc')) {
     }
 
 }
+
+if (!function_exists('array_get_key_value')) {
+
+    /**
+     * Gets a value from an array using a key, and returns the $default
+     * if the key does not exist
+     * @param array $array
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    function array_get_key_value(array $array, $key, $default = null) {
+        if (array_key_exists($key, $array)) {
+            return $array[$key];
+        } else {
+            return $default;
+        }
+    }
+
+}
