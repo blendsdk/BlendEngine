@@ -17,7 +17,9 @@
         "auth_mode": "login"
     },
     "translation": {
-        "defaultLocale": "en"
+        "defaultLocale": "nl",
+        "availableLocales": ["en","nl", "am"],
+        "persisInSession": false
     },
     "authmodule": {
         "login_path": "/login",
