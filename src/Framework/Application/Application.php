@@ -197,6 +197,7 @@ abstract class Application extends BaseApplication {
      */
     protected function matchRequestToRoutes(Request $request) {
         $routes = $this->collectRoutes();
+        $this->container->setScalar(RouteCollection::class, $routes);
         $context = new RequestContext();
         $context->fromRequest($request);
         $matcher = new UrlMatcher($routes, $context);
