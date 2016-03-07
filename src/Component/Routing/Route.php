@@ -33,7 +33,13 @@ class Route extends RouteBase {
         $this->setDefault('_access_method', self::ACCESS_PUBLIC);
         $this->setDefault('_roles', [self::ROLE_PUBLIC]);
         $this->setDefault('_locale', null);
-        $this->setDefault('route_type', self::TYPE_WEB_ROUTE);
+        $this->setDefault('_route_type', self::TYPE_WEB_ROUTE);
+    }
+
+    public function compile() {
+        $key = crc32($this->getPath() . serialize($this->getDefaults()));
+        $this->setDefault('_csrf_key', $key);
+        return parent::compile();
     }
 
     /**
