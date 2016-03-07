@@ -14,9 +14,8 @@ namespace Blend\Tests\Framework\Application\Stubs;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Blend\Component\Routing\RouteProviderInterface;
+use Blend\Component\Routing\RouteBuilder;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\Route;
-use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Description of ControllerTestModule
@@ -37,18 +36,12 @@ class ControllerTestModule implements RouteProviderInterface {
         return [$key => $value];
     }
 
-    public function loadRoutes(RouteCollection $collection) {
-        $collection->add('no-response', new Route('/no-response'));
-        $collection->add('ping', new Route('/ping', [
-            '_controller' => [self::class, 'ping']
-        ]));
-        $collection->add('hello', new Route('/hello/{fname}/{lname}', [
-            '_controller' => [self::class, 'hello']
-        ]));
-        $collection->add('api', new Route('/api/{key}/{value}', [
-            '_controller' => [self::class, 'api'],
-            '_json_response' => true
-        ]));
+    public function loadRoutes(RouteBuilder $builder) {
+        $builder->route('no-response', '/no-response', []);
+        $builder->route('ping', '/ping', [self::class, 'ping']);
+        $builder->route('hello', '/hello/{fname}/{lname}', [self::class, 'hello']);
+        $builder->route('api', '/api/{key}/{value}', [self::class, 'api'])
+                ->setAPIRoute();
     }
 
 }

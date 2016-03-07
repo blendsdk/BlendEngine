@@ -37,6 +37,7 @@ use Blend\Component\HttpKernel\ControllerHandlerInterface;
 use Blend\Component\Session\SessionProviderInterface;
 use Blend\Component\Session\NativeSessionProvider;
 use Blend\Component\Filesystem\Filesystem;
+use Blend\Component\Routing\RouteBuilder;
 
 /**
  * Application
@@ -233,12 +234,13 @@ abstract class Application extends BaseApplication {
 
     protected function collectRoutes() {
         return $this->localCache->withCache(__CLASS__ . __FUNCTION__, function() {
-                    $collection = new RouteCollection();
+                    $routes = new RouteCollection();
+                    $routeBuilder = new RouteBuilder($routes);
                     $services = $this->container->getByInterface(RouteProviderInterface::class);
                     foreach ($services as $service) {
-                        $service->loadRoutes($collection);
+                        $service->loadRoutes($routeBuilder);
                     }
-                    return $collection;
+                    return $routeBuilder->getRoutes();
                 });
     }
 

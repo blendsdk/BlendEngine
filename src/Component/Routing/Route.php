@@ -81,6 +81,7 @@ class Route extends RouteBase {
      */
     public function setAPIRoute() {
         $this->setDefault('_route_type', self::TYPE_API_ROUTE);
+        $this->setDefault('_json_response', true);
         return $this;
     }
 
