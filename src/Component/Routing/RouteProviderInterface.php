@@ -11,7 +11,7 @@
 
 namespace Blend\Component\Routing;
 
-use Symfony\Component\Routing\RouteCollection;
+use Blend\Component\Routing\RouteBuilder;
 
 /**
  *
@@ -19,5 +19,5 @@ use Symfony\Component\Routing\RouteCollection;
  */
 interface RouteProviderInterface {
 
-    public function loadRoutes(RouteCollection $collection);
+    public function loadRoutes(RouteBuilder $builder);
 }
