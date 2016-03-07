@@ -24,12 +24,12 @@ use Blend\Component\DI\ObjectFactoryInterface;
 class DatabaseFactory implements ObjectFactoryInterface {
 
     /**
-     * @var LoggerInterface 
+     * @var LoggerInterface
      */
     protected $logger;
 
     /**
-     * @var Configuration 
+     * @var Configuration
      */
     protected $config;
 
