@@ -56,7 +56,6 @@ class LocaleService implements EventSubscriberInterface {
 
     public function onRequest(GetResponseEvent $event) {
         $request = $event->getRequest();
-        $matchedRoute = $request->attributes->get('matchedRoute', []);
 
         /*
          * Check URL _locale
@@ -66,7 +65,7 @@ class LocaleService implements EventSubscriberInterface {
          */
 
         $locales = [
-            array_get_key_value($matchedRoute, '_locale', null),
+            $request->attributes->get('_locale', null),
             $request->getSession()->get('_locale', null),
             $request->getLocale(),
         ];
@@ -83,8 +82,7 @@ class LocaleService implements EventSubscriberInterface {
         if ($this->config->get('tranalstion.persistInSession', false) === true) {
             $request->getSession()->set('_locale', $locale);
         }
-        $matchedRoute['_locale'] = $locale;
-        $request->attributes->set('matchedRoute', $matchedRoute);
+        $request->attributes->set('_locale', $locale);
         $event->getContainer()->setScalar('_locale', $locale);
     }
 

@@ -16,9 +16,7 @@ use Blend\Component\Filesystem\Filesystem;
 use Blend\Framework\Factory\ApplicationFactory;
 use Symfony\Component\HttpFoundation\Request;
 use Blend\Tests\Framework\Application\Stubs\ControllerTestModule;
-use Blend\Tests\Framework\Application\Stubs\TestableApplication;
 use Blend\Tests\Framework\Application\Stubs\CustomRequestExceptionHandler;
-use Blend\Component\HttpKernel\ControllerHandlerInterface;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>

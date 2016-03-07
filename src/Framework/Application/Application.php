@@ -125,9 +125,7 @@ abstract class Application extends BaseApplication {
     protected function handleRequest(Request $request) {
 
         $this->container->setScalar(Request::class, $request);
-
-        $matchedRoute = $this->matchRequestToRoutes($request);
-        $request->attributes->set('matchedRoute', $matchedRoute);
+        $request->attributes->replace($this->matchRequestToRoutes($request));
 
         $this->initializeSession($request);
 
@@ -139,7 +137,7 @@ abstract class Application extends BaseApplication {
         }
 
         $controllerHandler = $this->getControllerHandler();
-        $controllerResponse = $controllerHandler->handle($request, $matchedRoute);
+        $controllerResponse = $controllerHandler->handle($request);
         if ($controllerResponse instanceof Response) {
             return $controllerResponse;
         }

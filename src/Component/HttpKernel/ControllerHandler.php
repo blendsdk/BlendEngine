@@ -46,12 +46,12 @@ class ControllerHandler implements ControllerHandlerInterface {
         $this->logger = $logger;
     }
 
-    public function handle(Request $request, array $matchedRoute) {
-        $this->assertControllerKey($request, $matchedRoute);
-        $controller = $matchedRoute['_controller'];
+    public function handle(Request $request) {
+        $this->assertControllerKey($request);
+        $controller = $request->attributes->get('_controller');
         if ($this->isArrayDefinition($controller)) {
-            $result = $this->container->call($controller[0], $controller[1], $matchedRoute);
-            if ($this->needJsonResponse($matchedRoute)) {
+            $result = $this->container->call($controller[0], $controller[1], $request->attributes->all());
+            if ($request->attributes->get('_json_response', false)) {
                 return new JsonResponse($result);
             } else {
                 return new Response($result);
@@ -59,18 +59,9 @@ class ControllerHandler implements ControllerHandlerInterface {
         } else {
             $error = "The _controller is has an invalid [controller,action] signature!" .
                     " You should check the Route creation!";
-            $this->logger->error($error, ['matchedRoute' => $matchedRoute, $request->getPathInfo()]);
+            $this->logger->error($error, ['RequestAttributes' => $request->attributes->add(), $request->getPathInfo()]);
             throw new InvalidParameterException($error);
         }
-    }
-
-    /**
-     * Check if the Route is set to return a JSON response
-     * @param array $matchedRoute
-     * @return boolean
-     */
-    protected function needJsonResponse($matchedRoute) {
-        return isset($matchedRoute['_json_response']) && $matchedRoute['_json_response'] === true;
     }
 
     /**
@@ -90,14 +81,13 @@ class ControllerHandler implements ControllerHandlerInterface {
     /**
      * Assert is the matched route contains a _controller key/pare
      * @param Request $request
-     * @param array $matchedRoute
      * @throws InvalidParameterException
      */
-    protected function assertControllerKey(Request $request, array $matchedRoute) {
-        if (!array_key_exists('_controller', $matchedRoute)) {
+    protected function assertControllerKey(Request $request) {
+        if (!$request->attributes->has('_controller')) {
             $error = "The matched route does not have a [_controller] " .
                     "key/value pair. You should check the Route creation!";
-            $this->logger->error($error, ['matchedRoute' => $matchedRoute, $request->getPathInfo()]);
+            $this->logger->error($error, ['RequestAttributes' => $request->attributes->add(), $request->getPathInfo()]);
             throw new InvalidParameterException($error);
         }
     }

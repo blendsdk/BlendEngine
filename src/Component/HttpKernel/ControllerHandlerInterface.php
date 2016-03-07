@@ -19,5 +19,5 @@ use Symfony\Component\HttpFoundation\Request;
  */
 interface ControllerHandlerInterface {
 
-    public function handle(Request $request, array $matchedRoute);
+    public function handle(Request $request);
 }
