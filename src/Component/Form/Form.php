@@ -232,11 +232,29 @@ abstract class Form {
         return $result;
     }
 
+    /**
+     * Get a field from the POST or GET variables
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
     protected function getField($name, $default = null) {
         if (array_key_exists($name, $this->fields)) {
             return $this->fields[$name];
         } else {
             return $default;
+        }
+    }
+
+    /**
+     * Checks if a given field is blank and add an error to the errors list
+     * @param string $field
+     * @param string $message
+     * @param array $context
+     */
+    protected function assertNotBlank($field, $message, array $context = []) {
+        if (empty($this->getField($field))) {
+            $this->addError($message, $context);
         }
     }
 
