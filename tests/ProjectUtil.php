@@ -16,6 +16,9 @@ use Blend\ProjectSetup\SetupApplication;
 use Symfony\Component\Console\Tester\CommandTester;
 use Composer\Autoload\ClassLoader;
 use Blend\Component\DI\Container;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Session\Storage\MockFileSessionStorage;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * ProjectUtil is a utility class for creating sub-project and run console
@@ -113,6 +116,10 @@ class ProjectUtil {
         }
         $merge = array_merge($merge, $services);
         file_put_contents($servicesFile, json_encode($merge));
+    }
+
+    public static function addSession(Request $request) {
+        $request->setSession(new Session(new MockFileSessionStorage(TEMP_DIR)));
     }
 
 }
