@@ -50,7 +50,13 @@ abstract class Form {
     /**
      * @var boolean
      */
-    protected $hasErrors;
+    private $hasErrors;
+
+    /**
+     *
+     * @var array
+     */
+    protected $fields;
 
     protected abstract function validateState($submitted);
 
@@ -64,6 +70,7 @@ abstract class Form {
         $this->csrf_key = crc32($request->getPathInfo());
         $this->session = $request->getSession();
         $this->formid = '_form_' . $this->csrf_key;
+        $this->fields = array_merge($request->query->all(), $request->request->all());
         $this->stateStorage = $this->session->get($this->formid
                 , $this->createStateStorage());
     }
@@ -89,7 +96,7 @@ abstract class Form {
         return array_merge(
                 $this->getDefaultValues()
                 , $this->stateStorage['savedValues']
-                , $this->request->request->all()
+                , $this->fields
         );
     }
 
@@ -173,8 +180,9 @@ abstract class Form {
      */
     protected function addMessage($type, $message, array $context = []) {
         if (!isset($this->stateStorage['messages'][$type])) {
-            $this->stateStorage['messages'][$type][] = [$message, $context];
+            $this->stateStorage['messages'][$type] = [];
         }
+        $this->stateStorage['messages'][$type][] = [$message, $context];
     }
 
     /**
@@ -222,6 +230,14 @@ abstract class Form {
         $result = $this->stateStorage['messages'];
         $this->stateStorage['messages'] = [];
         return $result;
+    }
+
+    protected function getField($name, $default = null) {
+        if (array_key_exists($name, $this->fields)) {
+            return $this->fields[$name];
+        } else {
+            return $default;
+        }
     }
 
 }
