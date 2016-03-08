@@ -70,7 +70,8 @@ abstract class Form {
         $this->csrf_key = crc32($request->getPathInfo());
         $this->session = $request->getSession();
         $this->formid = '_form_' . $this->csrf_key;
-        $this->fields = array_merge($request->query->all(), $request->request->all());
+        $this->fields = array_merge($request->query->all()
+                , $request->request->all());
         $this->stateStorage = $this->session->get($this->formid
                 , $this->createStateStorage());
     }
