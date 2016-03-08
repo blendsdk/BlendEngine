@@ -259,4 +259,18 @@ abstract class Form {
         }
     }
 
+    /**
+     * Checks if the given fields have the same value and add an error to
+     * the errors list
+     * @param string $field1
+     * @param string $field2
+     * @param string $message
+     * @param array $context
+     */
+    protected function assertSameValue($field1, $field2, $message, array $context = []) {
+        if ($this->getField($field1) !== $this->getField($field2)) {
+            $this->addError($message, array_merge($context, ['field1' => $field1, 'field2' => $field2]));
+        }
+    }
+
 }
