@@ -51,10 +51,14 @@ class ControllerHandler implements ControllerHandlerInterface {
         $controller = $request->attributes->get('_controller');
         if ($this->isArrayDefinition($controller)) {
             $result = $this->container->call($controller[0], $controller[1], $request->attributes->all());
-            if ($request->attributes->get('_json_response', false)) {
-                return new JsonResponse($result);
+            if ($result instanceof Response) {
+                return $result;
             } else {
-                return new Response($result);
+                if ($request->attributes->get('_json_response', false)) {
+                    return new JsonResponse($result);
+                } else {
+                    return new Response($result);
+                }
             }
         } else {
             $error = "The _controller is has an invalid [controller,action] signature!" .
