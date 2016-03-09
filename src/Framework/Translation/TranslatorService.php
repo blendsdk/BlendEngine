@@ -12,27 +12,18 @@
 namespace Blend\Framework\Translation;
 
 use Symfony\Component\Translation\MessageSelector;
-use Symfony\Component\Translation\Translator as TranslatorBase;
-use Symfony\Component\Translation\Loader\LoaderInterface;
+use Blend\Component\Translation\Translator;
 
 /**
- * Description of Translator
+ * TranslatorService is a customized Translator to be used in the application's
+ * Service container
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class TranslatorService extends TranslatorBase {
+class TranslatorService extends Translator {
 
     public function __construct($locale, $cacheDir = null, $debug = false) {
         parent::__construct($locale, new MessageSelector(), $cacheDir, $debug);
-    }
-
-    public function addLoader($format, LoaderInterface $loader) {
-        /**
-         * Override to skip the existsing loaders
-         */
-        if (!array_key_exists($format, $this->getLoaders())) {
-            parent::addLoader($format, $loader);
-        }
     }
 
 }

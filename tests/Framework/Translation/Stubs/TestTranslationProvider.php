@@ -12,7 +12,7 @@
 namespace Blend\Tests\Framework\Translation\Stubs;
 
 use Blend\Component\Translation\TranslationProviderInterface;
-use Symfony\Component\Translation\Translator;
+use Blend\Component\Translation\Translator;
 use Blend\Component\DI\Container;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
@@ -24,7 +24,9 @@ use Symfony\Component\Translation\Loader\ArrayLoader;
 class TestTranslationProvider implements TranslationProviderInterface {
 
     public function configure(Translator $translator, Container $container) {
-        $translator->addLoader('array', new ArrayLoader());
+        if (!$translator->hasLoader('array')) {
+            $translator->addLoader('array', new ArrayLoader());
+        }
         $resource = [
             'Good morning :name!' => 'Bari louys :name!'
         ];

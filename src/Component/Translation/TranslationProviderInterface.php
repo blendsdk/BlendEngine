@@ -12,7 +12,7 @@
 namespace Blend\Component\Translation;
 
 use Blend\Component\DI\Container;
-use Symfony\Component\Translation\Translator;
+use Blend\Component\Translation\Translator;
 
 /**
  *
