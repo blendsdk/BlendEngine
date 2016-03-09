@@ -12,7 +12,7 @@
 namespace Blend\Component\Translation;
 
 use Blend\Component\DI\Container;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Translation\Translator;
 
 /**
  *
@@ -20,5 +20,5 @@ use Symfony\Component\Translation\TranslatorInterface;
  */
 interface TranslationProviderInterface {
 
-    public function configure(TranslatorInterface $translator, Container $container);
+    public function configure(Translator $translator, Container $container);
 }

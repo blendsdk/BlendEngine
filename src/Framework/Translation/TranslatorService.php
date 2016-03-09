@@ -20,7 +20,7 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Translator extends TranslatorBase {
+class TranslatorService extends TranslatorBase {
 
     public function __construct($locale, $cacheDir = null, $debug = false) {
         parent::__construct($locale, new MessageSelector(), $cacheDir, $debug);

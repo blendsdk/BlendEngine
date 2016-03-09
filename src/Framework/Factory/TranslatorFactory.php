@@ -12,11 +12,11 @@
 namespace Blend\Framework\Factory;
 
 use Blend\Component\DI\ObjectFactoryInterface;
-use Blend\Framework\Translation\Translator;
-use Symfony\Component\Translation\TranslatorInterface;
+use Blend\Framework\Translation\TranslatorService;
 use Blend\Component\Translation\TranslationProviderInterface;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\DI\Container;
+use Blend\Component\Filesystem\Filesystem;
 
 /**
  * Description of TranslatorFactory
@@ -35,15 +35,15 @@ class TranslatorFactory implements ObjectFactoryInterface {
      */
     protected $config;
 
-    public function __construct(Container $container, Configurationi $config) {
+    public function __construct(Container $container, Configuration $config) {
         $this->container = $container;
         $this->config = $config;
     }
 
     public function create() {
-        $translator = new Translator(
+        $translator = new TranslatorService(
                 $this->getCurrentLocale()
-                , $this->config->get('app.root.folder', sys_get_temp_dir())
+                , $this->getCacheFolder()
                 , $this->config->get('debug', false)
         );
         $providers = $this->container
@@ -52,12 +52,18 @@ class TranslatorFactory implements ObjectFactoryInterface {
             /* @var $provider TranslationProviderInterface */
             $provider->configure($translator, $this->container);
         }
-        return [TranslatorInterface::class, $translator];
+        return $translator;
     }
 
-    public function getCurrentLocale() {
+    private function getCacheFolder() {
+        /* @var $fs Filesystem */
+        $fs = $this->container->get(Filesystem::class);
+        return $fs->assertFolderWritable($this->config->get('app.root.folder') . '/var/cache');
+    }
+
+    private function getCurrentLocale() {
         if ($this->container->isDefined('_locale')) {
-            return $this->container->get(('_locale'));
+            return $this->container->get('_locale');
         } else {
             return $this->config->get('translation.defaultLocale', null);
         }
