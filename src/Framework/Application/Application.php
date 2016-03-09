@@ -155,19 +155,21 @@ abstract class Application extends BaseApplication {
     }
 
     protected function initializeSession(Request $request) {
-        if (!$this->container->isDefined(SessionProviderInterface::class)) {
-            $savePath = $this->filesystem->assertFolderWritable($this->rootFolder . '/var/session');
-            $this->container->defineSingletonWithInterface(
-                    SessionProviderInterface::class
-                    , NativeSessionProvider::class
-                    , ['save_path' => $savePath]
-            );
+        if (!$request->hasSession()) {
+            if (!$this->container->isDefined(SessionProviderInterface::class)) {
+                $savePath = $this->filesystem->assertFolderWritable($this->rootFolder . '/var/session');
+                $this->container->defineSingletonWithInterface(
+                        SessionProviderInterface::class
+                        , NativeSessionProvider::class
+                        , ['save_path' => $savePath]
+                );
+            }
+            /* @var $provider SessionProviderInterface */
+            $provider = $this->container->get(SessionProviderInterface::class);
+            $provider->initializeSession($request);
+            $this->container->setScalar(SessionInterface::class
+                    , $provider->getSession());
         }
-        /* @var $provider SessionProviderInterface */
-        $provider = $this->container->get(SessionProviderInterface::class);
-        $provider->initializeSession($request);
-        $this->container->setScalar(SessionInterface::class
-                , $provider->getSession());
     }
 
     protected function finalizeResponse(Response $response) {
