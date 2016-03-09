@@ -18,7 +18,6 @@ use Blend\Tests\Framework\Application\Stubs\DummyApplication;
 use Symfony\Component\HttpFoundation\Request;
 use Blend\Tests\Framework\Application\Stubs\TestableApplication;
 use Blend\Tests\Framework\Application\Stubs\CustomRequestExceptionHandler;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  * Description of ApplicationFactoryTest

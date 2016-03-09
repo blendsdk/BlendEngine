@@ -5,6 +5,7 @@ namespace Acme;
 use Symfony\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Blend\Component\Routing\RouteProviderInterface;
+use Blend\Component\Routing\RouteBuilder;
 use Acme\AcmeController;
 
 /**
@@ -14,10 +15,8 @@ use Acme\AcmeController;
  */
 class Acme implements RouteProviderInterface {
 
-    public function loadRoutes(RouteCollection $collection) {
-        $collection->add('home', new Route('/', [
-            '_controller' => [AcmeController::class, 'index']
-        ]));
+    public function loadRoutes(RouteBuilder $builder) {
+        $builder->route('home', '/{_locale}', [AcmeController::class, 'index']);
     }
 
 }
