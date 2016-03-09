@@ -6,9 +6,7 @@ BlendEngine is a web application framework written using Symfony Components.
 Customized to sit somewhere between Silex and Symfony. It has several core
 components for creating web applications and public facing websites.
 
-At the heart of BlendEngine sits a DI container which takes care of auto-wiring 
-
-Current built-in functionality:
+### Current built-in functionality:
 
     - Dependency Injection Container, and a Service Container.
 
