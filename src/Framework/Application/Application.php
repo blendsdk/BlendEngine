@@ -38,6 +38,8 @@ use Blend\Component\Session\SessionProviderInterface;
 use Blend\Component\Session\NativeSessionProvider;
 use Blend\Component\Filesystem\Filesystem;
 use Blend\Component\Routing\RouteBuilder;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Generator\UrlGenerator;
 
 /**
  * Application
@@ -193,14 +195,28 @@ abstract class Application extends BaseApplication {
     }
 
     /**
+     * Prepares the Routing and the UrlGenerator
      * @param Request $request
-     * @return array
+     * @return type
      */
-    protected function matchRequestToRoutes(Request $request) {
-        $routes = $this->collectRoutes();
-        $this->container->setScalar(RouteCollection::class, $routes);
+    protected function prepareRouting(Request $request) {
         $context = new RequestContext();
+
+        $routes = $this->collectRoutes();
         $context->fromRequest($request);
+        $urlgen = new UrlGenerator($routes, $context, $this->logger);
+
+        $this->container->setScalars([
+            RouteCollection::class => $routes,
+            RequestContext::class => $context,
+            UrlGeneratorInterface::class => $urlgen
+        ]);
+
+        return [$routes, $context];
+    }
+
+    protected function matchRequestToRoutes(Request $request) {
+        list($routes, $context) = $this->prepareRouting($request);
         $matcher = new UrlMatcher($routes, $context);
         return $matcher->match($request->getPathInfo());
     }
