@@ -39,7 +39,7 @@ use Blend\Component\Session\NativeSessionProvider;
 use Blend\Component\Filesystem\Filesystem;
 use Blend\Component\Routing\RouteBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Routing\Generator\UrlGenerator;
+use Blend\Component\Routing\Generator\UrlGenerator;
 
 /**
  * Application
@@ -204,13 +204,14 @@ abstract class Application extends BaseApplication {
 
         $routes = $this->collectRoutes();
         $context->fromRequest($request);
-        $urlgen = new UrlGenerator($routes, $context, $this->logger);
 
         $this->container->setScalars([
             RouteCollection::class => $routes,
             RequestContext::class => $context,
-            UrlGeneratorInterface::class => $urlgen
         ]);
+
+        $this->container->defineSingletonWithInterface(
+                UrlGeneratorInterface::class, UrlGenerator::class);
 
         return [$routes, $context];
     }
