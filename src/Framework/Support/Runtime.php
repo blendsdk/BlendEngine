@@ -24,12 +24,21 @@ use Blend\Framework\Support\RuntimeProviderInterface;
 abstract class Runtime implements RuntimeProviderInterface {
 
     /**
-     * @var Container 
+     * @var Container
      */
     protected $container;
 
+    /**
+     * @var string
+     */
+    protected $name;
+
     public function __construct(Container $container) {
         $this->container = $container;
+    }
+
+    public function getApplicationName() {
+        return $this->name;
     }
 
     public function getAppRootFolder() {
@@ -38,6 +47,10 @@ abstract class Runtime implements RuntimeProviderInterface {
 
     public function getAppCacheFolder() {
         return $this->get('_app_cache_folder');
+    }
+
+    public function isDebug() {
+        return $this->get('_debug');
     }
 
     public function set($key, $value) {

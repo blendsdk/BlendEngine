@@ -11,4 +11,6 @@ use Blend\Framework\Support\Runtime;
  */
 class <?php echo $applicationName;?>Runtime extends Runtime {
 
+    protected $name = '<?php echo $applicationName?>';
+
 }

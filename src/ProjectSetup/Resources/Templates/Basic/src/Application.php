@@ -11,6 +11,4 @@ use Blend\Framework\Application\Application as Base;
  */
 class <?php echo $applicationClassName;?> extends Base {
 
-    protected $name = '<?php echo $applicationName?>';
-
 }

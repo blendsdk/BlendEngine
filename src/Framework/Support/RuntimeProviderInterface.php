@@ -16,5 +16,16 @@ namespace Blend\Framework\Support;
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 interface RuntimeProviderInterface {
-   
+
+    public function getApplicationName();
+
+    public function getAppRootFolder();
+
+    public function getAppCacheFolder();
+
+    public function set($key, $value);
+
+    public function get($key, $default = null);
+
+    public function isDebug();
 }
