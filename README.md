@@ -20,7 +20,7 @@ components for creating web applications and public facing websites.
 
     - Data Models: Generic data mapper and builder for ORM, not Doctrine!
 
-    - Twig: Support for Twig template engine.
+    - Template: Support for Twig, and Raw PHP templates.
 
     - JSON configuration: configuration files are in JSON, not .yml.
 
