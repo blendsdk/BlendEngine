@@ -259,7 +259,7 @@ class Container {
         $callSignature = [];
         if ($ref->isInterface()) {
             throw new InvalidConfigException(
-            "Interface type [$type] cannot be defined in the DI Container!");
+            "Interface type [$type] cannot be defined in the DI Container!", 1000);
         }
 
         if ($method === null) {
@@ -363,7 +363,20 @@ class Container {
         foreach ($callSignature as $name => $type) {
             if (!isset($callParams[$name])) {
                 if ($this->isDefined($name) || $this->isDefined($type) || !$this->isBuiltInType($type)) {
-                    $callParams[$name] = $this->get(is_null($type) ? $name : $type);
+                    $ptype = is_null($type) ? $name : $type;
+                    try {
+                        $callParams[$name] = $this->get($ptype);
+                    } catch (InvalidConfigException $exc) {
+                        /**
+                         * If the ptype is an interface and there is no class
+                         * defined for it and also there is not default argument
+                         * then throw the exception, otherwise we will go further
+                         * with that default argument
+                         */
+                        if ($exc->getCode() === 1000 && !in_array($name, $callParams)) {
+                            throw $exc;
+                        }
+                    }
                 }
             }
         }
