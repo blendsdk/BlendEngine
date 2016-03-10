@@ -42,3 +42,20 @@ components for creating web applications and public facing websites.
 
     - Form Processing: Easy Form processing, included built-in POST->Redirect-GET
 
+## Requirements
+
+BlendEngine requires the following componenets:
+
+     - PHP 5.6    : Is required and must be available from the command prompt.
+     - composer   : Is required and must be available from the command prompt.
+     - compass    : Required if you want to be able to compile the sass files to css
+     - PostgreSQL : Required if your application needs to work with a database (We don't support MySQL)
+
+### Getting Started
+
+To create a starter project run the following command from bash:
+```bash
+curl -s  blendsdk.github.io/create-app | bash -s -- MyProject
+cd MyProject
+bin/myproject serve
+```
