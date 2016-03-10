@@ -39,6 +39,7 @@ use Blend\Component\Filesystem\Filesystem;
 use Blend\Component\Routing\RouteBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Blend\Component\Routing\Generator\UrlGenerator;
+use Blend\Framework\Support\RuntimeProviderInterface;
 
 /**
  * Application
@@ -123,7 +124,26 @@ abstract class Application extends BaseApplication {
             $this->logger->notice(
                     "No service description file found!");
         }
+        $this->checkAndInstallRuntimeProvider();
         $this->installEventSubscribers();
+    }
+
+    /**
+     * Check and install the application specific Runtime object to be recalled
+     * and used by its interface name
+     */
+    protected function checkAndInstallRuntimeProvider() {
+        /**
+         * Should the application have a customized Runtime environment
+         * then we set by its interface name. This creates a duplicate entry
+         * in the DI Container since it does not support interface aliases!
+         */
+        $providers = $this->container
+                ->getByInterface(RuntimeProviderInterface::class);
+        if (count($providers) === 1) {
+            $this->container
+                    ->setScalar(RuntimeProviderInterface::class, $providers[0]);
+        }
     }
 
     protected function handleRequest(Request $request) {
