@@ -72,7 +72,7 @@ class ProjectUtil {
      * @param boolean $rebuild
      * @return string
      */
-    public static function createNewProject($projectName, $rebuild = false) {
+    public static function createNewProject($projectName, $rebuild = false, $deleteServices = true) {
 
         $fs = new Filesystem();
         $projectFolder = TEMP_DIR . '/TestProjects/' . $projectName;
@@ -85,7 +85,9 @@ class ProjectUtil {
         $fs->ensureFolder($projectFolder);
         $projectFolder = realpath($projectFolder);
         self::runCommand($projectFolder, 'project:init');
-        file_put_contents($projectFolder . '/config/services.json', json_encode([]));
+        if ($deleteServices) {
+            file_put_contents($projectFolder . '/config/services.json', json_encode([]));
+        }
         return $projectFolder;
     }
 
