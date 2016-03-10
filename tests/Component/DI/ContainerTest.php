@@ -169,4 +169,14 @@ class ContainerTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals(['a', 'arg2', 'b'], $result);
     }
 
+    public function testReplaceScalarTest() {
+        $c = new Container();
+
+        $c->setScalar('_test', 100);
+        $this->assertEquals(100, $c->get('_test'));
+
+        $c->setScalar('_test', 200);
+        $this->assertEquals(200, $c->get('_test'));
+    }
+
 }

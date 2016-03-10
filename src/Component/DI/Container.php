@@ -156,11 +156,16 @@ class Container {
      * @param mixed $value
      */
     public function setScalar($name, $value) {
-        $this->define($name, [
-            'kind' => 'x',
-            'type' => gettype($value),
-            'params' => [$value]
-        ]);
+        if (isset($this->definitions[$name]) && $this->definitions[$name]['kind'] === 'x') {
+            // replace the scalar if it exists
+            $this->definitions[$name]['params'] = [$value];
+        } else {
+            $this->define($name, [
+                'kind' => 'x',
+                'type' => gettype($value),
+                'params' => [$value]
+            ]);
+        }
     }
 
     /**
