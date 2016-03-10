@@ -43,4 +43,8 @@ class PhpEngine implements EngineInterface {
         return array_merge($this->defaults, $parameters);
     }
 
+    public function setViewPaths(array $paths = array()) {
+        return false;
+    }
+
 }
