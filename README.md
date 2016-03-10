@@ -28,8 +28,8 @@ components for creating web applications and public facing websites.
 
     - SwiftMailer: Provides functionality to send e-mails.
 
-    - Session Handling: Native (php native) session handling by defaults but
-        customizable to Redis or Memcache
+    - Session Handling: Native (php native) session handling by default but
+        customizable to use Redis or Memcache
 
     - Text and JSON Response: Creates the correct HTTP response based on
         controller/action return values
