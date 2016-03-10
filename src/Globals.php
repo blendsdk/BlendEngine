@@ -105,7 +105,7 @@ if (!function_exists('sqlstr')) {
 if (!function_exists('render_php_template')) {
 
     /**
-     * Renders a PHP template (view) and retusn the results either as string
+     * Renders a PHP template (view) and returns the results either as string
      * or writes the contents to a file
      * @param string $templateFile The template (view) to render
      * @param array $context An key/valye array pass to the template
