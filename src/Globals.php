@@ -117,6 +117,7 @@ if (!function_exists('render_php_template')) {
         if (is_array($context)) {
             extract($context, EXTR_PREFIX_SAME, 'data');
         }
+        ini_set('short_open_tag', 1);
         ob_start();
         ob_implicit_flush(false);
         require($templateFile);
@@ -124,6 +125,7 @@ if (!function_exists('render_php_template')) {
         if (!is_null($outputFile)) {
             file_put_contents($outputFile, $result);
         }
+        ini_set('short_open_tag', 0);
         return $result;
     }
 
