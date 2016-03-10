@@ -11,6 +11,7 @@
 
 namespace Blend\Framework\Application;
 
+use Blend\Component\DI\Container;
 use Psr\Log\LoggerInterface;
 use Blend\Component\Cache\LocalCache;
 use Blend\Component\Application\Application as BaseApplication;
@@ -19,7 +20,6 @@ use Blend\Component\Configuration\Configuration;
 use Blend\Component\Routing\RouteProviderInterface;
 use Blend\Component\HttpKernel\Event\GetResponseEvent;
 use Blend\Component\HttpKernel\Event\GetExceptionResponseEvent;
-use Blend\Component\DI\Container;
 use Blend\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,7 +27,6 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\EventDispatcher\EventDispatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Blend\Component\HttpKernel\Event\GetControllerResponseEvent;
@@ -113,7 +112,10 @@ abstract class Application extends BaseApplication {
             LocalCache::class => $this->localCache,
             EventDispatcherInterface::class => $this->dispatcher,
             Container::class => $this->container,
-            Filesystem::class => $this->filesystem
+            Filesystem::class => $this->filesystem,
+            '_app_root_folder' => $this->rootFolder,
+            '_app_cache_folder' => $this->localCache->getCacheFolder(),
+            '_debug' => $config->get('debug', false)
         ]);
 
         if (!$this->container->loadServicesFromFile($this->rootFolder
