@@ -42,6 +42,9 @@ class ConfigurationFactory implements ObjectFactoryInterface {
             $config = Configuration::createFromFile($configFile);
             $config->dump($cacheFile);
         }
+        if (!$config->has('debug')) {
+            $config->mergeWith(['debug' => $this->debug]);
+        }
         return $config;
     }
 
