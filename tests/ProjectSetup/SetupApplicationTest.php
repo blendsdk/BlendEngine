@@ -18,7 +18,7 @@ use Blend\Tests\ProjectUtil;
 class SetupApplicationTest extends \PHPUnit_Framework_TestCase {
 
     public function testSanity() {
-        $projectFolder = ProjectUtil::createNewProject('sanity', true);
+        $projectFolder = ProjectUtil::createNewProject('sanity', true, false);
         $this->assertTrue(file_exists("$projectFolder/bin/sanity.php"));
         $this->assertTrue(file_exists("$projectFolder/web/css/sanity.css"));
         $commandTester = ProjectUtil::runCommand($projectFolder, 'list', ['-V --no-ansi'], 'Sanity\Console\SanityApplication');

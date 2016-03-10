@@ -1,3 +1,4 @@
 {
+    "<?php echo $applicationNamespace;?>\\<?php echo $applicationClassName;?>Runtime": "<?php echo $applicationNamespace;?>\\<?php echo $applicationClassName;?>Runtime",
     "acme-module": "Acme\\Acme"
 }

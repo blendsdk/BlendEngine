@@ -135,19 +135,22 @@ class InitCommand extends Command {
             'src/Console/Application.php' => 'src/Console/' . $applicationCommandClassName . '.php',
             'src/Application.php' => 'src/' . $applicationClassName . '.php',
             'web/app_dev.php' => 'web/' . $lowerName . '_dev.php',
-            'web/app.php' => 'web/' . $lowerName . '.php'
+            'web/app.php' => 'web/' . $lowerName . '.php',
+            'src/Runtime.php' => 'src/' . $applicationName . 'Runtime.php',
         );
 
         $this->renderTable = array(
             'phpunit.xml.dist',
             'tests/README',
             'config/config.json',
+            'config/services.json',
             'bin/app',
             'bin/app.bat',
             'bin/app.php',
             'composer.json',
             'src/Console/Application.php',
             'src/Application.php',
+            'src/Runtime.php',
             'web/app_dev.php',
             'web/app.php'
         );
