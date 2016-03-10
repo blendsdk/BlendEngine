@@ -133,4 +133,11 @@ class LocalCache {
         }
     }
 
+    /**
+     * Retuns the path to the cache folder
+     */
+    public function getCacheFolder() {
+        return $this->cacheFolder;
+    }
+
 }
