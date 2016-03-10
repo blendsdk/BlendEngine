@@ -79,11 +79,11 @@ class TwigServiceTest extends \PHPUnit_Framework_TestCase {
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
         ProjectUtil::appendOrCreateServicesConfig($projectFolder, [
+            "twig-module" => TwigModule::class,
             'locale-service' => LocaleService::class,
             TranslatorInterface::class => TranslatorFactory::class,
             'test-translations' => TestTranslationProvider::class,
             EngineInterface::class => TwigEngineService::class,
-            "twig-module" => TwigModule::class
         ]);
         $factory = new ApplicationFactory($clazz, $projectFolder, true);
         /* @var $app TestableApplication */
