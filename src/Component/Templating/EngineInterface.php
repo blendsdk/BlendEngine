@@ -18,4 +18,6 @@ namespace Blend\Component\Templating;
 interface EngineInterface {
 
     public function render($view, array $parameters = []);
+
+    public function setViewPaths(array $paths = []);
 }
