@@ -25,6 +25,11 @@ class TwigEngine implements EngineInterface {
      */
     protected $twigEnvironment;
 
+    /**
+     * @var Twig_Loader_Filesystem
+     */
+    protected $loader;
+
     public function __construct($viewRootFolder, $cacheFolder, $debug = false) {
         $this->twigEnvironment = $this->createTwig($viewRootFolder
                 , $cacheFolder
@@ -39,8 +44,8 @@ class TwigEngine implements EngineInterface {
      * @return \Twig_Environment
      */
     protected function createTwig($viewRootFolder, $cacheFolder, $debug) {
-        $loader = new \Twig_Loader_Filesystem($viewRootFolder);
-        $twig = new \Twig_Environment($loader);
+        $this->loader = new \Twig_Loader_Filesystem($viewRootFolder);
+        $twig = new \Twig_Environment($this->loader);
         $twig->enableStrictVariables();
         if ($debug === true) {
             $twig->enableDebug();
@@ -53,6 +58,10 @@ class TwigEngine implements EngineInterface {
 
     public function render($view, array $parameters = array()) {
         return $this->twigEnvironment->render($view, $parameters);
+    }
+
+    public function setViewPaths(array $paths = array()) {
+        $this->loader->setPaths($paths);
     }
 
 }
