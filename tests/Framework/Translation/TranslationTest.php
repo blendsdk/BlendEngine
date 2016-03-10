@@ -52,7 +52,7 @@ class TranslationTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('Bari louys Blend!', $translator->trans('Good morning :name!', [
                     ':name' => 'Blend'
         ]));
-        //self::$cleanup[] = $projectFolder;
+        self::$cleanup[] = $projectFolder;
     }
 
     public static function tearDownAfterClass() {
