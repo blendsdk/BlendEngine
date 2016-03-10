@@ -58,7 +58,7 @@ class TranslatorFactory implements ObjectFactoryInterface {
     private function getCacheFolder() {
         /* @var $fs Filesystem */
         $fs = $this->container->get(Filesystem::class);
-        return $fs->assertFolderWritable($this->config->get('app.root.folder') . '/var/cache');
+        return $fs->assertFolderWritable($this->container->get('_app_cache_folder'));
     }
 
     private function getCurrentLocale() {
