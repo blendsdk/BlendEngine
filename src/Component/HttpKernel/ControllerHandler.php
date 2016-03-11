@@ -50,7 +50,12 @@ class ControllerHandler implements ControllerHandlerInterface {
         $this->assertControllerKey($request);
         $controller = $request->attributes->get('_controller');
         if ($this->isArrayDefinition($controller)) {
-            $result = $this->container->call($controller[0], $controller[1], $request->attributes->all());
+            $result = $this->container->call($controller[0]
+                    , $controller[1]
+                    ,  array_merge($request->attributes->all()
+                            ,$request->request->all()
+                            ,$request->query->all())
+                    );
             if ($result instanceof Response) {
                 return $result;
             } else {
