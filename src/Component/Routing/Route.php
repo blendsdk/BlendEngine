@@ -82,7 +82,8 @@ class Route extends RouteBase {
 
     /**
      * Mark a Route as API route, This will trigger the Security service to
-     * handle the route differently
+     * handle the route differently and the responses that are retuned from
+     * the controller->action will be converted to a JSON response
      * @return \Blend\Component\Routing\Route
      */
     public function setAPIRoute() {
