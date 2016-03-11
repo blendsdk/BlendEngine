@@ -84,7 +84,7 @@ class ProjectUtil {
 
         $fs->ensureFolder($projectFolder);
         $projectFolder = realpath($projectFolder);
-        self::runCommand($projectFolder, 'project:init');
+        self::runCommand($projectFolder, 'init');
         if ($deleteServices) {
             file_put_contents($projectFolder . '/config/services.json', json_encode([]));
         }

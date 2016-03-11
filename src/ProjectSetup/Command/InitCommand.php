@@ -88,7 +88,7 @@ class InitCommand extends Command {
         $this->applicationName = str_identifier((new \SplFileInfo($this->workFolder))->getBasename());
         $this->prepareTablesAndContext();
         $this->templates = $this->getTemplateNames();
-        $this->setName('project:init')
+        $this->setName('init')
                 ->setDescription('Initializes a new BlendEngine project in [' . $this->workFolder . ']')
                 ->addOption('template', 't', InputOption::VALUE_OPTIONAL, 'Name of the template to generate this project (' . implode(',', $this->templates) . ')', 'Basic')
                 ->addOption('appname', 'a', InputOption::VALUE_OPTIONAL, 'Name of the application to generate', $this->applicationName);
