@@ -13,6 +13,7 @@ namespace Blend\Framework\Support\Runtime;
 
 use Blend\Component\DI\Container;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
+use Blend\Framework\Security\User\Guest;
 
 /**
  * Runtime is essencially a wrapper around the Container that can be used
@@ -63,6 +64,15 @@ abstract class Runtime implements RuntimeProviderInterface {
         } else {
             return $default;
         }
+    }
+
+    /**
+     * Returns the current user, if no user is authenticated it will return
+     * a Guest user
+     * @return \Blend\Framework\Security\User\UserProviderInterface
+     */
+    public function getCurrentUser() {
+        return $this->get('_current_user',new Guest());
     }
 
 }
