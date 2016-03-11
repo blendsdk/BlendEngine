@@ -55,4 +55,8 @@ class Guest implements UserProviderInterface {
         return true;
     }
 
+    public function getAPIKey() {
+        return null;
+    }
+
 }

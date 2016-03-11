@@ -18,6 +18,7 @@ namespace Blend\Framework\Security\User;
 interface UserProviderInterface {
 
     public function getUserID();
+    public function getAPIKey();
     public function getUsername();
     public function getEmail();
     public function getRoles();
