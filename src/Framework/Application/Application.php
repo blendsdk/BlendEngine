@@ -258,7 +258,7 @@ abstract class Application extends BaseApplication {
         } else if ($request->attributes->get('_json_response', false)) {
             return $this->createJSONExceptionResponse($ex);
         } else {
-            $response = new Response($ex->getMessage(), $ex->getCode());
+            $response = new Response($ex->getMessage(), 500);
         }
         $this->logger->error($ex->getMessage(), $ex->getTrace());
         return $response;
@@ -275,7 +275,7 @@ abstract class Application extends BaseApplication {
             'code' => $ex->getCode(),
             'exception' => true,
             'exceptionTyle' => get_class($ex)
-                ], $ex->getCode());
+                ], 500);
     }
 
     /**
