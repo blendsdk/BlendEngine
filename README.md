@@ -42,6 +42,8 @@ components for creating web applications and public facing websites.
 
     - Form Processing: Easy Form processing, included built-in POST->Redirect-GET
 
+    - JSON API: Built-in functionality to create JSON (REST-ish) APIs
+
 ## Requirements
 
 BlendEngine requires the following componenets:
