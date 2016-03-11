@@ -41,6 +41,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Blend\Component\Routing\Generator\UrlGenerator;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Blend\Framework\Security\SecurityHandler;
 
 /**
  * Application
@@ -119,6 +120,14 @@ abstract class Application extends BaseApplication {
             '_app_cache_folder' => $this->localCache->getCacheFolder(),
             '_debug' => $config->get('debug', false)
         ]);
+
+        /**
+         * Adds the SecurityHandler class by default. This will
+         * add a small overdead to the request/response cycle
+         * but we gain functionality by having a _current_user
+         * when possible
+         */
+        $this->container->defineClass(SecurityHandler::class);
 
         if (!$this->container->loadServicesFromFile($this->rootFolder
                         . '/config/services.json')) {
