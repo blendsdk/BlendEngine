@@ -23,4 +23,8 @@ class KernelEvents {
     const CONTROLLER_RESPONSE = 'http.controller.response';
     const FINALIZE_RESPONSE = 'http.finalize.response';
 
+    const PRIORITY_HIGHT = 1500;
+    const PRIORITY_MEDIUM = 1000;
+    CONST PRIORITY_LOW = 500;
+
 }
