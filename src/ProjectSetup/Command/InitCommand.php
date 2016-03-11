@@ -191,12 +191,23 @@ class InitCommand extends Command {
             $fs->ensureFolder($folder, 0777);
         }
     }
-    
+
     private function syncServices(InputInterface $input, OutputInterface $output) {
         $command = new ServicesSyncCommand();
         $command->setApplicationFolder($this->workFolder);
         $this->getApplication()->add($command);
         $command->run($input, $output);
+        $context = $this->createRenderContext();
+        $output->writeln("");
+        $output->writeln("You can edit the {$command->getServiceFile()},");
+        $output->writeln("then run <info>bin/{$context['applicationScriptName']} " .
+                "{$command->getName()}</info> to synchronize the " .
+                "<info>config/services.json</info> file.");
+        $output->writeln(
+                [""
+                    , "<info>Thank you for using BlendEngine :)</info>"
+                    , "<info>Enjoy!</info>"]
+        );
     }
 
     /**

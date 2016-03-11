@@ -26,7 +26,14 @@ use Blend\Component\Exception\InvalidConfigException;
  */
 class ServicesSyncCommand extends Command {
 
+    /**
+     * @var string
+     */
     private $arrayFile;
+
+    /**
+     * @var string
+     */
     private $appFolder;
 
     protected function configure() {
@@ -34,17 +41,27 @@ class ServicesSyncCommand extends Command {
                 ->setDescription('Generates a new services.json file from a PHP array')
                 ->addArgument('arrayFile', InputArgument::OPTIONAL, "The PHP array file to run");
     }
-    
+
     public function setApplicationFolder($folder) {
+        /**
+         * This function is called internally by the InitCommand
+         */
         $this->appFolder = $folder;
     }
 
+    public function getServiceFile() {
+        /**
+         * This function is called internally by the InitCommand
+         */
+        return $this->arrayFile;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output) {
-        
-        if(!empty($this->appFolder)) {
+
+        if (!empty($this->appFolder)) {
             $this->container->setScalar('rootFolder', $this->appFolder);
         }
-        
+
         $this->checkAndSetArrayFile();
         $info = pathinfo($this->arrayFile);
         $services = require($this->arrayFile);
