@@ -11,17 +11,17 @@ use Blend\Framework\Factory\TranslatorFactory;
 
 return [
     /**
-     * <?php echo $applicationName;?>Runtime will help you to gain access 
-     * to the application's Dependency Injection Container. 
+     * <?php echo $applicationName;?>Runtime will help you to gain access
+     * to the application's Dependency Injection Container.
      * DO NOT REMOVE THIS SERVICE! YOUR APPLICATION MIGHT STOP WORKING!
      */
     "<?php echo $applicationNamespace;?>\\<?php echo $applicationName;?>Runtime" => "<?php echo $applicationNamespace;?>\\<?php echo $applicationName;?>Runtime",
-    
+
     /**
      * Example of how you can add your custom modules to your application.
      */
     "acme-module" => Acme::class,
-    
+
     /**
      * Uncomment if you need multi-language option in your application.
      * The LocaleService will automatically handle the {_locale}
@@ -40,6 +40,10 @@ return [
      * check the config.json->database
      */
     //Database::class => DatabaseFactory::class,
+
+    /**
+     * The Twig template parser engine
+     */
     EngineInterface::class => TwigEngineService::class
 ];
 
