@@ -52,6 +52,10 @@ class Route extends RouteBase {
         return $this;
     }
 
+    public function getAccessMethod() {
+        return $this->getDefault('_access_method');
+    }
+
     /**
      * Sets the roles for this Route
      * @param string/array $roles Cna be a comma seperated string or an array
