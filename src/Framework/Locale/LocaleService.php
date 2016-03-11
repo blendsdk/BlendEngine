@@ -101,7 +101,8 @@ class LocaleService implements EventSubscriberInterface {
 
     public static function getSubscribedEvents() {
         return [
-            KernelEvents::REQUEST => ['onRequest', 1000]
+            KernelEvents::REQUEST => ['onRequest'
+                , KernelEvents::PRIORITY_HIGHT + 1000]
         ];
     }
 
