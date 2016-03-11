@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Blend\Component\Templating\Twig\Extension\EuroCurrencyExtension;
 use Blend\Component\Templating\Twig\Extension\RoutingExtension;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Blend\Framework\Support\RuntimeProviderInterface;
+use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 
 /**
  * TwigEngineService is a customized version of the

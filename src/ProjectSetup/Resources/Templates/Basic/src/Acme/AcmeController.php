@@ -2,7 +2,7 @@
 
 namespace Acme;
 
-use Blend\Framework\Support\RuntimeProviderInterface;
+use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>

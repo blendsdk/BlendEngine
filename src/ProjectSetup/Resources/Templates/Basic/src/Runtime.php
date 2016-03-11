@@ -2,7 +2,7 @@
 
 namespace <?php echo $applicationNamespace;?>;
 
-use Blend\Framework\Support\Runtime;
+use Blend\Framework\Support\Runtime\Runtime;
 
 /**
  * The runtime setting class for <?php echo $applicationClassName;?>

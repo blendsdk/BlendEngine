@@ -9,10 +9,10 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Framework\Support;
+namespace Blend\Framework\Support\Runtime;
 
 use Blend\Component\DI\Container;
-use Blend\Framework\Support\RuntimeProviderInterface;
+use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 
 /**
  * Runtime is essencially a wrapper around the Container that can be used

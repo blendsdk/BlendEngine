@@ -39,7 +39,7 @@ use Blend\Component\Filesystem\Filesystem;
 use Blend\Component\Routing\RouteBuilder;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Blend\Component\Routing\Generator\UrlGenerator;
-use Blend\Framework\Support\RuntimeProviderInterface;
+use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 
 /**
  * Application
