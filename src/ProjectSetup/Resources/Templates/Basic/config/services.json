@@ -1,4 +1,0 @@
-{
-    "<?php echo $applicationNamespace;?>\\<?php echo $applicationName;?>Runtime": "<?php echo $applicationNamespace;?>\\<?php echo $applicationName;?>Runtime",
-    "acme-module": "Acme\\Acme"
-}

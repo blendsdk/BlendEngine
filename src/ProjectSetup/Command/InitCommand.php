@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use Blend\Component\Filesystem\Filesystem;
+use Blend\Framework\Console\Command\ServicesSyncCommand;
 
 /**
  * InitCommand helps to initialize a new BlendEngine Application
@@ -143,7 +144,7 @@ class InitCommand extends Command {
             'phpunit.xml.dist',
             'tests/README',
             'config/config.json',
-            'config/services.json',
+            'resources/services.php',
             'bin/app',
             'bin/app.bat',
             'bin/app.php',
@@ -170,6 +171,7 @@ class InitCommand extends Command {
                 $this->generateWithTemplate($template, $output);
                 $this->runCompass($output);
                 $this->createVarFolders();
+                $this->syncServices($input, $output);
             } else {
                 $output->writeln("<error>The requested template [" . $template . '] does not exist!</error>');
             }
@@ -188,6 +190,13 @@ class InitCommand extends Command {
         foreach ($folders as $folder) {
             $fs->ensureFolder($folder, 0777);
         }
+    }
+    
+    private function syncServices(InputInterface $input, OutputInterface $output) {
+        $command = new ServicesSyncCommand();
+        $command->setApplicationFolder($this->workFolder);
+        $this->getApplication()->add($command);
+        $command->run($input, $output);
     }
 
     /**
