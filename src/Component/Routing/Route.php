@@ -20,17 +20,17 @@ use Symfony\Component\Routing\Route as RouteBase;
  */
 class Route extends RouteBase {
 
-    const ACCESS_PUBLIC = 'ACCESS_PUBLIC';
-    const ACCESS_AUTHORIZED_USER = 'ACCESS_AUTHORIZED_USER';
-    const ACCESS_ANONYMOUS_ONLY = 'ACCESS_ANONYMOUS_ONLY';
+    const ACCESS_PUBLIC = 10;
+    const ACCESS_AUTHORIZED_USER = 20;
+    const ACCESS_GUEST_ONLY = 30;
     const ROLE_PUBLIC = 'ROLE_PUBLIC';
     const ROLE_ADMIN = 'ROLE_PUBLIC';
-    const TYPE_WEB_ROUTE = 'TYPE_WEB_ROUTE';
-    const TYPE_API_ROUTE = 'TYPE_API_ROUTE';
+    const TYPE_WEB_ROUTE = 10;
+    const TYPE_API_ROUTE = 20;
 
     public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '') {
         parent::__construct($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
-        $this->setDefault('_access_method', self::ACCESS_PUBLIC);
+        $this->setDefault('_am', self::ACCESS_PUBLIC);
         $this->setDefault('_roles', [self::ROLE_PUBLIC]);
         $this->setDefault('_locale', null);
         $this->setDefault('_route_type', self::TYPE_WEB_ROUTE);
@@ -48,12 +48,16 @@ class Route extends RouteBase {
      * @return \Blend\Component\Routing\Route
      */
     public function setAccessMethod($method) {
-        $this->setDefault('_access_method', $method);
+        $this->setDefault('_am', $method);
         return $this;
     }
 
+    /**
+     * Gets the access method for this route
+     * @return type
+     */
     public function getAccessMethod() {
-        return $this->getDefault('_access_method');
+        return $this->getDefault('_am');
     }
 
     /**

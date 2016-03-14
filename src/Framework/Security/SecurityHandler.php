@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Blend\Component\DI\Container;
 use Blend\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
+use Blend\Framework\Security\User\UserProviderInterface;
+use Blend\Framework\Security\User\Guest;
 
 /**
  * Description of SecurityHandler
@@ -44,13 +46,45 @@ class SecurityHandler implements EventSubscriberInterface {
     public function onRequest(GetResponseEvent $event) {
         $this->request = $event->getRequest();
         $this->container = $event->getContainer();
+
         /* @var $routes RouteCollection */
         $routes = $this->container->get(RouteCollection::class);
         /* @var $route Route */
         $route = $routes->get($this->request->attributes->get('_route'));
         $accessMethod = $route->getAccessMethod();
+
         if ($accessMethod === Route::ACCESS_PUBLIC) {
             return null;
+        }
+
+        $user = $this->getCurrentUser();
+
+        if ($accessMethod === Route::ACCESS_AUTHORIZED_USER) {
+            if ($user->isGuest()) {
+                // start authentication
+            } else {
+                // start role checking
+            }
+        }
+
+        if ($accessMethod === Route::ACCESS_GUEST_ONLY) {
+            if ($user->isGuest()) {
+                return null;
+            } else {
+                // delegate to entry point
+            }
+        }
+    }
+
+    /**
+     * Tries to get the current user from the container
+     * @return null|User\UserProviderInterface
+     */
+    private function getCurrentUser() {
+        if ($this->container->isDefined('_current_user')) {
+            return $this->container->get('_current_user');
+        } else {
+            return new Guest();
         }
     }
 
