@@ -27,13 +27,19 @@ class Route extends RouteBase {
     const ROLE_ADMIN = 'ROLE_PUBLIC';
     const TYPE_WEB_ROUTE = 10;
     const TYPE_API_ROUTE = 20;
+    const SECURITY_TYPE_API = 10;
+    const SECURITY_TYPE_LOGIN = 20;
 
     public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '') {
         parent::__construct($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
         $this->setDefault('_am', self::ACCESS_PUBLIC);
         $this->setDefault('_roles', [self::ROLE_PUBLIC]);
         $this->setDefault('_locale', null);
-        $this->setDefault('_route_type', self::TYPE_WEB_ROUTE);
+        /**
+         * We make this by default to LOGIN bu the security handle will only
+         * act if the access method is not publc
+         */
+        $this->setDefault('_security_type', self::SECURITY_TYPE_LOGIN);
     }
 
     public function compile() {
@@ -78,6 +84,14 @@ class Route extends RouteBase {
     }
 
     /**
+     * Gets the list of allowed roles for this Route
+     * @return type
+     */
+    public function getRoles() {
+        return $this->getDefault('_roles', []);
+    }
+
+    /**
      * Seth the controller and the action for this route
      * @param type $controller
      * @param type $action
@@ -89,15 +103,31 @@ class Route extends RouteBase {
     }
 
     /**
-     * Mark a Route as API route, This will trigger the Security service to
-     * handle the route differently and the responses that are retuned from
+     * Mark a Route as API route, the responses that are retuned from
      * the controller->action will be converted to a JSON response
      * @return \Blend\Component\Routing\Route
      */
     public function setAPIRoute() {
-        $this->setDefault('_route_type', self::TYPE_API_ROUTE);
         $this->setDefault('_json_response', true);
         return $this;
+    }
+
+    /**
+     * Sets the security type for this route
+     * @param type $type
+     * @return \Blend\Component\Routing\Route
+     */
+    public function setSecurityType($type) {
+        $this->setDefault('_security_type', $type);
+        return $this;
+    }
+
+    /**
+     * Thes the security type for this route
+     * @return type
+     */
+    public function getSecurityType() {
+        return $this->getDefault('_security_type', self::SECURITY_TYPE_LOGIN);
     }
 
 }

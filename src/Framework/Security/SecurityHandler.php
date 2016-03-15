@@ -20,9 +20,12 @@ use Blend\Component\Routing\Route;
 use Symfony\Component\Routing\RouteCollection;
 use Blend\Framework\Security\User\UserProviderInterface;
 use Blend\Framework\Security\User\Guest;
+use Blend\Framework\Security\SecurityProviderInterface;
+use Psr\Log\LoggerInterface;
 
 /**
- * Description of SecurityHandler
+ * Listens to the incomming requests and handles the security based on the
+ * Route
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
@@ -43,6 +46,11 @@ class SecurityHandler implements EventSubscriberInterface {
      */
     protected $routes;
 
+    /**
+     * @var UserProviderInterface
+     */
+    protected $currentUser;
+
     public function onRequest(GetResponseEvent $event) {
         $this->request = $event->getRequest();
         $this->container = $event->getContainer();
@@ -57,23 +65,50 @@ class SecurityHandler implements EventSubscriberInterface {
             return null;
         }
 
-        $user = $this->getCurrentUser();
+        $this->currentUser = $this->getCurrentUser();
 
         if ($accessMethod === Route::ACCESS_AUTHORIZED_USER) {
-            if ($user->isGuest()) {
-                // start authentication
+            $handler = $this->getSecurityHandler($route->getSecurityType());
+            if ($handler !== null) {
+                if ($this->currentUser->isGuest()) {
+                    $event->setResponse($handler->startAuthentication());
+                } else {
+                    return $handler->validateRoles($route->getRoles());
+                }
             } else {
-                // start role checking
+                return null;
             }
         }
 
         if ($accessMethod === Route::ACCESS_GUEST_ONLY) {
-            if ($user->isGuest()) {
+            if ($this->currentUser->isGuest()) {
                 return null;
             } else {
-                // delegate to entry point
+                $handler = $this->getSecurityHandler($route->getSecurityType());
+                if ($handler !== null) {
+                    $event->setResponse($handler->delegateToEntryPoint());
+                }
             }
         }
+    }
+
+    /**
+     * @param mixed $type
+     * @return SecurityProviderInterface
+     */
+    private function getSecurityHandler($type) {
+        $providers = $this->container->getByInterface(SecurityProviderInterface::class);
+        foreach ($providers as $provider) {
+            /* @var $provider SecurityProviderInterface */
+            if ($provider->getHandlerType() === $type) {
+                return $provider;
+            }
+        }
+        /* @var $logger LoggerInterface */
+        $logger = $this->container->get(LoggerInterface::class);
+        $logger->warning("The requested security provides was" .
+                " not met! Check your services", ['type' => $type]);
+        return null;
     }
 
     /**
@@ -81,11 +116,7 @@ class SecurityHandler implements EventSubscriberInterface {
      * @return null|User\UserProviderInterface
      */
     private function getCurrentUser() {
-        if ($this->container->isDefined('_current_user')) {
-            return $this->container->get('_current_user');
-        } else {
-            return new Guest();
-        }
+        return $this->request->getSession()->get('_authenticated_user', new Guest());
     }
 
     public static function getSubscribedEvents() {
