@@ -71,7 +71,8 @@ class TwigEngineService extends TwigEngine {
     private function normalizeParameters(array $parameters = []) {
         $defaults = [
             'request' => $this->request,
-            'runtime' => $this->runtime
+            'runtime' => $this->runtime,
+            'authenticated' => !$this->runtime->getCurrentUser()->isGuest()
         ];
         return array_merge($defaults, $parameters);
     }
