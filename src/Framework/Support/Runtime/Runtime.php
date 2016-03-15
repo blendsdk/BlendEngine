@@ -14,6 +14,8 @@ namespace Blend\Framework\Support\Runtime;
 use Blend\Component\DI\Container;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 use Blend\Framework\Security\User\Guest;
+use Symfony\Component\HttpFoundation\Request;
+use Blend\Framework\Security\User\UserProviderInterface;
 
 /**
  * Runtime is essencially a wrapper around the Container that can be used
@@ -34,8 +36,14 @@ abstract class Runtime implements RuntimeProviderInterface {
      */
     protected $name;
 
+    /**
+     * @var Request;
+     */
+    protected $request;
+
     public function __construct(Container $container) {
         $this->container = $container;
+        $this->request = $this->container->get(Request::class);
     }
 
     public function getApplicationName() {
@@ -72,7 +80,19 @@ abstract class Runtime implements RuntimeProviderInterface {
      * @return \Blend\Framework\Security\User\UserProviderInterface
      */
     public function getCurrentUser() {
-        return $this->get('_current_user',new Guest());
+        return $this->request->getSession()->get('_authenticated_user', new Guest());
+    }
+
+    public function setCurrentUser(UserProviderInterface $user) {
+        $this->request->getSession()->set('_authenticated_user', $user);
+        $this->set('_authenticated_user', $user);
+    }
+
+    /**
+     * @return Container
+     */
+    public function getContainer() {
+        return $this->container;
     }
 
 }
