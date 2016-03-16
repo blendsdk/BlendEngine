@@ -64,54 +64,37 @@ class SecurityHandler implements EventSubscriberInterface {
         $route = $routes->get($this->request->attributes->get('_route'));
         $accessMethod = $route->getAccessMethod();
 
+
         if ($accessMethod === Route::ACCESS_PUBLIC) {
-            return null;
+            return; //no-op
+        } else if ($accessMethod === Route::ACCESS_GUEST_ONLY) {
+            $this->handleAccessGuestOnly($event);
+        } else if ($accessMethod === Route::ACCESS_AUTHORIZED_USER) {
+            $this->handleAccessAuthorizedUser($event, $route);
         }
+    }
 
-        $this->currentUser = $this->getCurrentUser();
-
-        if ($accessMethod === Route::ACCESS_AUTHORIZED_USER) {
-            $handler = $this->getSecurityHandler($route->getSecurityType());
-            if ($handler !== null) {
-                if ($this->currentUser->isGuest()) {
-                    $this->saveReferer();
-                    $event->setResponse($handler->startAuthentication());
-                } else {
-                    return $handler->validateRoles($route->getRoles());
-                }
+    private function handleAccessGuestOnly(GetResponseEvent $event) {
+        $user = $this->getCurrentUser();
+        if (!$user->isGuest()) {
+            $referer = $this->getReferer();
+            if ($referer !== null) {
+                $event->setResponse(new RedirectResponse($referer));
             } else {
-                return null;
-            }
-        }
-
-        if ($accessMethod === Route::ACCESS_GUEST_ONLY) {
-            if ($this->currentUser->isGuest()) {
-                return null;
-            } else {
-                $referer = $this->getReferer();
-                if ($referer !== null) {
-                    $event->setResponse(new RedirectResponse($referer));
-                } else {
-                    $handler = $this->getSecurityHandler($route->getSecurityType());
-                    if ($handler !== null) {
-                        $event->setResponse($handler->delegateToEntryPoint());
-                    }
-                }
+                $event->setResponse($handler->delegateToEntryPoint());
             }
         }
     }
 
-    private function handleAccessAuthorizedRequest(Route $route, GetResponseEvent $event) {
+    private function handleAccessAuthorizedUser(GetResponseEvent $event
+    , Route $route) {
+
         $handler = $this->getSecurityHandler($route->getSecurityType());
         if ($handler !== null) {
-            if ($this->currentUser->isGuest()) {
+            $user = $this->getCurrentUser();
+            if ($user->isGuest()) {
                 $this->saveReferer();
                 $event->setResponse($handler->startAuthentication());
-            } else {
-                if (!$handler->validateRoles($route->getRoles())) {
-                    // roles are not valid
-                    $event->setResponse(/* do somethign with invalid role! */);
-                }
             }
         }
     }
@@ -144,6 +127,7 @@ class SecurityHandler implements EventSubscriberInterface {
     }
 
     private function saveReferer() {
+        $referer = $this->request->getUri();
         $this->request->getSession()->set(self::REFERER_URL
                 , $this->request->getUri());
     }
