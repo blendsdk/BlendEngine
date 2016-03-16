@@ -22,6 +22,7 @@ use Blend\Framework\Security\User\UserProviderInterface;
 use Blend\Framework\Security\User\Guest;
 use Blend\Framework\Security\SecurityProviderInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 /**
  * Listens to the incomming requests and handles the security based on the
@@ -30,6 +31,8 @@ use Psr\Log\LoggerInterface;
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class SecurityHandler implements EventSubscriberInterface {
+
+    const REFERER_URL = '_http_referer';
 
     /**
      * @var Request
@@ -71,6 +74,7 @@ class SecurityHandler implements EventSubscriberInterface {
             $handler = $this->getSecurityHandler($route->getSecurityType());
             if ($handler !== null) {
                 if ($this->currentUser->isGuest()) {
+                    $this->saveReferer();
                     $event->setResponse($handler->startAuthentication());
                 } else {
                     return $handler->validateRoles($route->getRoles());
@@ -84,9 +88,29 @@ class SecurityHandler implements EventSubscriberInterface {
             if ($this->currentUser->isGuest()) {
                 return null;
             } else {
-                $handler = $this->getSecurityHandler($route->getSecurityType());
-                if ($handler !== null) {
-                    $event->setResponse($handler->delegateToEntryPoint());
+                $referer = $this->getReferer();
+                if ($referer !== null) {
+                    $event->setResponse(new RedirectResponse($referer));
+                } else {
+                    $handler = $this->getSecurityHandler($route->getSecurityType());
+                    if ($handler !== null) {
+                        $event->setResponse($handler->delegateToEntryPoint());
+                    }
+                }
+            }
+        }
+    }
+
+    private function handleAccessAuthorizedRequest(Route $route, GetResponseEvent $event) {
+        $handler = $this->getSecurityHandler($route->getSecurityType());
+        if ($handler !== null) {
+            if ($this->currentUser->isGuest()) {
+                $this->saveReferer();
+                $event->setResponse($handler->startAuthentication());
+            } else {
+                if (!$handler->validateRoles($route->getRoles())) {
+                    // roles are not valid
+                    $event->setResponse(/* do somethign with invalid role! */);
                 }
             }
         }
@@ -117,6 +141,20 @@ class SecurityHandler implements EventSubscriberInterface {
      */
     private function getCurrentUser() {
         return $this->request->getSession()->get('_authenticated_user', new Guest());
+    }
+
+    private function saveReferer() {
+        $this->request->getSession()->set(self::REFERER_URL
+                , $this->request->getUri());
+    }
+
+    private function getReferer() {
+        $session = $this->request->getSession();
+        $result = $session->get(self::REFERER_URL, null);
+        if ($result !== null) {
+            $session->remove(self::REFERER_URL);
+        }
+        return $result;
     }
 
     public static function getSubscribedEvents() {
