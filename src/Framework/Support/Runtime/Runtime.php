@@ -11,10 +11,11 @@
 
 namespace Blend\Framework\Support\Runtime;
 
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Blend\Component\DI\Container;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 use Blend\Framework\Security\User\Guest;
-use Symfony\Component\HttpFoundation\Request;
 use Blend\Framework\Security\User\UserProviderInterface;
 use Blend\Component\Security\Security;
 
@@ -84,6 +85,10 @@ abstract class Runtime implements RuntimeProviderInterface {
         return $this->request->getSession()->get(Security::AUTHENTICATED_USER, new Guest());
     }
 
+    /**
+     * The the current user of this runtime envirounment (application)
+     * @param UserProviderInterface $user
+     */
     public function setCurrentUser(UserProviderInterface $user) {
         $this->request->getSession()->set(Security::AUTHENTICATED_USER, $user);
         $this->set(Security::AUTHENTICATED_USER, $user);
@@ -94,6 +99,14 @@ abstract class Runtime implements RuntimeProviderInterface {
      */
     public function getContainer() {
         return $this->container;
+    }
+
+    public function signOut() {
+        if ($this->request) {
+            $this->request->getSession()->clear();
+            return new RedirectResponse($this->request->getUri());
+        }
+        return null;
     }
 
 }

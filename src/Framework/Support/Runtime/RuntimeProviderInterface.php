@@ -42,4 +42,12 @@ interface RuntimeProviderInterface {
     public function getCurrentUser();
 
     public function setCurrentUser(UserProviderInterface $user);
+
+    /**
+     * Signout by clearing the current session and return a redirect
+     * response to the current request. This should trigger the security
+     * handler to redirect this request to an authentication workflow
+     * @return null|RedirectResponse
+     */
+    public function signOut();
 }
