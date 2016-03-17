@@ -11,63 +11,48 @@
 
 namespace Blend\Framework\Security\Provider\Common;
 
-use Blend\Framework\Security\SecurityProviderInterface;
 use Blend\Component\Routing\Route;
-use Blend\Component\Configuration\Configuration;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Blend\Framework\Security\Provider\SecurityProvider;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
+use Blend\Component\Security\SecurityAccessMethod;
 
 /**
- * Description of LoginSecurityProvider
- *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class LoginSecurityProvider implements SecurityProviderInterface {
-
-    /**
-     * @var Configuration;
-     */
-    protected $config;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var UrlGeneratorInterface
-     */
-    protected $urlGenerator;
-
-    protected abstract function getLoginURL();
-
-    protected abstract function getLogoutURL();
-
-    protected abstract function getEntryPointURL();
-
-    protected abstract function getAfterLogoutURL();
-
-    public function __construct(
-    Configuration $config
-    , Request $request
-    , UrlGeneratorInterface $urlGenerator) {
-
-        $this->config = $config;
-        $this->request = $request;
-        $this->urlGenerator = $urlGenerator;
-    }
-
-    public function delegateToEntryPoint() {
-        return new RedirectResponse($this->getEntryPointURL());
-    }
+class LoginSecurityProvider extends SecurityProvider {
 
     public function getHandlerType() {
         return Route::SECURITY_TYPE_LOGIN;
     }
 
-    public function startAuthentication() {
-        return new RedirectResponse($this->getLoginURL());
+    public function handle($accessMethod, Route $route) {
+
+        if ($accessMethod === SecurityAccessMethod::ACCESS_AUTHORIZED_USER) {
+            
+        }
+    }
+
+    /**
+     * Tries to get the current user from the container
+     * @return null|User\UserProviderInterface
+     */
+    protected function getCurrentUser() {
+        return $this->request->getSession()->get('_authenticated_user', new Guest());
+    }
+
+    protected function saveReferer() {
+        $referer = $this->request->getUri();
+        $this->request->getSession()->set(self::REFERER_URL
+                , $this->request->getUri());
+    }
+
+    protected function getReferer() {
+        $session = $this->request->getSession();
+        $result = $session->get(self::REFERER_URL, null);
+        if ($result !== null) {
+            $session->remove(self::REFERER_URL);
+        }
+        return $result;
     }
 
 }

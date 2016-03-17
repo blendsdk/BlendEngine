@@ -12,6 +12,7 @@
 namespace Blend\Component\Routing;
 
 use Symfony\Component\Routing\Route as RouteBase;
+use Blend\Component\Security\SecurityAccessMethod;
 
 /**
  * Route class with Blend specific functions
@@ -20,11 +21,8 @@ use Symfony\Component\Routing\Route as RouteBase;
  */
 class Route extends RouteBase {
 
-    const ACCESS_PUBLIC = 10;
-    const ACCESS_AUTHORIZED_USER = 20;
-    const ACCESS_GUEST_ONLY = 30;
     const ROLE_PUBLIC = 'ROLE_PUBLIC';
-    const ROLE_ADMIN = 'ROLE_PUBLIC';
+    const ROLE_ADMIN = 'ROLE_';
     const TYPE_WEB_ROUTE = 10;
     const TYPE_API_ROUTE = 20;
     const SECURITY_TYPE_API = 10;
@@ -32,8 +30,7 @@ class Route extends RouteBase {
 
     public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '') {
         parent::__construct($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
-        $this->setDefault('_am', self::ACCESS_PUBLIC);
-        $this->setDefault('_roles', [self::ROLE_PUBLIC]);
+        $this->setDefault('_am', SecurityAccessMethod::ACCESS_PUBLIC);
         $this->setDefault('_locale', null);
         /**
          * We make this by default to LOGIN bu the security handle will only
@@ -64,31 +61,6 @@ class Route extends RouteBase {
      */
     public function getAccessMethod() {
         return $this->getDefault('_am');
-    }
-
-    /**
-     * Sets the roles for this Route
-     * @param string/array $roles Cna be a comma seperated string or an array
-     * @return \Blend\Component\Routing\Route
-     */
-    public function setRoles($roles) {
-        $r = [];
-        if (is_string($roles)) {
-            $roles = explode(',', $roles);
-        }
-        foreach ($roles as $role) {
-            $r[] = trim($role);
-        }
-        $this->setDefault('_roles', $role);
-        return $this;
-    }
-
-    /**
-     * Gets the list of allowed roles for this Route
-     * @return type
-     */
-    public function getRoles() {
-        return $this->getDefault('_roles', []);
     }
 
     /**

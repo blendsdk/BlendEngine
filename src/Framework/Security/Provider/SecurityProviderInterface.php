@@ -9,9 +9,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Framework\Security;
+namespace Blend\Framework\Security\Provider;
 
-use Symfony\Component\HttpFoundation\Request;
+use Blend\Component\Routing\Route;
 
 /**
  * SecurityProviderInterface provides a common interface for both form based
@@ -23,9 +23,5 @@ interface SecurityProviderInterface {
 
     public function getHandlerType();
 
-    public function startAuthentication();
-
-    public function validateRoles(array $roles = []);
-
-    public function delegateToEntryPoint();
+    public function handle($accessMethod, Route $route);
 }
