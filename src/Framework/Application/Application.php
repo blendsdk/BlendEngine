@@ -43,6 +43,7 @@ use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Blend\Framework\Security\SecurityHandler;
 use Blend\Component\Routing\RouteAttribute;
+use Blend\Framework\Support\Runtime\RuntimeAttribute;
 
 /**
  * Application
@@ -117,9 +118,9 @@ abstract class Application extends BaseApplication {
             EventDispatcherInterface::class => $this->dispatcher,
             Container::class => $this->container,
             Filesystem::class => $this->filesystem,
-            '_app_root_folder' => $this->rootFolder,
-            '_app_cache_folder' => $this->localCache->getCacheFolder(),
-            '_debug' => $config->get('debug', false)
+            RuntimeAttribute::APPLICATION_ROOT_FOLDER => $this->rootFolder,
+            RuntimeAttribute::APPLICATION_CACHE_FOLDER => $this->localCache->getCacheFolder(),
+            RuntimeAttribute::DEBUG => $config->get('debug', false)
         ]);
 
         /**

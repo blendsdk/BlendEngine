@@ -53,15 +53,15 @@ abstract class Runtime implements RuntimeProviderInterface {
     }
 
     public function getAppRootFolder() {
-        return $this->get('_app_root_folder');
+        return $this->get(RuntimeAttribute::APPLICATION_ROOT_FOLDER);
     }
 
     public function getAppCacheFolder() {
-        return $this->get('_app_cache_folder');
+        return $this->get(RuntimeAttribute::APPLICATION_CACHE_FOLDER);
     }
 
     public function isDebug() {
-        return $this->get('_debug');
+        return $this->get(RuntimeAttribute::DEBUG);
     }
 
     public function set($key, $value) {

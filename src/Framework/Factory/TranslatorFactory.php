@@ -18,6 +18,7 @@ use Blend\Component\Configuration\Configuration;
 use Blend\Component\DI\Container;
 use Blend\Component\Filesystem\Filesystem;
 use Blend\Component\Routing\RouteAttribute;
+use Blend\Framework\Support\Runtime\RuntimeAttribute;
 
 /**
  * Description of TranslatorFactory
@@ -59,7 +60,7 @@ class TranslatorFactory implements ObjectFactoryInterface {
     private function getCacheFolder() {
         /* @var $fs Filesystem */
         $fs = $this->container->get(Filesystem::class);
-        return $fs->assertFolderWritable($this->container->get('_app_cache_folder'));
+        return $fs->assertFolderWritable($this->container->get(RuntimeAttribute::APPLICATION_CACHE_FOLDER));
     }
 
     private function getCurrentLocale() {
