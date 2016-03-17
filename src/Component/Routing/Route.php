@@ -100,4 +100,25 @@ class Route extends RouteBase {
         return $this->getDefault('_security_type', Security::SECURITY_TYPE_LOGIN);
     }
 
+    /**
+     * Mark this Route as publicly accessible
+     */
+    public function accessPublic() {
+        $this->setAccessMethod(Security::ACCESS_PUBLIC);
+    }
+
+    /**
+     * Mark this Rout only accessible by an authorized user
+     */
+    public function accessAuthorized() {
+        $this->setAccessMethod(Security::ACCESS_AUTHORIZED_USER);
+    }
+
+    /**
+     * Mark this Route only accessible if the used is not authorized
+     */
+    public function accessGuestOnly() {
+        $this->setAccessMethod(Security::ACCESS_GUEST_ONLY);
+    }
+
 }
