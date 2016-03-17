@@ -14,7 +14,7 @@ namespace Blend\Framework\Security\Provider\Common;
 use Blend\Component\Routing\Route;
 use Blend\Framework\Security\Provider\SecurityProvider;
 use Symfony\Component\HttpFoundation\Request;
-use Blend\Component\Security\SecurityAccessMethod;
+use Blend\Component\Security\Security;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -27,7 +27,7 @@ class LoginSecurityProvider extends SecurityProvider {
 
     public function handle($accessMethod, Route $route) {
 
-        if ($accessMethod === SecurityAccessMethod::ACCESS_AUTHORIZED_USER) {
+        if ($accessMethod === Security::ACCESS_AUTHORIZED_USER) {
             
         }
     }

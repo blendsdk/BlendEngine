@@ -19,7 +19,7 @@ use Blend\Component\HttpKernel\KernelEvents;
 use Blend\Component\HttpKernel\Event\GetResponseEvent;
 use Blend\Component\DI\Container;
 use Blend\Component\Routing\Route;
-use Blend\Component\Security\SecurityAccessMethod;
+use Blend\Component\Security\Security;
 use Blend\Framework\Security\Provider\SecurityProviderInterface;
 
 /**
@@ -45,7 +45,7 @@ class SecurityHandler implements EventSubscriberInterface {
         $route = $routes->get($request->attributes->get('_route'));
         $accessMethod = $route->getAccessMethod();
 
-        if ($accessMethod === SecurityAccessMethod::ACCESS_PUBLIC) {
+        if ($accessMethod === Security::ACCESS_PUBLIC) {
             return; //no-op
         } else {
             $handler = $this->getSecurityHandler($route->getSecurityType());

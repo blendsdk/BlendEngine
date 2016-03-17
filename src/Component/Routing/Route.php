@@ -12,7 +12,7 @@
 namespace Blend\Component\Routing;
 
 use Symfony\Component\Routing\Route as RouteBase;
-use Blend\Component\Security\SecurityAccessMethod;
+use Blend\Component\Security\Security;
 
 /**
  * Route class with Blend specific functions
@@ -25,18 +25,16 @@ class Route extends RouteBase {
     const ROLE_ADMIN = 'ROLE_';
     const TYPE_WEB_ROUTE = 10;
     const TYPE_API_ROUTE = 20;
-    const SECURITY_TYPE_API = 10;
-    const SECURITY_TYPE_LOGIN = 20;
 
     public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '') {
         parent::__construct($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
-        $this->setDefault('_am', SecurityAccessMethod::ACCESS_PUBLIC);
+        $this->setDefault('_am', Security::ACCESS_PUBLIC);
         $this->setDefault('_locale', null);
         /**
          * We make this by default to LOGIN bu the security handle will only
          * act if the access method is not publc
          */
-        $this->setDefault('_security_type', self::SECURITY_TYPE_LOGIN);
+        $this->setDefault('_security_type', Security::SECURITY_TYPE_LOGIN);
     }
 
     public function compile() {
@@ -99,7 +97,7 @@ class Route extends RouteBase {
      * @return type
      */
     public function getSecurityType() {
-        return $this->getDefault('_security_type', self::SECURITY_TYPE_LOGIN);
+        return $this->getDefault('_security_type', Security::SECURITY_TYPE_LOGIN);
     }
 
 }
