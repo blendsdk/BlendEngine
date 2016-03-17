@@ -17,6 +17,7 @@ use Blend\Component\Translation\TranslationProviderInterface;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\DI\Container;
 use Blend\Component\Filesystem\Filesystem;
+use Blend\Component\Routing\RouteAttribute;
 
 /**
  * Description of TranslatorFactory
@@ -62,8 +63,8 @@ class TranslatorFactory implements ObjectFactoryInterface {
     }
 
     private function getCurrentLocale() {
-        if ($this->container->isDefined('_locale')) {
-            return $this->container->get('_locale');
+        if ($this->container->isDefined(RouteAttribute::LOCALE)) {
+            return $this->container->get(RouteAttribute::LOCALE);
         } else {
             return $this->config->get('translation.defaultLocale', null);
         }

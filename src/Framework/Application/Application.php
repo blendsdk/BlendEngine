@@ -41,6 +41,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Blend\Component\Routing\Generator\UrlGenerator;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Blend\Framework\Security\SecurityHandler;
+use Blend\Component\Routing\RouteAttribute;
 
 /**
  * Application
@@ -120,12 +122,19 @@ abstract class Application extends BaseApplication {
             '_debug' => $config->get('debug', false)
         ]);
 
+        /**
+         * Adds the SecurityHandler class by default. This will
+         * add a small overdead to the request/response cycle
+         * but we gain functionality by having a _authenticated_user
+         * when possible
+         */
+        $this->container->defineClass(SecurityHandler::class);
+
         if (!$this->container->loadServicesFromFile($this->rootFolder
                         . '/config/services.json')) {
             $this->logger->notice(
                     "No service description file found!");
         }
-        $this->checkAndInstallRuntimeProvider();
         $this->installEventSubscribers();
     }
 
@@ -153,6 +162,8 @@ abstract class Application extends BaseApplication {
         $request->attributes->replace($this->matchRequestToRoutes($request));
 
         $this->initializeSession($request);
+        $this->checkAndInstallRuntimeProvider();
+
 
         /* @var $event GetResponseEvent */
         $responseEvent = $this->container->get(GetResponseEvent::class);
@@ -255,12 +266,13 @@ abstract class Application extends BaseApplication {
         $this->dispatcher->dispatch(KernelEvents::REQUEST_EXCEPTION, $event);
         if ($event->hasResponse()) {
             $response = $event->getResponse();
-        } else if ($request->attributes->get('_json_response', false)) {
-            return $this->createJSONExceptionResponse($ex);
+        } else if ($request->attributes->get(RouteAttribute::JSON_RESPONSE, false)) {
+            $response = $this->createJSONExceptionResponse($ex);
         } else {
             $response = new Response($ex->getMessage(), 500);
         }
         $this->logger->error($ex->getMessage(), $ex->getTrace());
+        $this->logger->debug($ex->getMessage(), $ex->getTrace());
         return $response;
     }
 

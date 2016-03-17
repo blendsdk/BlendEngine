@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Generator\UrlGenerator as GeneratorBase;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RequestContext;
 use Psr\Log\LoggerInterface;
+use Blend\Component\Routing\RouteAttribute;
 
 /**
  * Customized UrlGenerator to include the current Locale
@@ -35,8 +36,8 @@ class UrlGenerator extends GeneratorBase {
     }
 
     public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH) {
-        if ($this->locale !== null && !isset($parameters['_locale'])) {
-            $parameters['_locale'] = $this->locale;
+        if ($this->locale !== null && !isset($parameters[RouteAttribute::LOCALE])) {
+            $parameters[RouteAttribute::LOCALE] = $this->locale;
         }
         return parent::generate($name, $parameters, $referenceType);
     }

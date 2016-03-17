@@ -12,6 +12,8 @@
 namespace Blend\Component\Routing;
 
 use Symfony\Component\Routing\Route as RouteBase;
+use Blend\Component\Security\Security;
+use Blend\Component\Routing\RouteAttribute;
 
 /**
  * Route class with Blend specific functions
@@ -20,20 +22,20 @@ use Symfony\Component\Routing\Route as RouteBase;
  */
 class Route extends RouteBase {
 
-    const ACCESS_PUBLIC = 'ACCESS_PUBLIC';
-    const ACCESS_AUTHORIZED_USER = 'ACCESS_AUTHORIZED_USER';
-    const ACCESS_ANONYMOUS_ONLY = 'ACCESS_ANONYMOUS_ONLY';
     const ROLE_PUBLIC = 'ROLE_PUBLIC';
-    const ROLE_ADMIN = 'ROLE_PUBLIC';
-    const TYPE_WEB_ROUTE = 'TYPE_WEB_ROUTE';
-    const TYPE_API_ROUTE = 'TYPE_API_ROUTE';
+    const ROLE_ADMIN = 'ROLE_';
+    const TYPE_WEB_ROUTE = 10;
+    const TYPE_API_ROUTE = 20;
 
     public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '') {
         parent::__construct($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
-        $this->setDefault('_access_method', self::ACCESS_PUBLIC);
-        $this->setDefault('_roles', [self::ROLE_PUBLIC]);
-        $this->setDefault('_locale', null);
-        $this->setDefault('_route_type', self::TYPE_WEB_ROUTE);
+        $this->setDefault('_am', Security::ACCESS_PUBLIC);
+        $this->setDefault(RouteAttribute::LOCALE, null);
+        /**
+         * We make this by default to LOGIN bu the security handle will only
+         * act if the access method is not publc
+         */
+        $this->setDefault('_security_type', Security::SECURITY_TYPE_LOGIN);
     }
 
     public function compile() {
@@ -48,25 +50,16 @@ class Route extends RouteBase {
      * @return \Blend\Component\Routing\Route
      */
     public function setAccessMethod($method) {
-        $this->setDefault('_access_method', $method);
+        $this->setDefault('_am', $method);
         return $this;
     }
 
     /**
-     * Sets the roles for this Route
-     * @param string/array $roles Cna be a comma seperated string or an array
-     * @return \Blend\Component\Routing\Route
+     * Gets the access method for this route
+     * @return type
      */
-    public function setRoles($roles) {
-        $r = [];
-        if (is_string($roles)) {
-            $roles = explode(',', $roles);
-        }
-        foreach ($roles as $role) {
-            $r[] = trim($role);
-        }
-        $this->setDefault('_roles', $role);
-        return $this;
+    public function getAccessMethod() {
+        return $this->getDefault('_am');
     }
 
     /**
@@ -76,20 +69,57 @@ class Route extends RouteBase {
      * @return \Blend\Component\Routing\Route
      */
     public function setControllerAction($controller, $action) {
-        $this->setDefault('_controller', [$controller, $action]);
+        $this->setDefault(RouteAttribute::CONTROLLER, [$controller, $action]);
         return $this;
     }
 
     /**
-     * Mark a Route as API route, This will trigger the Security service to
-     * handle the route differently and the responses that are retuned from
+     * Mark a Route as API route, the responses that are retuned from
      * the controller->action will be converted to a JSON response
      * @return \Blend\Component\Routing\Route
      */
     public function setAPIRoute() {
-        $this->setDefault('_route_type', self::TYPE_API_ROUTE);
-        $this->setDefault('_json_response', true);
+        $this->setDefault(RouteAttribute::JSON_RESPONSE, true);
         return $this;
+    }
+
+    /**
+     * Sets the security type for this route
+     * @param type $type
+     * @return \Blend\Component\Routing\Route
+     */
+    public function setSecurityType($type) {
+        $this->setDefault('_security_type', $type);
+        return $this;
+    }
+
+    /**
+     * Thes the security type for this route
+     * @return type
+     */
+    public function getSecurityType() {
+        return $this->getDefault('_security_type', Security::SECURITY_TYPE_LOGIN);
+    }
+
+    /**
+     * Mark this Route as publicly accessible
+     */
+    public function accessPublic() {
+        $this->setAccessMethod(Security::ACCESS_PUBLIC);
+    }
+
+    /**
+     * Mark this Rout only accessible by an authorized user
+     */
+    public function accessAuthorized() {
+        $this->setAccessMethod(Security::ACCESS_AUTHORIZED_USER);
+    }
+
+    /**
+     * Mark this Route only accessible if the used is not authorized
+     */
+    public function accessGuestOnly() {
+        $this->setAccessMethod(Security::ACCESS_GUEST_ONLY);
     }
 
 }

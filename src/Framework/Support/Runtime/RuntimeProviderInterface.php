@@ -11,6 +11,8 @@
 
 namespace Blend\Framework\Support\Runtime;
 
+use Blend\Framework\Security\User\UserProviderInterface;
+
 /**
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -28,4 +30,16 @@ interface RuntimeProviderInterface {
     public function get($key, $default = null);
 
     public function isDebug();
+
+    /**
+     * @return \Blend\Component\DI\Container
+     */
+    public function getContainer();
+
+    /**
+     * @return UserProviderInterface
+     */
+    public function getCurrentUser();
+
+    public function setCurrentUser(UserProviderInterface $user);
 }
