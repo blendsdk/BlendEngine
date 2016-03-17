@@ -42,6 +42,7 @@ use Blend\Component\Routing\Generator\UrlGenerator;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Blend\Framework\Security\SecurityHandler;
+use Blend\Component\Routing\RouteAttribute;
 
 /**
  * Application
@@ -265,7 +266,7 @@ abstract class Application extends BaseApplication {
         $this->dispatcher->dispatch(KernelEvents::REQUEST_EXCEPTION, $event);
         if ($event->hasResponse()) {
             $response = $event->getResponse();
-        } else if ($request->attributes->get('_json_response', false)) {
+        } else if ($request->attributes->get(RouteAttribute::JSON_RESPONSE, false)) {
             $response = $this->createJSONExceptionResponse($ex);
         } else {
             $response = new Response($ex->getMessage(), 500);

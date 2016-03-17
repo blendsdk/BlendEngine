@@ -13,6 +13,7 @@ namespace Blend\Component\Routing;
 
 use Symfony\Component\Routing\Route as RouteBase;
 use Blend\Component\Security\Security;
+use Blend\Component\Routing\RouteAttribute;
 
 /**
  * Route class with Blend specific functions
@@ -29,7 +30,7 @@ class Route extends RouteBase {
     public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '') {
         parent::__construct($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
         $this->setDefault('_am', Security::ACCESS_PUBLIC);
-        $this->setDefault('_locale', null);
+        $this->setDefault(RouteAttribute::LOCALE, null);
         /**
          * We make this by default to LOGIN bu the security handle will only
          * act if the access method is not publc
@@ -68,7 +69,7 @@ class Route extends RouteBase {
      * @return \Blend\Component\Routing\Route
      */
     public function setControllerAction($controller, $action) {
-        $this->setDefault('_controller', [$controller, $action]);
+        $this->setDefault(RouteAttribute::CONTROLLER, [$controller, $action]);
         return $this;
     }
 
@@ -78,7 +79,7 @@ class Route extends RouteBase {
      * @return \Blend\Component\Routing\Route
      */
     public function setAPIRoute() {
-        $this->setDefault('_json_response', true);
+        $this->setDefault(RouteAttribute::JSON_RESPONSE, true);
         return $this;
     }
 

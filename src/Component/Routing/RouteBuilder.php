@@ -13,6 +13,7 @@ namespace Blend\Component\Routing;
 
 use Symfony\Component\Routing\RouteCollection;
 use Blend\Component\Routing\Route;
+use Blend\Component\Routing\RouteAttribute;
 
 /**
  * RouteBuilder to help create Routes
@@ -25,7 +26,7 @@ class RouteBuilder {
      * @var RouteCollection
      */
     protected $routes;
-    
+
     /**
      * @return RouteCollection
      */
@@ -36,7 +37,7 @@ class RouteBuilder {
     public function __construct(RouteCollection $routes) {
         $this->routes = $routes;
     }
-    
+
     /**
      * Adds a Route to the Route Collection
      * @param type $name
@@ -47,7 +48,7 @@ class RouteBuilder {
      */
     public function route($name, $path, array $controlerAction, array $defaults = []) {
         $params = array_merge($defaults, [
-            '_controller' => $controlerAction,
+            RouteAttribute::CONTROLLER => $controlerAction,
         ]);
         $route = new Route($path, $params);
         $this->routes->add($name, $route);

@@ -11,12 +11,13 @@
 
 namespace Blend\Component\HttpKernel;
 
-use Blend\Component\DI\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Exception\InvalidParameterException;
+use Blend\Component\DI\Container;
 use Blend\Component\HttpKernel\ControllerHandlerInterface;
+use Blend\Component\Routing\RouteAttribute;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -48,25 +49,25 @@ class ControllerHandler implements ControllerHandlerInterface {
 
     public function handle(Request $request) {
         $this->assertControllerKey($request);
-        $controller = $request->attributes->get('_controller');
+        $controller = $request->attributes->get(RouteAttribute::CONTROLLER);
         if ($this->isArrayDefinition($controller)) {
             $result = $this->container->call($controller[0]
                     , $controller[1]
-                    ,  array_merge($request->attributes->all()
-                            ,$request->request->all()
-                            ,$request->query->all())
-                    );
+                    , array_merge($request->attributes->all()
+                            , $request->request->all()
+                            , $request->query->all())
+            );
             if ($result instanceof Response) {
                 return $result;
             } else {
-                if ($request->attributes->get('_json_response', false)) {
+                if ($request->attributes->get(RouteAttribute::JSON_RESPONSE, false)) {
                     return new JsonResponse($result);
                 } else {
                     return new Response($result);
                 }
             }
         } else {
-            $error = "The _controller is has an invalid [controller,action] signature!" .
+            $error = "The controller has an invalid [controller,action] signature!" .
                     " You should check the Route creation!";
             $this->logger->error($error, ['RequestAttributes' => $request->attributes->add(), $request->getPathInfo()]);
             throw new InvalidParameterException($error);
@@ -74,7 +75,7 @@ class ControllerHandler implements ControllerHandlerInterface {
     }
 
     /**
-     * Check the signature of the provided _controller
+     * Check the signature of the provided controller
      * @param array $controller
      * @return boolean
      */
@@ -88,13 +89,13 @@ class ControllerHandler implements ControllerHandlerInterface {
     }
 
     /**
-     * Assert is the matched route contains a _controller key/pare
+     * Assert if the matched route contains a controller key/pare
      * @param Request $request
      * @throws InvalidParameterException
      */
     protected function assertControllerKey(Request $request) {
-        if (!$request->attributes->has('_controller')) {
-            $error = "The matched route does not have a [_controller] " .
+        if (!$request->attributes->has(RouteAttribute::CONTROLLER)) {
+            $error = "The matched route does not have a controller " .
                     "key/value pair. You should check the Route creation!";
             $this->logger->error($error, ['RequestAttributes' => $request->attributes->add(), $request->getPathInfo()]);
             throw new InvalidParameterException($error);

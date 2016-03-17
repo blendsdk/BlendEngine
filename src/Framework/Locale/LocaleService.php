@@ -17,12 +17,13 @@ use Blend\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpFoundation\Request;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\Exception\InvalidConfigException;
+use Blend\Component\Routing\RouteAttribute;
 
 /**
  * LocaleService provides automatic locale recognition to be used
  * by a translation service or other locale aware service in the
  * application. The current active locale can be read from the
- * Container _locale key
+ * Container RouteAttribute::LOCALE key
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
@@ -65,8 +66,8 @@ class LocaleService implements EventSubscriberInterface {
          */
 
         $locales = [
-            $request->attributes->get('_locale', null),
-            $request->getSession()->get('_locale', null),
+            $request->attributes->get(RouteAttribute::LOCALE, null),
+            $request->getSession()->get(RouteAttribute::LOCALE, null),
             $request->getLocale(),
         ];
 
@@ -80,10 +81,10 @@ class LocaleService implements EventSubscriberInterface {
         }
 
         if ($this->config->get('tranalstion.persistInSession', false) === true) {
-            $request->getSession()->set('_locale', $locale);
+            $request->getSession()->set(RouteAttribute::LOCALE, $locale);
         }
-        $request->attributes->set('_locale', $locale);
-        $event->getContainer()->setScalar('_locale', $locale);
+        $request->attributes->set(RouteAttribute::LOCALE, $locale);
+        $event->getContainer()->setScalar(RouteAttribute::LOCALE, $locale);
     }
 
     private function assertLocaleConfig() {
