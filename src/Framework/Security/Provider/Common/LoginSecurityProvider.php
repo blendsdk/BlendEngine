@@ -21,15 +21,14 @@ use Blend\Component\Security\Security;
  */
 class LoginSecurityProvider extends SecurityProvider {
 
+    const REFERER_URL = '_referer_url';
+
     public function getHandlerType() {
-        return Route::SECURITY_TYPE_LOGIN;
+        return Security::SECURITY_TYPE_LOGIN;
     }
 
     public function handle($accessMethod, Route $route) {
 
-        if ($accessMethod === Security::ACCESS_AUTHORIZED_USER) {
-            
-        }
     }
 
     /**
@@ -37,7 +36,7 @@ class LoginSecurityProvider extends SecurityProvider {
      * @return null|User\UserProviderInterface
      */
     protected function getCurrentUser() {
-        return $this->request->getSession()->get('_authenticated_user', new Guest());
+        return $this->request->getSession()->get(Security::AUTHENTICATED_USER, new Guest());
     }
 
     protected function saveReferer() {

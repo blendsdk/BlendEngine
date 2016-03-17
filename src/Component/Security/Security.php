@@ -21,5 +21,6 @@ class Security {
     const ACCESS_GUEST_ONLY = 30;
     const SECURITY_TYPE_API = 10;
     const SECURITY_TYPE_LOGIN = 20;
+    const AUTHENTICATED_USER = '_auth_user';
 
 }
