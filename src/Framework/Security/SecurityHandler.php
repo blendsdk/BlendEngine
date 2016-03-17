@@ -50,7 +50,7 @@ class SecurityHandler implements EventSubscriberInterface {
         } else {
             $handler = $this->getSecurityHandler($route->getSecurityType());
             if ($handler !== null) {
-                $response = $handler->hanlde($accessMethod, $route);
+                $response = $handler->handle($accessMethod, $route);
                 if ($response instanceof Response) {
                     $event->setResponse($response);
                 }
