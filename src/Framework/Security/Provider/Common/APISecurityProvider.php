@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Blend\Framework\Security\Provider\SecurityProvider;
 use Blend\Component\Routing\Route;
 use Blend\Component\Security\Security;
+use Symfony\Component\HttpFoundation\Cookie;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -25,10 +26,12 @@ abstract class APISecurityProvider extends SecurityProvider {
     protected abstract function receiveBrowserCookies();
 
     public function finalize($accessMethod, Route $route, Response $response) {
-        $response->headers->set('Access-Control-Allow-Origin', 'http://127.0.0.1:8001');
+
+        $response->headers->set('Access-Control-Allow-Origin', $this->request->server->get('HTTP_ORIGIN', null));
         $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
         $response->headers->set('Access-Control-Allow-Headers', 'token');
+        $response->headers->setCookie(new Cookie('token', 12345));
     }
 
     public function getHandlerType() {
