@@ -17,10 +17,12 @@ use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\HttpFoundation\Response;
 use Blend\Component\HttpKernel\KernelEvents;
 use Blend\Component\HttpKernel\Event\GetResponseEvent;
+use Blend\Component\HttpKernel\Event\GetFinalizeResponseEvent;
 use Blend\Component\DI\Container;
 use Blend\Component\Routing\Route;
 use Blend\Component\Security\Security;
 use Blend\Framework\Security\Provider\SecurityProviderInterface;
+use Blend\Component\HttpKernel\Event\KernelEvent;
 
 /**
  * Listens to the incomming requests and handles the security based on the
@@ -35,22 +37,38 @@ class SecurityHandler implements EventSubscriberInterface {
      */
     protected $container;
 
-    public function onRequest(GetResponseEvent $event) {
+    /**
+     * @var SecurityProviderInterface
+     */
+    protected $securityHandler;
+
+    /**
+     * @var mixed
+     */
+    protected $accessMethod;
+
+    /**
+     * @var Route
+     */
+    protected $route;
+
+    protected function initialize(KernelEvent $event) {
         $request = $event->getRequest();
         $this->container = $event->getContainer();
-
         /* @var $routes RouteCollection */
         $routes = $this->container->get(RouteCollection::class);
-        /* @var $route Route */
-        $route = $routes->get($request->attributes->get('_route'));
-        $accessMethod = $route->getAccessMethod();
+        $this->route = $routes->get($request->attributes->get('_route'));
+        $this->accessMethod = $this->route->getAccessMethod();
+    }
 
-        if ($accessMethod === Security::ACCESS_PUBLIC) {
+    public function onRequest(GetResponseEvent $event) {
+        $this->initialize($event);
+        if ($this->accessMethod === Security::ACCESS_PUBLIC) {
             return; //no-op
         } else {
-            $handler = $this->getSecurityHandler($route->getSecurityType());
+            $handler = $this->getSecurityHandler($this->route->getSecurityType());
             if ($handler !== null) {
-                $response = $handler->handle($accessMethod, $route);
+                $response = $handler->handle($this->accessMethod, $this->route);
                 if ($response instanceof Response) {
                     $event->setResponse($response);
                 }
@@ -77,9 +95,19 @@ class SecurityHandler implements EventSubscriberInterface {
         return null;
     }
 
+    public function onResponse(GetFinalizeResponseEvent $event) {
+        $this->initialize($event);
+        $handler = $this->getSecurityHandler($this->route->getSecurityType());
+        if ($handler !== null) {
+            $handler->finalize($this->accessMethod, $this->route, $event->getResponse());
+        }
+    }
+
     public static function getSubscribedEvents() {
         return [
             KernelEvents::REQUEST => ['onRequest'
+                , KernelEvents::PRIORITY_HIGHT + 900],
+            KernelEvents::FINALIZE_RESPONSE => ['onResponse'
                 , KernelEvents::PRIORITY_HIGHT + 900]
         ];
     }

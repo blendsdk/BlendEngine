@@ -19,6 +19,7 @@ use Blend\Framework\Security\Provider\SecurityProvider;
 use Blend\Framework\Security\User\UserProviderInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Blend\Framework\Security\User\Guest;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -111,6 +112,10 @@ abstract class LoginSecurityProvider extends SecurityProvider {
             $session->remove(self::REFERER_URL);
         }
         return $result;
+    }
+
+    public function finalize($accessMethod, Route $route, Response $response) {
+        return; //do nothing
     }
 
 }
