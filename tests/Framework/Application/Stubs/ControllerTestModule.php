@@ -41,7 +41,7 @@ class ControllerTestModule implements RouteProviderInterface {
         $builder->route('ping', '/ping', [self::class, 'ping']);
         $builder->route('hello', '/hello/{fname}/{lname}', [self::class, 'hello']);
         $builder->route('api', '/api/{key}/{value}', [self::class, 'api'])
-                ->setAPIRoute();
+                ->responseJSON();
     }
 
 }
