@@ -129,7 +129,7 @@ abstract class Application extends BaseApplication {
          * but we gain functionality by having a _authenticated_user
          * when possible
          */
-        $this->container->defineClass(SecurityHandler::class);
+        $this->container->defineSingleton(SecurityHandler::class);
 
         if (!$this->container->loadServicesFromFile($this->rootFolder
                         . '/config/services.json')) {
