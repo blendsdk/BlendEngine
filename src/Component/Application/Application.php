@@ -38,10 +38,10 @@ abstract class Application {
                 'The handleRequest did not return a valid Response object'
                 );
             }
+            $this->finalizeResponse($response);
         } catch (\Exception $ex) {
             $response = $this->handleRequestException($ex, $request);
         }
-        $this->finalizeResponse($response);
         $response->send();
     }
 
