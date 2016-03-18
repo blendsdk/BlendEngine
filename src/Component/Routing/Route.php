@@ -29,13 +29,9 @@ class Route extends RouteBase {
 
     public function __construct($path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '') {
         parent::__construct($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition);
-        $this->setDefault('_am', Security::ACCESS_PUBLIC);
+        $this->accessPublic();
+        $this->secureByLoginSecurity();
         $this->setDefault(RouteAttribute::LOCALE, null);
-        /**
-         * We make this by default to LOGIN bu the security handle will only
-         * act if the access method is not publc
-         */
-        $this->setDefault('_security_type', Security::SECURITY_TYPE_LOGIN);
     }
 
     public function compile() {
@@ -49,7 +45,7 @@ class Route extends RouteBase {
      * @param type $method
      * @return \Blend\Component\Routing\Route
      */
-    public function setAccessMethod($method) {
+    protected function setAccessMethod($method) {
         $this->setDefault('_am', $method);
         return $this;
     }
@@ -74,11 +70,10 @@ class Route extends RouteBase {
     }
 
     /**
-     * Mark a Route as API route, the responses that are retuned from
-     * the controller->action will be converted to a JSON response
+     * Mark the response of this route to be converted to JSON
      * @return \Blend\Component\Routing\Route
      */
-    public function setAPIRoute() {
+    public function responseJSON() {
         $this->setDefault(RouteAttribute::JSON_RESPONSE, true);
         return $this;
     }
@@ -88,8 +83,26 @@ class Route extends RouteBase {
      * @param type $type
      * @return \Blend\Component\Routing\Route
      */
-    public function setSecurityType($type) {
+    protected function setSecurityType($type) {
         $this->setDefault('_security_type', $type);
+        return $this;
+    }
+
+    /**
+     * Secure this route by a Login Security handler if enabled
+     * @return \Blend\Component\Routing\Route
+     */
+    public function secureByLoginSecurity() {
+        $this->setSecurityType(Security::SECURITY_TYPE_LOGIN);
+        return $this;
+    }
+
+    /**
+     * Secure this Route by an API Security handler if enabled
+     * @return \Blend\Component\Routing\Route
+     */
+    public function secureByAPISecurity() {
+        $this->setSecurityType(Security::SECURITY_TYPE_API);
         return $this;
     }
 
