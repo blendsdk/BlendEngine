@@ -103,23 +103,29 @@ class Route extends RouteBase {
 
     /**
      * Mark this Route as publicly accessible
+     * @return \Blend\Component\Routing\Route
      */
     public function accessPublic() {
         $this->setAccessMethod(Security::ACCESS_PUBLIC);
+        return $this;
     }
 
     /**
      * Mark this Rout only accessible by an authorized user
+     * @return \Blend\Component\Routing\Route
      */
     public function accessAuthorized() {
         $this->setAccessMethod(Security::ACCESS_AUTHORIZED_USER);
+        return $this;
     }
 
     /**
      * Mark this Route only accessible if the used is not authorized
+     * @return \Blend\Component\Routing\Route
      */
     public function accessGuestOnly() {
         $this->setAccessMethod(Security::ACCESS_GUEST_ONLY);
+        return $this;
     }
 
 }
