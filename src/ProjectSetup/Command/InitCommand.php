@@ -127,7 +127,7 @@ class InitCommand extends Command {
         extract($this->renderContext);
 
         $this->renameTable = array(
-            'src/gitignore' => '.gitignore',
+            'src/gitignore' => 'src/.gitignore',
             'config/gitignore' => 'config/.gitignore',
             'resources/gitignore' => 'resources/.gitignore',
             'resources/sass/app.scss' => 'resources/sass/' . $applicationScriptName . '.scss',
