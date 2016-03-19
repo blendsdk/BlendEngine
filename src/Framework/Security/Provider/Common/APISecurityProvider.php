@@ -23,12 +23,12 @@ use Symfony\Component\HttpFoundation\Cookie;
  */
 abstract class APISecurityProvider extends SecurityProvider {
 
-    protected abstract function receiveBrowserCookies();
-
     public function finalize($accessMethod, Route $route, Response $response) {
 
-        $response->headers->set('Access-Control-Allow-Origin', $this->request->server->get('HTTP_ORIGIN', null));
-        $response->headers->set('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+        $response->headers->set('Access-Control-Allow-Origin'
+                , $this->request->server->get('HTTP_ORIGIN', null));
+        $response->headers->set('Access-Control-Allow-Methods'
+                , 'POST, GET, OPTIONS');
         $response->headers->set('Access-Control-Allow-Credentials', 'true');
         $response->headers->set('Access-Control-Allow-Headers', 'token');
         $response->headers->setCookie(new Cookie('token', 12345));
