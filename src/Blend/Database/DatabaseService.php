@@ -236,7 +236,7 @@ class DatabaseService {
         $result = array();
         foreach ($list as $key => $value) {
             $k = ":{$key}";
-            $result[$k] = $value;
+            $result[$k] = is_bool($value) ? ($value === true ? 'TRUE' : 'FALSE') : $value;
         }
         return $result;
     }
