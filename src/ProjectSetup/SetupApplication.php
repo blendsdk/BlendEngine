@@ -22,7 +22,7 @@ use Blend\ProjectSetup\Command\InitCommand;
 class SetupApplication extends Application {
 
     public function __construct($script_dir) {
-        parent::__construct($script_dir, 'BlendEngine Setup Utility', '1.0');
+        parent::__construct($script_dir, 'BlendEngine Setup Utility', '2.0');
         $this->add(new InitCommand());
     }
 
