@@ -1,0 +1,29 @@
+{
+    "name": "<?php echo $applicationName?>",
+    "timezone": "<?php echo date_default_timezone_get()?>",
+    "database": {
+        "host": "localhost",
+        "database": "<?php echo $applicationDatabaseName?>",
+        "username": "postgres",
+        "password": "postgres",
+        "port": 5432
+    },
+    "email": {
+        "host": "email.host.com",
+        "port": 465,
+        "username": "username",
+        "password": "password",
+        "encryption": "ssl",
+        "auth_mode": "login"
+    },
+    "translation": {
+        "defaultLocale": "nl",
+        "availableLocales": ["en","nl", "am"],
+        "persistInSession": false
+    },
+    "authmodule": {
+        "login_path": "/login",
+        "logout_path": "/logout",
+        "after_logout_path": "/"
+    }
+}

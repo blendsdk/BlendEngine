@@ -1,0 +1,16 @@
+{
+    "name": "<?php echo $applicationPackageName;?>",
+    "require": {
+        "php": ">=5.5.9",
+        "blendsdk/blendengine": "dev-engine2"
+    },
+    "autoload": {
+        "psr-4": {
+            "<?php echo $applicationName;?>\\": "src",
+            "Acme\\": "src/Acme"
+        },
+        "files": [
+            "src/Globals.php"
+        ]
+    }
+}
