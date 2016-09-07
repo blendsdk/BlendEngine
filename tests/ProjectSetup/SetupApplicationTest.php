@@ -23,7 +23,7 @@ class SetupApplicationTest extends \PHPUnit_Framework_TestCase {
         $this->assertTrue(file_exists("$projectFolder/web/css/sanity.css"));
         $commandTester = ProjectUtil::runCommand($projectFolder, 'list', ['-V --no-ansi'], 'Sanity\Console\SanityApplication');
         $display = preg_replace('/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]/', '', $commandTester->getDisplay());
-        $this->assertTrue(stripos($display, "Sanity Command Utility version 1.0") !== false);
+        $this->assertTrue(stripos($display, "Sanity Command Utility 1.0") !== false, $display);
     }
 
 }
