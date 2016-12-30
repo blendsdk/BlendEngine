@@ -11,7 +11,7 @@
 
 namespace Blend\Tests\Framework\Translation\Stubs;
 
-use Blend\Framework\Application\Application;
+use Blend\Framework\Application\ApplicationTestable;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Blend\Component\DI\Container;
@@ -22,7 +22,7 @@ use Blend\Component\Configuration\Configuration;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class TestableApplication extends Application {
+class TestableApplication extends ApplicationTestable {
 
     /**
      * @return Container
@@ -36,6 +36,11 @@ class TestableApplication extends Application {
      */
     public function getConfiguration() {
         return $this->container->get(Configuration::class);
+    }
+
+    protected function confiureServices(\Blend\Component\DI\ServiceContainer $container) {
+        $container->loadServices(array(
+        ));
     }
 
 }

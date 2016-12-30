@@ -56,6 +56,7 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         $appName = 'App1';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
+        $loader->addPsr4("Acme" . '\\', $projectFolder .'/src/Acme');
         $factory = new ApplicationFactory($clazz, $projectFolder);
         $factory->create();
         $configCache = $projectFolder . '/var/cache/config.cache';
@@ -92,6 +93,7 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         $appName = 'App13';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
+        $loader->addPsr4("Acme" . '\\', $projectFolder .'/src/Acme');
         $factory = new ApplicationFactory($clazz, $projectFolder);
         $app = $factory->create();
         $request = Request::create("/notexists");
@@ -109,11 +111,13 @@ class ApplicationFactoryTest extends \PHPUnit_Framework_TestCase {
         $appName = 'App14';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
-        ProjectUtil::appendOrCreateServicesConfig($projectFolder, [
-            'custom-exception-handler' => CustomRequestExceptionHandler::class
-        ]);
+        $loader->addPsr4("Acme" . '\\', $projectFolder .'/src/Acme');
         $factory = new ApplicationFactory($clazz, $projectFolder);
         $app = $factory->create();
+        $app->loadServices([
+            'custom-exception-handler' => CustomRequestExceptionHandler::class
+        ]);
+        $app->reInstallEventSubscribers();
         $request = Request::create("/notexists");
         $output = catch_output(function() use($app, $request) {
             $app->run($request);

@@ -20,7 +20,7 @@ use Blend\Framework\Security\User\UserProviderInterface;
 use Blend\Component\Security\Security;
 
 /**
- * Runtime is essencially a wrapper around the Container that can be used
+ * Runtime is essentially a wrapper around the Container that can be used
  * to be customized and passed round to get and set domain (project)
  * specific settings
  *

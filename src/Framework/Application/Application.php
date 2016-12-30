@@ -87,6 +87,8 @@ abstract class Application extends BaseApplication {
      */
     protected $filesystem;
 
+    protected abstract function confiureServices(ServiceContainer $container);
+
     public function __construct(Configuration $config
     , LoggerInterface $logger
     , LocalCache $localCache
@@ -95,7 +97,7 @@ abstract class Application extends BaseApplication {
         /**
          * Calling the initialize from the constructor will force some of
          * services to be instantiated early on which will result these object
-         * beserialized too when the Application is being cached
+         * be serialized too when the Application is being cached
          */
         $this->rootFolder = $rootFolder;
         $this->routeCollection = new RouteCollection();
@@ -125,17 +127,12 @@ abstract class Application extends BaseApplication {
 
         /**
          * Adds the SecurityHandler class by default. This will
-         * add a small overdead to the request/response cycle
+         * add a small overhead to the request/response cycle
          * but we gain functionality by having a _authenticated_user
          * when possible
          */
         $this->container->defineSingleton(SecurityHandler::class);
-
-        if (!$this->container->loadServicesFromFile($this->rootFolder
-                        . '/config/services.json')) {
-            $this->logger->notice(
-                    "No service description file found!");
-        }
+        $this->confiureServices($this->container);
         $this->installEventSubscribers();
     }
 

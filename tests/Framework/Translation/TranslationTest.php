@@ -33,16 +33,17 @@ class TranslationTest extends \PHPUnit_Framework_TestCase {
         $appName = 'TransApp1';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
-        ProjectUtil::appendOrCreateServicesConfig($projectFolder, [
-            'acme-module' => [$projectFolder . '/src/Acme', 'Acme\\Acme'],
+        $loader->addPsr4("Acme" . '\\', $projectFolder .'/src/Acme');
+        $factory = new ApplicationFactory($clazz, $projectFolder);
+        /* @var $app TestableApplication */
+        $app = $factory->create();
+        $app->loadServices([
             'locale-service' => LocaleService::class,
             TranslatorInterface::class => TranslatorFactory::class,
             'test-translations' => Stubs\TestTranslationProvider::class
         ]);
-        $factory = new ApplicationFactory(TestableApplication::class, $projectFolder);
-        /* @var $app TestableApplication */
-        $app = $factory->create();
-        $request = Request::create("/am");
+        $app->reInstallEventSubscribers();
+        $request = Request::create("/?_locale=am");
         ProjectUtil::addSession($request);
         $output = catch_output(function() use($app, $request) {
             $app->run($request);

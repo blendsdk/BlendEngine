@@ -78,7 +78,11 @@ class TwigServiceTest extends \PHPUnit_Framework_TestCase {
         $appName = 'TwigRouting';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
-        ProjectUtil::appendOrCreateServicesConfig($projectFolder, [
+        $loader->addPsr4("Acme" . '\\', $projectFolder .'/src/Acme');
+        $factory = new ApplicationFactory($clazz, $projectFolder, true);
+        /* @var $app TestableApplication */
+        $app = $factory->create();
+        $app->loadServices([
             "runtime" => 'TwigRouting\\TwigRoutingRuntime',
             "twig-module" => TwigModule::class,
             'locale-service' => LocaleService::class,
@@ -86,9 +90,7 @@ class TwigServiceTest extends \PHPUnit_Framework_TestCase {
             'test-translations' => TestTranslationProvider::class,
             EngineInterface::class => TwigEngineService::class,
         ]);
-        $factory = new ApplicationFactory($clazz, $projectFolder, true);
-        /* @var $app TestableApplication */
-        $app = $factory->create();
+        $app->reInstallEventSubscribers();
         $request = Request::create("/urltest/am");
         ProjectUtil::addSession($request);
         $output = catch_output(function() use($app, $request) {

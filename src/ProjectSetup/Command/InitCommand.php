@@ -34,7 +34,7 @@ class InitCommand extends Command {
     private $workFolder;
 
     /**
-     * Points to the folder where the temapltes are located
+     * Points to the folder where the templates are located
      * @var string
      */
     private $templatesFolder;
@@ -64,6 +64,12 @@ class InitCommand extends Command {
     private $applicationName;
 
     /**
+     * Flag to generate a testable Application
+     * @var type
+     */
+    private $testable;
+
+    /**
      * Mapping table to be used when rendering files
      * @var array
      */
@@ -81,18 +87,27 @@ class InitCommand extends Command {
      */
     private $hasPostgres;
 
+    /**
+     * The current version of installed BlendEngine
+     * @var string
+     */
+    private $installedSDKVersion;
+
     protected function configure() {
+
         parent::configure();
 
         $this->templatesFolder = realpath(__DIR__ . '/../Resources/Templates');
         $this->workFolder = getcwd();
         $this->applicationName = str_identifier((new \SplFileInfo($this->workFolder))->getBasename());
-        $this->prepareTablesAndContext();
         $this->templates = $this->getTemplateNames();
+        $this->installedSDKVersion = $this->getInstalledBlendEngineVersion();
+
         $this->setName('init')
                 ->setDescription('Initializes a new BlendEngine project in [' . $this->workFolder . ']')
                 ->addOption('template', 't', InputOption::VALUE_OPTIONAL, 'Name of the template to generate this project (' . implode(',', $this->templates) . ')', 'Basic')
-                ->addOption('appname', 'a', InputOption::VALUE_OPTIONAL, 'Name of the application to generate', $this->applicationName);
+                ->addOption('appname', 'a', InputOption::VALUE_OPTIONAL, 'Name of the application to generate', $this->applicationName)
+                ->addOption('testable', 'x', InputOption::VALUE_OPTIONAL, 'Expose the application internals for testing. (Internal use only)', false);
     }
 
     /**
@@ -104,6 +119,7 @@ class InitCommand extends Command {
         $lowerAppName = strtolower($this->applicationName);
         $gitInfo = $this->getCurrentGitUser();
         return array(
+            'testable' => $this->testable,
             'applicationName' => $this->applicationName,
             'applicationScriptName' => $lowerAppName,
             'applicationNamespace' => $this->applicationName,
@@ -127,7 +143,7 @@ class InitCommand extends Command {
         extract($this->renderContext);
 
         $this->renameTable = array(
-            'src/gitignore' => 'src/.gitignore',
+            'gitignore' => '.gitignore',
             'config/gitignore' => 'config/.gitignore',
             'resources/gitignore' => 'resources/.gitignore',
             'resources/sass/app.scss' => 'resources/sass/' . $applicationScriptName . '.scss',
@@ -145,7 +161,6 @@ class InitCommand extends Command {
             'phpunit.xml.dist',
             'tests/README',
             'config/config.json',
-            'resources/services.php',
             'bin/app',
             'bin/app.bat',
             'bin/app.php',
@@ -168,11 +183,19 @@ class InitCommand extends Command {
             $template = strtolower($input->getOption('template'));
             if ($this->checkTemplate($template)) {
                 $this->applicationName = $input->getOption('appname');
+                $this->testable = $input->getOption('testable');
                 $output->writeln('<info>Generating ' . $this->applicationName . ' :)</info>');
+                $this->prepareTablesAndContext();
                 $this->generateWithTemplate($template, $output);
                 $this->runCompass($output);
                 $this->createVarFolders();
-                $this->syncServices($input, $output);
+                $this->setSDKVersion();
+
+                $output->writeln(
+                        [""
+                            , "<info>Thank you for using BlendEngine :)</info>"
+                            , "<info>Enjoy!</info>"]
+                );
             } else {
                 $output->writeln("<error>The requested template [" . $template . '] does not exist!</error>');
             }
@@ -191,24 +214,6 @@ class InitCommand extends Command {
         foreach ($folders as $folder) {
             $fs->ensureFolder($folder, 0777);
         }
-    }
-
-    private function syncServices(InputInterface $input, OutputInterface $output) {
-        $command = new ServicesSyncCommand();
-        $command->setApplicationFolder($this->workFolder);
-        $this->getApplication()->add($command);
-        $command->run($input, $output);
-        $context = $this->createRenderContext();
-        $output->writeln("");
-        $output->writeln("You can edit the {$command->getServiceFile()},");
-        $output->writeln("then run <info>bin/{$context['applicationScriptName']} " .
-                "{$command->getName()}</info> to synchronize the " .
-                "<info>config/services.json</info> file.");
-        $output->writeln(
-                [""
-                    , "<info>Thank you for using BlendEngine :)</info>"
-                    , "<info>Enjoy!</info>"]
-        );
     }
 
     /**
@@ -300,7 +305,7 @@ class InitCommand extends Command {
     }
 
     /**
-     * Find the names of currently availble templates
+     * Find the names of currently available templates
      * @return type
      */
     private function getTemplateNames() {
@@ -330,6 +335,32 @@ class InitCommand extends Command {
                 ->notName("composer.*")
                 ->notName("reset-project.*");
         return $finder->count() === 0;
+    }
+
+    /**
+     * Get the current version of the installed BlendEngine
+     * @return string
+     */
+    private function getInstalledBlendEngineVersion() {
+        $fname = $this->workFolder . '/composer.json';
+        if (file_exists($fname) && is_file($fname)) {
+            $config = json_decode(file_get_contents($fname), true);
+            return $config["require"]["blendsdk/blendengine"];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Set the correct SDK version in the newly created/initialized project
+     */
+    private function setSDKVersion() {
+        if ($this->installedSDKVersion !== null) {
+            $fname = $this->workFolder . '/composer.json';
+            $config = json_decode(file_get_contents($fname), true);
+            $config["require"]["blendsdk/blendengine"] = $this->installedSDKVersion;
+            file_put_contents($fname, json_encode($config, JSON_PRETTY_PRINT));
+        }
     }
 
     /**
@@ -371,6 +402,7 @@ class InitCommand extends Command {
             $output->writeln("<info>Compass is installed on your system, great.</info>");
             return true;
         } catch (\Exception $e) {
+            $log = $e->getMessage();
             $output->writeln([
                 "",
                 "<warn>WARNING: Compass could not be verified on your system!</warn>",

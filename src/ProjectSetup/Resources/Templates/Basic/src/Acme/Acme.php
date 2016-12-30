@@ -16,7 +16,7 @@ use Acme\AcmeController;
 class Acme implements RouteProviderInterface {
 
     public function loadRoutes(RouteBuilder $builder) {
-        $builder->route('home', '/{_locale}', [AcmeController::class, 'index']);
+        $builder->route('home', '/', [AcmeController::class, 'index']);
     }
 
 }

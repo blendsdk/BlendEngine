@@ -22,32 +22,29 @@ use Composer\Autoload\ClassLoader;
 class ServiceContainer extends Container {
 
     /**
-     * Load services from a JSON configuration. The services will be registered
-     * as singletons inside the container
-     * @param type $filename
-     * @return boolean
+     * Loads the services from a dictionary array. The array keys should be
+     * the interface names and the values should be class names
+     * @param type $services a dictionary array
      */
-    public function loadServicesFromFile($filename) {
+    public function loadServices($services = []) {
         $classLoader = $this->getClassLoader();
-        if (file_exists($filename)) {
-            $config = json_decode(file_get_contents($filename), true);
-            foreach ($config as $interface => $serviceDescription) {
-                if (is_string($serviceDescription)) {
-                    $this->defineSingletonWithInterface($interface
-                            , $serviceDescription);
-                } else if ($classLoader !== null &&
-                        is_array($serviceDescription) &&
-                        count($serviceDescription) == 2) {
-                    list($folder, $className) = $serviceDescription;
-                    $ns = explode('\\', $className);
-                    $classLoader->addPsr4($ns[0] . '\\', $folder);
-                    $this->defineSingletonWithInterface($interface
-                            , $className);
-                }
-            }
-            return true;
+        if (!is_array($services)) {
+            $services = array($services);
         }
-        return false;
+        foreach ($services as $interface => $serviceDescription) {
+            if (is_string($serviceDescription)) {
+                $this->defineSingletonWithInterface($interface
+                        , $serviceDescription);
+            } else if ($classLoader !== null &&
+                    is_array($serviceDescription) &&
+                    count($serviceDescription) == 2) {
+                list($folder, $className) = $serviceDescription;
+                $ns = explode('\\', $className);
+                $classLoader->addPsr4($ns[0] . '\\', $folder);
+                $this->defineSingletonWithInterface($interface
+                        , $className);
+            }
+        }
     }
 
     /**
