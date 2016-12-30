@@ -17,6 +17,7 @@
         "auth_mode": "login"
     },
     "translation": {
+        "localeParameterName" : "lang",
         "defaultLocale": "nl",
         "availableLocales": ["en","nl", "am"],
         "persistInSession": false

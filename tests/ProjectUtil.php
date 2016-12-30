@@ -72,7 +72,7 @@ class ProjectUtil {
      * @param boolean $rebuild
      * @return string
      */
-    public static function createNewProject($projectName, $rebuild = false, $deleteServices = true) {
+    public static function createNewProject($projectName, $rebuild = false) {
 
         $fs = new Filesystem();
         $projectFolder = TEMP_DIR . '/TestProjects/' . $projectName;
@@ -84,10 +84,7 @@ class ProjectUtil {
 
         $fs->ensureFolder($projectFolder);
         $projectFolder = realpath($projectFolder);
-        self::runCommand($projectFolder, 'init');
-        if ($deleteServices) {
-            file_put_contents($projectFolder . '/config/services.json', json_encode([]));
-        }
+        self::runCommand($projectFolder, 'init', array("--testable" => true));
         return $projectFolder;
     }
 
@@ -105,19 +102,6 @@ class ProjectUtil {
         $loader->addPsr4($ns . '\\', $projectFolder . '/src/');
         $loader->register(true);
         return ["{$ns}\\{$ns}Application", $loader];
-    }
-
-    public static function appendOrCreateServicesConfig($projectFolder, array $services = []) {
-        $servicesFile = $projectFolder . '/config/services.json';
-        $merge = [];
-        if (file_exists($servicesFile)) {
-            $merge = json_decode(file_get_contents($servicesFile), true);
-            if (!is_array($merge)) {
-                $merge = [];
-            }
-        }
-        $merge = array_merge($merge, $services);
-        file_put_contents($servicesFile, json_encode($merge));
     }
 
     public static function addSession(Request $request) {

@@ -43,4 +43,9 @@ class TestableApplication extends Application {
         return $ex;
     }
 
+    protected function confiureServices(\Blend\Component\DI\ServiceContainer $container) {
+        $container->loadServices(array(
+        ));
+    }
+
 }

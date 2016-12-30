@@ -32,12 +32,13 @@ class ApplicationRequestKernelTest extends \PHPUnit_Framework_TestCase {
         $appName = 'App15';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
-        ProjectUtil::appendOrCreateServicesConfig($projectFolder, [
+        $factory = new ApplicationFactory($clazz, $projectFolder);
+        $app = $factory->create();
+        $app->loadServices([
             'custom-exception-handler' => CustomRequestExceptionHandler::class,
             'controller-test-module' => ControllerTestModule::class
         ]);
-        $factory = new ApplicationFactory($clazz, $projectFolder);
-        $app = $factory->create();
+        $app->reInstallEventSubscribers();
         $request = Request::create("/no-response");
         $output = catch_output(function() use($app, $request) {
             $app->run($request);
@@ -53,12 +54,13 @@ class ApplicationRequestKernelTest extends \PHPUnit_Framework_TestCase {
         $appName = 'App16';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
-        ProjectUtil::appendOrCreateServicesConfig($projectFolder, [
+        $factory = new ApplicationFactory($clazz, $projectFolder);
+        $app = $factory->create();
+        $app->loadServices([
             'custom-exception-handler' => CustomRequestExceptionHandler::class,
             'controller-test-module' => ControllerTestModule::class
         ]);
-        $factory = new ApplicationFactory($clazz, $projectFolder);
-        $app = $factory->create();
+        $app->reInstallEventSubscribers();
         $output = catch_output(function() use($app) {
             $app->run(Request::create("/ping"));
         });
@@ -78,13 +80,13 @@ class ApplicationRequestKernelTest extends \PHPUnit_Framework_TestCase {
         $appName = 'App15';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
-        ProjectUtil::appendOrCreateServicesConfig($projectFolder, [
+        $factory = new ApplicationFactory($clazz, $projectFolder);
+        $app = $factory->create();
+        $app->loadServices([
             'custom-exception-handler' => CustomRequestExceptionHandler::class,
             'controller-test-module' => ControllerTestModule::class
         ]);
-        $factory = new ApplicationFactory($clazz, $projectFolder);
-        $app = $factory->create();
-
+        $app->reInstallEventSubscribers();        
         $output = catch_output(function() use($app) {
             $request = Request::create("/api/hello/world");
             $app->run($request);

@@ -8,6 +8,7 @@
 >
     <php>
         <ini name="error_reporting" value="-1" />
+        <env name="XDEBUG_CONFIG" value="idekey=netbeans-xdebug"/>
     </php>
 
     <testsuites>
