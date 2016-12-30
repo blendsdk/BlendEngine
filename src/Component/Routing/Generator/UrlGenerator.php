@@ -28,8 +28,8 @@ class UrlGenerator extends GeneratorBase {
 
     public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null, $_locale = null) {
         /**
-         * The $_locale parameter is automatically retrived from the container
-         * if the LocaleService is availble
+         * The $_locale parameter is automatically retrieved from the container
+         * if the LocaleService is available
          */
         parent::__construct($routes, $context, $logger);
         $this->locale = $_locale;
