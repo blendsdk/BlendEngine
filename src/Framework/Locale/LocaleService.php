@@ -45,6 +45,11 @@ class LocaleService implements EventSubscriberInterface {
     protected $availableLocales;
 
     /**
+     * @var string
+     */
+    protected $localeParamName;
+
+    /**
      * @var Request
      */
     protected $request;
@@ -64,12 +69,15 @@ class LocaleService implements EventSubscriberInterface {
          *  default to -> browser locale
          *  default to -> translation.defaultLocale
          */
+        $locales = [];
+        foreach (array(RouteAttribute::LOCALE, $this->localeParamName) as $item) {
+            $locales[] = $request->attributes->get($item, null);
+            $locales[] = $request->getSession()->get($item, null);
+            $locales[] = $request->query->get($item, null);
+            $locales[] = $request->getLocale();
+        }
 
-        $locales = [
-            $request->attributes->get(RouteAttribute::LOCALE, null),
-            $request->getSession()->get(RouteAttribute::LOCALE, null),
-            $request->getLocale(),
-        ];
+        $locales = array_unique($locales);
 
         $locale = $this->defaultLocale;
 
@@ -88,6 +96,7 @@ class LocaleService implements EventSubscriberInterface {
     }
 
     private function assertLocaleConfig() {
+        $this->localeParamName = $this->config->get('translation.localeParameterName', "_lang");
         $this->defaultLocale = $this->config->get('translation.defaultLocale', null);
         $this->availableLocales = $this->config->get('translation.availableLocales', []);
         if (empty($this->availableLocales)) {
