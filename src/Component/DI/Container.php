@@ -330,7 +330,7 @@ class Container {
     }
 
     /**
-     * Check to see if the interface alreay exists, in which case it throws
+     * Check to see if the interface already exists, in which case it throws
      * an InvalidConfigException
      * @param string $interface
      * @throws InvalidConfigException
