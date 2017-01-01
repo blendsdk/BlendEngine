@@ -17,7 +17,6 @@ class <?php echo $applicationCommandClassName;?> extends Application {
     public function __construct($scriptPath) {
         parent::__construct($scriptPath, '<?php echo $applicationName?> Command Utility', '1.0');
         $this->add(new ServeCommand());
-        $this->add(new ServicesSyncCommand());
         $this->add(new DataModelCommand());
     }
 
