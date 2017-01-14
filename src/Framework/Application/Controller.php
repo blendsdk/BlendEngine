@@ -31,14 +31,19 @@ abstract class Controller {
      */
     protected $runtime;
 
+    /**
+     * Returns an array or a folder where the views are located
+     */
     protected abstract function getTemplatesFolder();
 
     public function __construct(EngineInterface $renderer, RuntimeProviderInterface $runtime) {
         $this->renderer = $renderer;
         $this->runtime = $runtime;
-        $this->renderer->setViewPaths([
-            $this->getTemplatesFolder()
-        ]);
+        $viewsPath = $this->getTemplatesFolder();
+        if(!is_array($viewsPath)) {
+            $view = array($viewsPath);
+        }
+        $this->renderer->setViewPaths($viewsPath);
     }
 
 }
