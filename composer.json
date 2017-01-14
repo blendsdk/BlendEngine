@@ -27,7 +27,8 @@
         "symfony/event-dispatcher": "^3.0",
         "symfony/translation": "^3.0",
         "symfony/config": "^3.0",
-        "twig/twig": "^1.24"
+        "twig/twig": "^1.24",
+        "symfony/twig-bridge": "^3.2"
     },
     "autoload": {
         "psr-4": {
