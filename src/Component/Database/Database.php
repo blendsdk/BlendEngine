@@ -55,7 +55,7 @@ class Database {
     private $dsn;
 
     /**
-     * Retrives the name of the current database
+     * Retrieves the name of the current database
      * @return string
      */
     public function getDatabaseName() {
@@ -80,7 +80,7 @@ class Database {
     }
 
     /**
-     * Executes a SQL statament and returns the first column of the first row in the
+     * Executes a SQL statement and returns the first column of the first row in the
      * result set returned by the query. Additional columns or rows are ignored.
      * @param string $sql The SQL to execute
      * @param array $params The parameters to populate the SQL query
@@ -96,12 +96,12 @@ class Database {
     }
 
     /**
-     * Executes a SQL statement and retuns a recordset given resultType
+     * Executes a SQL statement and returns a recordset given resultType
      * @param string $sql The SQL to execute
      * @param array $params The parameters to populate the SQL query
      * @param StatementResult $statementResult The query result to get the number of
-     * affected redords
-     * @param int $resultType The esult type, defaults to \PDO::FETCH_ASSOC
+     * affected records
+     * @param int $resultType The result type, defaults to \PDO::FETCH_ASSOC
      * @return mixed
      * @throws DatabaseQueryException
      */
@@ -133,7 +133,7 @@ class Database {
     }
 
     /**
-     * Executes a multiline SQL query script
+     * Executes a multi-line SQL query script
      * @param string $sql
      * @return boolean Returns true or exception
      * @throws DatabaseQueryException
@@ -165,7 +165,7 @@ class Database {
      * Inserts a record into the database using an associative
      * array (key => value pairs)
      * @param string $table_name The name of the table to insert
-     * @param array $params An assiciative array containing key => value pairs
+     * @param array $params An associative array containing key => value pairs
      * @param StatementResult $statementResult The StatementResult
      * @param number $resultType The PDO Fetch type
      * @return array
@@ -187,7 +187,7 @@ class Database {
     }
 
     /**
-     * Delets a record from the database using a custom condition and
+     * Deletes a record from the database using a custom condition and
      * an associative array as condition parameters
      * @param string $table_name The name of the table
      * @param string $condition The WHERE condition
@@ -220,7 +220,7 @@ class Database {
      * @param string $table_name the name of the table to update
      * @param array $params column setters. This is an associative array
      * @param string $condition The WHERE clause
-     * @param array $cparams The WHERE clause paramaters
+     * @param array $cparams The WHERE clause parameters
      * @param StatementResult $statementResult The StatementResult
      * @param integer $resultType The PDO Fetch type
      * @return array The updated record result

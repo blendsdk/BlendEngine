@@ -22,7 +22,7 @@ class StatementResult {
     private $affectedRecords;
 
     /**
-     * Get the number od affected records
+     * Get the number of affected records
      * @return integer
      */
     public function getAffectedRecords() {

@@ -372,6 +372,7 @@ class InitCommand extends Command {
         $p = new Process('git config --list');
         $p->enableOutput();
         $result = [];
+        $user = get_current_user();
         try {
             $p->mustRun();
             $lines = explode("\n", trim($p->getOutput()));
@@ -381,9 +382,14 @@ class InitCommand extends Command {
                     $result[$ar[0]] = $ar[1];
                 }
             }
+            if(!isset($result['user.name'])) {
+                $result['user.name'] = $user;
+            }
+            if(!isset($result['user.email'])) {
+                $result['user.email'] = $user;
+            }            
             return $result;
         } catch (\Exception $e) {
-            $user = get_current_user();
             return array(
                 'user.name' => $user,
                 'user.email' => $user

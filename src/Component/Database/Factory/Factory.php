@@ -191,7 +191,7 @@ abstract class Factory {
     }
 
     /**
-     * Creates an condition from an associative array
+     * Creates an AND condition from an associative array
      * @param array $params
      * @return array
      */
@@ -235,8 +235,10 @@ abstract class Factory {
     }
 
     /**
-     * Geta single record by params as condition and arguments
-     * @param array $params
+     * Gets a single records using $byColumns as AND condition
+     * @param array $selectColumns
+     * @param array $byColumns
+     * @return type
      */
     protected function getOneBy(array $selectColumns, array $byColumns) {
         list($condition, $conditionParams) = $this->createAndCondition($byColumns);
@@ -255,7 +257,7 @@ abstract class Factory {
     }
 
     /**
-     * Deletes a single record by params as condition and arguments
+     * Deletes a single record by $byColumns as condition and arguments
      * @param array $byColumns
      */
     protected function deleteOneBy(array $byColumns) {
@@ -277,7 +279,7 @@ abstract class Factory {
     }
 
     /**
-     * Deletes records by params as condition and arguments
+     * Deletes records by $byColumns as condition and arguments
      * @param array $byColumns
      */
     protected function deleteManyBy(array $byColumns
@@ -293,7 +295,7 @@ abstract class Factory {
     }
 
     /**
-     * Retuns the count of record by a condition set in $byColumns
+     * Returns the count of record by a condition set in $byColumns
      * @param array $byCondition
      * @return integer
      */
@@ -317,7 +319,7 @@ abstract class Factory {
 
     /**
      * Gets many records from a relation
-     * @param array $selectColumns columnt o select
+     * @param array $selectColumns column o select
      * @param array $byColumns condition
      * @param type $orderDirective
      * @param type $offsetLimitDirective
