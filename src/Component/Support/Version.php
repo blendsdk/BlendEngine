@@ -86,6 +86,9 @@ class Version {
      */
     public function bumpMajor() {
         $this->major += 1;
+        $this->minor = 0;
+        $this->build = 0;
+        $this->release = null;
         return $this;
     }
 
@@ -95,6 +98,8 @@ class Version {
      */
     public function bumpMinor() {
         $this->minor += 1;
+        $this->build = 0;
+        $this->release = null;
         return $this;
     }
 
@@ -104,6 +109,7 @@ class Version {
      */
     public function bumpBuild() {
         $this->build += 1;
+        $this->release = null;
         return $this;
     }
 
