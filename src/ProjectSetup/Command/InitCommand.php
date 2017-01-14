@@ -18,7 +18,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 use Blend\Component\Filesystem\Filesystem;
-use Blend\Framework\Console\Command\ServicesSyncCommand;
 
 /**
  * InitCommand helps to initialize a new BlendEngine Application
@@ -169,7 +168,8 @@ class InitCommand extends Command {
             'src/Application.php',
             'src/Runtime.php',
             'web/app_dev.php',
-            'web/app.php'
+            'web/app.php',
+            'src/Console/Command/PublishCommand.php'
         );
     }
 
@@ -345,7 +345,11 @@ class InitCommand extends Command {
         $fname = $this->workFolder . '/composer.json';
         if (file_exists($fname) && is_file($fname)) {
             $config = json_decode(file_get_contents($fname), true);
-            return $config["require"]["blendsdk/blendengine"];
+            if (isset($config["require"]["blendsdk/blendengine"])) {
+                return $config["require"]["blendsdk/blendengine"];
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -382,12 +386,12 @@ class InitCommand extends Command {
                     $result[$ar[0]] = $ar[1];
                 }
             }
-            if(!isset($result['user.name'])) {
+            if (!isset($result['user.name'])) {
                 $result['user.name'] = $user;
             }
-            if(!isset($result['user.email'])) {
+            if (!isset($result['user.email'])) {
                 $result['user.email'] = $user;
-            }            
+            }
             return $result;
         } catch (\Exception $e) {
             return array(

@@ -13,6 +13,7 @@ namespace Blend\ProjectSetup;
 
 use Blend\Framework\Console\Application;
 use Blend\ProjectSetup\Command\InitCommand;
+use Blend\ProjectSetup\Command\PublishCommand;
 
 /**
  * ProjectSetupApplication
@@ -24,6 +25,7 @@ class SetupApplication extends Application {
     public function __construct($script_dir) {
         parent::__construct($script_dir, 'BlendEngine Setup Utility', '2.0');
         $this->add(new InitCommand());
+        $this->add(new PublishCommand());
     }
 
 }
