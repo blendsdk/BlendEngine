@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Application;
+namespace Blend\Framework\Application;
 
 use Blend\Component\Templating\EngineInterface;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
