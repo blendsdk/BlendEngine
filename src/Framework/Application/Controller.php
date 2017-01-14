@@ -41,7 +41,7 @@ abstract class Controller {
         $this->runtime = $runtime;
         $viewsPath = $this->getTemplatesFolder();
         if(!is_array($viewsPath)) {
-            $view = array($viewsPath);
+            $viewsPath = array($viewsPath);
         }
         $this->renderer->setViewPaths($viewsPath);
     }
