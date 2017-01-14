@@ -24,7 +24,14 @@ date_default_timezone_set("Europe/Amsterdam");
 
 use <?php echo $applicationNamespace.'\\'.$applicationClassName;?>;
 use Blend\Framework\Factory\ApplicationFactory;
+use Blend\Framework\Support\StaticResourceRequest;
 
-(new ApplicationFactory(<?php echo $applicationClassName;?>::class, __DIR__ . '/..',true))
-        ->create()
-        ->run();
+$srr = new StaticResourceRequest(__DIR__);
+if ($srr->isValid()) {
+    $srr->serveLocalResource();
+} else {
+
+    (new ApplicationFactory(<?php echo $applicationClassName;?>::class, __DIR__ . '/..',true))
+            ->create()
+            ->run();
+}
