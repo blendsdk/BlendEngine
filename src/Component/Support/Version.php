@@ -49,6 +49,38 @@ class Version {
     }
 
     /**
+     * Gets the major version part
+     * @return type
+     */
+    public function getMajor() {
+        return $this->major;
+    }
+
+    /**
+     * Gets the minor version part
+     * @return type
+     */
+    public function getMinor() {
+        return $this->minor;
+    }
+
+    /**
+     * Gets the build version part
+     * @return type
+     */
+    public function getBuild() {
+        return $this->build;
+    }
+
+    /**
+     * Gets the release version part
+     * @return type
+     */
+    public function getRelease() {
+        return $this->release;
+    }
+
+    /**
      * Bumps the major version
      * @return $this
      */
@@ -148,7 +180,7 @@ class Version {
         return $result;
     }
 
-    public static function FromFile($filename) {
+    public static function fromFile($filename) {
         return new Version(file_get_contents($filename));
     }
 
