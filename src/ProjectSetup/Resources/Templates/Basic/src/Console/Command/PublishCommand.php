@@ -1,6 +1,6 @@
 <?php print_php_header() ?>
 
-namespace <?php echo $applicationNamespace;?>\Console;
+namespace <?php echo $applicationNamespace;?>\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
