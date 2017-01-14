@@ -86,7 +86,7 @@ class BumpVersionCommand extends Command {
                     $this->pushToRepository($output);
                 }
             } else {
-                throw new Exception("$branch branch is not clean yet!");
+                throw new Exception("$this->branch branch is not clean yet!");
             }
         } else {
             throw new Exception("Cannot relase from the $this->branch branch, only master is allowed!");
@@ -95,7 +95,7 @@ class BumpVersionCommand extends Command {
 
     private function pushToRepository(OutputInterface $output) {
         $output->writeln("Pushing to repository");
-        return `git push origin master --follow-tags"`;
+        return `git push origin master --follow-tags`;
     }
 
     private function createNewGitTag(OutputInterface $output) {
@@ -119,8 +119,7 @@ class BumpVersionCommand extends Command {
 
     private function isBranchClean() {
         $result = trim('`git status --porcelain`');
-        //return empty($result);
-        return true;
+        return empty($result);
     }
 
 }
