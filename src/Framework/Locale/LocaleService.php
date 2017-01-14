@@ -74,7 +74,6 @@ class LocaleService implements EventSubscriberInterface {
             $locales[] = $request->attributes->get($item, null);
             $locales[] = $request->getSession()->get($item, null);
             $locales[] = $request->query->get($item, null);
-            $locales[] = $request->getLocale();
         }
 
         $locales = array_unique($locales);
@@ -92,6 +91,7 @@ class LocaleService implements EventSubscriberInterface {
             $request->getSession()->set(RouteAttribute::LOCALE, $locale);
         }
         $request->attributes->set(RouteAttribute::LOCALE, $locale);
+        $request->setLocale($locale);
         $event->getContainer()->setScalar(RouteAttribute::LOCALE, $locale);
     }
 
