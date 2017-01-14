@@ -17,6 +17,8 @@ use Blend\Component\Templating\Twig\Extension\EuroCurrencyExtension;
 use Blend\Component\Templating\Twig\Extension\RoutingExtension;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
+use Symfony\Bridge\Twig\Extension\TranslationExtension;
+use Symfony\Component\Translation\TranslatorInterface;
 
 /**
  * TwigEngineService is a customized version of the
@@ -43,9 +45,11 @@ class TwigEngineService extends TwigEngine {
     , $_debug
     , $viewRootFolder = null
     , UrlGeneratorInterface $urlGenerator = null
-    , RuntimeProviderInterface $runtime = null) {
+    , RuntimeProviderInterface $runtime = null
+    , TranslatorInterface $translator = null
+    ) {
         /**
-         * The $_debug, $_app_cache_folder parametes will be read from
+         * The $_debug, $_app_cache_folder parameters will be read from
          * the Service Container
          */
         parent::__construct($viewRootFolder, $_app_cache_folder, $_debug);
@@ -58,6 +62,11 @@ class TwigEngineService extends TwigEngine {
             $this->twigEnvironment->addExtension(
                     new RoutingExtension($urlGenerator));
         }
+
+        if(!is_null($translator)) {
+            $this->twigEnvironment->addExtension(new TranslationExtension($translator));
+        }
+
     }
 
     public function render($view, array $parameters = array()) {
