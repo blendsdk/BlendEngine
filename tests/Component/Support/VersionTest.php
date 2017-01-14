@@ -38,6 +38,18 @@ class VersionTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals($v7->getVersion(), "0.0.1-alpha");
 
 
+        $v8 = new Version("0.0.1-beta");
+        $v8->bumpMajor()
+           ->bumpMinor()
+           ->bumpBuild();
+
+        $this->assertEquals($v8->getVersion(), "1.1.2-beta");
+
+
+        $v9 = new Version("0");
+        $v9->serReleaseTag("test");
+        $this->assertEquals($v9->getVersion(), "0.0.0-test");
+
     }
 
 }

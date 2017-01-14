@@ -44,9 +44,43 @@ class Version {
                     $this->build = $this->makeNumber($temp[2], 0);
                     $this->release = $this->parsePostfix($temp[2]);
                 }
-
             }
         }
+    }
+
+    /**
+     * Bumps the major version
+     * @return $this
+     */
+    public function bumpMajor() {
+        $this->major += 1;
+        return $this;
+    }
+
+    /**
+     * Bumps the minor version
+     * @return $this
+     */
+    public function bumpMinor() {
+        $this->minor += 1;
+        return $this;
+    }
+
+    /**
+     * Bumps the build version
+     * @return $this
+     */
+    public function bumpBuild() {
+        $this->build += 1;
+        return $this;
+    }
+
+    /**
+     * Sets the release tag name
+     * @param type $tag
+     */
+    public function serReleaseTag($tag) {
+        $this->release = $tag;
     }
 
     private function makeNumber($data, $default = 0) {
