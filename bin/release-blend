@@ -118,7 +118,7 @@ class BumpVersionCommand extends Command {
     }
 
     private function isBranchClean() {
-        $result = trim('`git status --porcelain`');
+        $result = trim(`git status --porcelain`);
         return empty($result);
     }
 
