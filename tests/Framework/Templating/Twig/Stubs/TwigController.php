@@ -12,6 +12,7 @@
 namespace Blend\Tests\Framework\Templating\Twig\Stubs;
 
 use Blend\Component\Templating\EngineInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Description of TwigController
@@ -30,8 +31,11 @@ class TwigController {
         $this->templateEngine->setViewPaths([__DIR__ . '/../templates']);
     }
 
-    public function urlTest() {
-        return $this->templateEngine->render("url.twig", ['_trim' => true]);
+    public function urlTest(Request $request) {
+        return $this->templateEngine->render("url.twig", [
+                    '_twig_trim' => true,
+                    'request' => $request
+        ]);
     }
 
 }

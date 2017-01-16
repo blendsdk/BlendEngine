@@ -20,6 +20,8 @@ use Blend\Component\Templating\EngineInterface;
  */
 class TwigEngine implements EngineInterface {
 
+    const TRIM_RESULT = '_twig_trim';
+
     /**
      * @var \Twig_Environment
      */
@@ -56,17 +58,32 @@ class TwigEngine implements EngineInterface {
         return $twig;
     }
 
-    //TODO: add code doc
+    /**
+     * Adds an extension to the twig
+     * @param \Twig_ExtensionInterface $extension
+     * @return $this
+     */
     public function addExtension(\Twig_ExtensionInterface $extension) {
         $this->twigEnvironment->addExtension($extension);
+        return $this;
     }
 
     public function render($view, array $parameters = array()) {
-        return $this->twigEnvironment->render($view, $parameters);
+        if (isset($parameters[self::TRIM_RESULT]) && $parameters[self::TRIM_RESULT] === true) {
+            return trim($this->twigEnvironment->render($view, $parameters));
+        } else {
+            return $this->twigEnvironment->render($view, $parameters);
+        }
     }
 
+    /**
+     * Sets the views path for this TwigEngine
+     * @param array $paths
+     * @return $this
+     */
     public function setViewPaths(array $paths = array()) {
         $this->loader->setPaths($paths);
+        return $this;
     }
 
 }
