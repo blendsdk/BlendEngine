@@ -14,8 +14,6 @@ namespace Blend\Component\DI;
 use Blend\Component\DI\Container;
 use Composer\Autoload\ClassLoader;
 
-//TODO: reformat
-
 /**
  * ServiceContainer
  *
@@ -27,7 +25,7 @@ class ServiceContainer extends Container {
         parent::__construct();
         $this->setScalar(Container::class, $this);
     }
-    
+
     /**
      * Loads the services from a dictionary array. The array keys should be
      * the interface names and the values should be class names

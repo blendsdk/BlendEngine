@@ -10,15 +10,13 @@
  */
 
 namespace Blend\Framework\Factory;
+
 use Blend\Component\DI\ObjectFactoryInterface;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\DI\Container;
 use Blend\Component\Templating\Twig\Extension\CommonTwigEngineExtensions;
 use Blend\Component\Templating\Twig\Extension\TwigEngineExtensionProviderInterface;
-use Blend\Framework\Templating\Twig\TwigEngineService;
-
-//TODO: reformat
-
+use Blend\Component\Templating\Twig\TwigEngine;
 
 /**
  * Factory class for creating a TwigEngine object
@@ -37,16 +35,31 @@ class TwigEngineFactory implements ObjectFactoryInterface {
      */
     protected $config;
 
-    public function __construct(Container $container, Configuration $config) {
+    /**
+     * @var bool
+     */
+    protected $debug;
+
+    /**
+     * @var string
+     */
+    protected $cacheFolder;
+
+    public function __construct(Container $container
+    , Configuration $config
+    , $_app_cache_folder
+    , $_debug = false) {
         $this->container = $container;
         $this->config = $config;
         $this->container->defineClass(CommonTwigEngineExtensions::class);
+        $this->debug = $_debug;
+        $this->cacheFolder = $_app_cache_folder;
     }
 
     public function create() {
 
-        $twigEngine = $this->container->get(TwigEngineService::class);
-        
+        $twigEngine = new TwigEngine(null, $this->cacheFolder, $this->debug);
+
         $providers = $this->container
                 ->getByInterface(TwigEngineExtensionProviderInterface::class);
         foreach ($providers as $provider) {
