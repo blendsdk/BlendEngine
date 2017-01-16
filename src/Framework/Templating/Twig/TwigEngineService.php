@@ -44,9 +44,7 @@ class TwigEngineService extends TwigEngine {
     , $_app_cache_folder
     , $_debug
     , $viewRootFolder = null
-    , UrlGeneratorInterface $urlGenerator = null
     , RuntimeProviderInterface $runtime = null
-    , TranslatorInterface $translator = null
     ) {
         /**
          * The $_debug, $_app_cache_folder parameters will be read from
@@ -57,24 +55,11 @@ class TwigEngineService extends TwigEngine {
         $this->request = $request;
         $this->runtime = $runtime;
 
-        $this->twigEnvironment->addExtension(new EuroCurrencyExtension());
-        if (!is_null($urlGenerator)) {
-            $this->twigEnvironment->addExtension(
-                    new RoutingExtension($urlGenerator));
-        }
-
-        if(!is_null($translator)) {
-            $this->twigEnvironment->addExtension(new TranslationExtension($translator));
-        }
-
     }
 
+    //TODO: Provide comments
     public function render($view, array $parameters = array()) {
-        if (isset($parameters['_trim'])) {
-            return trim(parent::render($view, $this->normalizeParameters($parameters)));
-        } else {
-            return parent::render($view, $this->normalizeParameters($parameters));
-        }
+        return parent::render($view, $this->normalizeParameters($parameters));
     }
 
     private function normalizeParameters(array $parameters = []) {

@@ -56,6 +56,10 @@ class TwigEngine implements EngineInterface {
         return $twig;
     }
 
+    public function addExtension() {
+     throw new \Exception("Not implemented yet!");
+    }
+
     public function render($view, array $parameters = array()) {
         return $this->twigEnvironment->render($view, $parameters);
     }

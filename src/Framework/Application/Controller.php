@@ -27,7 +27,7 @@ abstract class Controller {
     protected $renderer;
 
     /**
-     * @var RuntimeProviderInterface;
+     * @var RuntimeProviderInterface
      */
     protected $runtime;
 
