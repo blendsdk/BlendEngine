@@ -118,7 +118,6 @@ abstract class Application extends BaseApplication {
             Configuration::class => $config,
             LocalCache::class => $this->localCache,
             EventDispatcherInterface::class => $this->dispatcher,
-            Container::class => $this->container,
             Filesystem::class => $this->filesystem,
             RuntimeAttribute::APPLICATION_ROOT_FOLDER => $this->rootFolder,
             RuntimeAttribute::APPLICATION_CACHE_FOLDER => $this->localCache->getCacheFolder(),

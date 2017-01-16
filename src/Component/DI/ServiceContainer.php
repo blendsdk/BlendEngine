@@ -21,6 +21,11 @@ use Composer\Autoload\ClassLoader;
  */
 class ServiceContainer extends Container {
 
+    public function __construct() {
+        parent::__construct();
+        $this->setScalar(Container::class, $this);
+    }
+
     /**
      * Loads the services from a dictionary array. The array keys should be
      * the interface names and the values should be class names

@@ -21,7 +21,7 @@ use Blend\Component\Routing\RouteAttribute;
 use Blend\Framework\Support\Runtime\RuntimeAttribute;
 
 /**
- * Description of TranslatorFactory
+ * Factory class for creating a Translator object
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

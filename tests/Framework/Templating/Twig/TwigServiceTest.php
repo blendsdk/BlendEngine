@@ -11,17 +11,18 @@
 
 namespace Blend\tests\Framework\Templating\Twig;
 
+use Blend\Framework\Factory\TwigEngineFactory;
 use Blend\Framework\Templating\Twig\TwigEngineService;
 use Blend\Component\Templating\EngineInterface;
-use Blend\Component\DI\Container;
+use Blend\Component\DI\ServiceContainer;
 use Blend\Tests\Framework\Translation\Stubs\TestTranslationProvider;
 use Blend\Tests\ProjectUtil;
 use Blend\Framework\Factory\ApplicationFactory;
 use Blend\Framework\Locale\LocaleService;
 use Blend\Tests\Framework\Templating\Twig\Stubs\TwigModule;
-use Blend\Tests\Framework\Templating\Twig\Stubs\TwigController;
 use Blend\Framework\Factory\TranslatorFactory;
 use Symfony\Component\HttpFoundation\Request;
+use Blend\Component\Templating\Twig\TwigEngine;
 
 /**
  * Description of TwigServiceTest
@@ -37,31 +38,25 @@ class TwigServiceTest extends \PHPUnit_Framework_TestCase {
      */
     static $templateRoot;
 
-    /**
-     * @var Container
-     */
-    static $container;
-
     public static function setUpBeforeClass() {
         parent::setUpBeforeClass();
         self::$templateRoot = __DIR__ . '/templates';
-        self::$container = new Container();
     }
 
     /**
      * @return TwigEngineService
      */
     private function engine(array $params = []) {
-        $defaults = [
-            'viewRootFolder' => __DIR__ . '/templates',
+
+        $container = new ServiceContainer();
+
+        $container->setScalars([
             '_app_cache_folder' => TEMP_DIR,
             '_debug' => true
-        ];
+        ]);
 
-        return self::$container->get(
-                        TwigEngineService::class
-                        , array_merge($defaults, $params)
-        );
+        return $container->get(TwigEngineFactory::class)
+                        ->setViewPaths([__DIR__ . '/templates']);
     }
 
     public function testEngineSanity() {
@@ -70,7 +65,7 @@ class TwigServiceTest extends \PHPUnit_Framework_TestCase {
     }
 
     public function testEuroCurrency() {
-        $result = $this->engine()->render('euro.twig', ['value' => 100, '_trim' => true]);
+        $result = $this->engine()->render('euro.twig', ['value' => 100, TwigEngine::TRIM_RESULT => true]);
         $this->assertEquals('&euro;100,-', $result);
     }
 
@@ -78,7 +73,7 @@ class TwigServiceTest extends \PHPUnit_Framework_TestCase {
         $appName = 'TwigRouting';
         $projectFolder = ProjectUtil::createNewProject($appName, true);
         list($clazz, $loader) = ProjectUtil::initProjectClassLoader($projectFolder);
-        $loader->addPsr4("Acme" . '\\', $projectFolder .'/src/Acme');
+        $loader->addPsr4("Acme" . '\\', $projectFolder . '/src/Acme');
         $factory = new ApplicationFactory($clazz, $projectFolder, true);
         /* @var $app TestableApplication */
         $app = $factory->create();
@@ -88,7 +83,7 @@ class TwigServiceTest extends \PHPUnit_Framework_TestCase {
             'locale-service' => LocaleService::class,
             TranslatorInterface::class => TranslatorFactory::class,
             'test-translations' => TestTranslationProvider::class,
-            EngineInterface::class => TwigEngineService::class,
+            EngineInterface::class => TwigEngineFactory::class,
         ]);
         $app->reInstallEventSubscribers();
         $request = Request::create("/urltest/am");
