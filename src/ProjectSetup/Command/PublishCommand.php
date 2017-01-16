@@ -16,7 +16,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Blend\Framework\Console\Command\PublishCommand as Base;
 
 /**
- * InitCommand helps to initialize a new BlendEngine Application
+ * PublishCommand helps to tag and publish a new release version
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
