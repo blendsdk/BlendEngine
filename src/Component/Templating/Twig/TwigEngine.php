@@ -11,14 +11,14 @@
 
 namespace Blend\Component\Templating\Twig;
 
-use Blend\Component\Templating\EngineInterface;
+use Blend\Component\Templating\TemplateEngineInterface;
 
 /**
  * TwigEngine provides rendering Twig templates
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class TwigEngine implements EngineInterface {
+class TwigEngine implements TemplateEngineInterface {
 
     const TRIM_RESULT = '_twig_trim';
 

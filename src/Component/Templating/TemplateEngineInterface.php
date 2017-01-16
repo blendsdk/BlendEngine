@@ -15,7 +15,7 @@ namespace Blend\Component\Templating;
  * A simplified interface to implement templating engines
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface EngineInterface {
+interface TemplateEngineInterface {
 
     public function render($view, array $parameters = []);
 

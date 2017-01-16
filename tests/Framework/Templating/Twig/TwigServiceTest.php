@@ -13,7 +13,7 @@ namespace Blend\tests\Framework\Templating\Twig;
 
 use Blend\Framework\Factory\TwigEngineFactory;
 use Blend\Framework\Templating\Twig\TwigEngineService;
-use Blend\Component\Templating\EngineInterface;
+use Blend\Component\Templating\TemplateEngineInterface;
 use Blend\Component\DI\ServiceContainer;
 use Blend\Tests\Framework\Translation\Stubs\TestTranslationProvider;
 use Blend\Tests\ProjectUtil;
@@ -83,7 +83,7 @@ class TwigServiceTest extends \PHPUnit_Framework_TestCase {
             'locale-service' => LocaleService::class,
             TranslatorInterface::class => TranslatorFactory::class,
             'test-translations' => TestTranslationProvider::class,
-            EngineInterface::class => TwigEngineFactory::class,
+            TemplateEngineInterface::class => TwigEngineFactory::class,
         ]);
         $app->reInstallEventSubscribers();
         $request = Request::create("/urltest/am");
