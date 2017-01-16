@@ -39,7 +39,7 @@ abstract class Runtime implements RuntimeProviderInterface {
     protected $name;
 
     /**
-     * @var Request;
+     * @var Request
      */
     protected $request;
 
