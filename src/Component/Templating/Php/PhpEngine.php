@@ -11,14 +11,14 @@
 
 namespace Blend\Component\Templating\Php;
 
-use Blend\Component\Templating\EngineInterface;
+use Blend\Component\Templating\TemplateEngineInterface;
 
 /**
  * Basic PHP PhpEngine
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class PhpEngine implements EngineInterface {
+class PhpEngine implements TemplateEngineInterface {
 
     /**
      * @var boolean

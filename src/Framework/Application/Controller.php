@@ -11,7 +11,7 @@
 
 namespace Blend\Framework\Application;
 
-use Blend\Component\Templating\EngineInterface;
+use Blend\Component\Templating\TemplateEngineInterface;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 
 /**
@@ -22,7 +22,7 @@ use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 abstract class Controller {
 
     /**
-     * @var EngineInterface
+     * @var TemplateEngineInterface
      */
     protected $renderer;
 
@@ -36,7 +36,7 @@ abstract class Controller {
      */
     protected abstract function getTemplatesFolder();
 
-    public function __construct(EngineInterface $renderer, RuntimeProviderInterface $runtime) {
+    public function __construct(TemplateEngineInterface $renderer, RuntimeProviderInterface $runtime) {
         $this->renderer = $renderer;
         $this->runtime = $runtime;
         $viewsPath = $this->getTemplatesFolder();
