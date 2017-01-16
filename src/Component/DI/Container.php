@@ -323,7 +323,7 @@ class Container {
         if ($reflection->implementsInterface(ObjectFactoryInterface::class)) {
             $instance = call_user_func([$instance, 'create']);
             if ($instance === null) {
-                throw new InvalidConfigException($reflection->getName() . '->create() did not reaturn an object instance');
+                throw new InvalidConfigException($reflection->getName() . '->create() did not return an object instance');
             }
         }
         return $instance;
