@@ -36,7 +36,14 @@ abstract class PublishCommand extends Command {
     private function getLatestTagVersion() {
         $data = explode("\n", trim(`git tag`));
         if (!empty($data)) {
-            return trim($data[count($data) - 1]);
+            $v = "0.0.0";
+            foreach($data as $item) {
+                $item = str_replace("v","",$item);
+                if(version_compare($item,$v,'>')) {
+                    $v = $item;
+                }
+            }
+            return $v;
         } else {
             return null;
         }
@@ -44,7 +51,7 @@ abstract class PublishCommand extends Command {
 
     protected function configure() {
         $this->setName('publish')
-                ->setDescription('Creates a new release version: default build ' . $this->version->getBuild())
+                ->setDescription('Creates a new release version: defaults to build ' . $this->version->getBuild())
                 ->addOption('bump', 'b', InputOption::VALUE_REQUIRED, 'The version part', 'build');
     }
 
