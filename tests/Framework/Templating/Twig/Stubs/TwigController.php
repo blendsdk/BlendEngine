@@ -11,7 +11,7 @@
 
 namespace Blend\Tests\Framework\Templating\Twig\Stubs;
 
-use Blend\Component\Templating\EngineInterface;
+use Blend\Component\Templating\TemplateEngineInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -22,11 +22,11 @@ use Symfony\Component\HttpFoundation\Request;
 class TwigController {
 
     /**
-     * @var EngineInterface
+     * @var TemplateEngineInterface
      */
     protected $templateEngine;
 
-    public function __construct(EngineInterface $templateEngine) {
+    public function __construct(TemplateEngineInterface $templateEngine) {
         $this->templateEngine = $templateEngine;
         $this->templateEngine->setViewPaths([__DIR__ . '/../templates']);
     }
