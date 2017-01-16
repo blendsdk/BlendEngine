@@ -55,9 +55,7 @@ abstract class PublishCommand extends Command {
                 ->addOption('bump', 'b', InputOption::VALUE_REQUIRED, 'The version part', 'build');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $output->writeln("Current version: " . $this->version->getVersion());
-        $this->branch = $this->getCurrentGitBranch();
+    protected function bumpVersion(InputInterface $input, OutputInterface $output) {
         $versionPart = $this->getAssetVersionPart($input->getOption("bump", "build"));
         switch ($versionPart) {
             case "major":
@@ -69,14 +67,20 @@ abstract class PublishCommand extends Command {
             case "build":
                 $this->version->bumpBuild();
                 break;
-            case "release":
+            case "beta":
+            case "alpha":
                 $this->version->serReleaseTag($versionPart);
                 break;
             default:
                 $this->version->bumpBuild();
         }
         $output->writeln("Bumping to: " . $this->version->getVersion());
-        
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output) {
+        $output->writeln("Current version: " . $this->version->getVersion());
+        $this->branch = $this->getCurrentGitBranch();     
+        $this->bumpVersion($input,$output);   
         if ($this->branch === "master") {
             if ($this->isBranchClean()) {
                 $helper = $this->getHelper('question');
@@ -108,9 +112,9 @@ abstract class PublishCommand extends Command {
 
     private function getAssetVersionPart($value) {
         $value = strtolower($value);
-        $allowed = array("major", "minor", "build", "release");
+        $allowed = array("major", "minor", "build", "beta","alpha");
         if (!in_array($value, $allowed)) {
-            throw new Exception("Invalid bump value $value. Only major, minor, build, or relase are allowed!");
+            throw new \Exception("Invalid bump value $value. Only major, minor, build, or relase are allowed!");
         }
         return $value;
     }
