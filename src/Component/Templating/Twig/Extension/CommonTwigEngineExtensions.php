@@ -18,7 +18,7 @@ use Blend\Component\Templating\Twig\Extension\EuroCurrencyExtension;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bridge\Twig\Extension\TranslationExtension;
 use Symfony\Component\Translation\TranslatorInterface;
-use  Blend\Component\Translation\Extension\TwigEngineExtensionProviderInterface;
+use Blend\Component\Templating\Twig\Extension\TwigEngineExtensionProviderInterface;
 
 
 class CommonTwigEngineExtensions implements TwigEngineExtensionProviderInterface {

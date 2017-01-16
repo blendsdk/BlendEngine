@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Blend\Component\Translation\Extension;
+namespace Blend\Component\Templating\Twig\Extension;
 
 use Blend\Component\DI\Container;
 use Blend\Component\Templating\Twig\TwigEngine;
