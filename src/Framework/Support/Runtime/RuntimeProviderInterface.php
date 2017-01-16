@@ -19,6 +19,8 @@ use Blend\Framework\Security\User\UserProviderInterface;
  */
 interface RuntimeProviderInterface {
 
+    public function getRequest();
+
     public function getApplicationName();
 
     public function getAppRootFolder();

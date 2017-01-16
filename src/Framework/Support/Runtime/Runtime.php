@@ -82,7 +82,11 @@ abstract class Runtime implements RuntimeProviderInterface {
      * @return \Blend\Framework\Security\User\UserProviderInterface
      */
     public function getCurrentUser() {
-        return $this->request->getSession()->get(Security::AUTHENTICATED_USER, new Guest());
+        if ($this->request && $this->request->getSession()) {
+            return $this->request->getSession()->get(Security::AUTHENTICATED_USER, new Guest());
+        } else {
+            return new Guest();
+        }
     }
 
     /**
@@ -101,12 +105,24 @@ abstract class Runtime implements RuntimeProviderInterface {
         return $this->container;
     }
 
+    /**
+     * Signout from the application by clearing the session
+     * @return RedirectResponse
+     */
     public function signOut() {
         if ($this->request) {
             $this->request->getSession()->clear();
             return new RedirectResponse($this->request->getUri());
         }
         return null;
+    }
+
+    /**
+     * Returns an instance of the current request
+     * @return type
+     */
+    public function getRequest() {
+        return $this->request;
     }
 
 }
