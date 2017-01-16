@@ -43,7 +43,7 @@ abstract class PublishCommand extends Command {
                     $v = $item;
                 }
             }
-            return $v;
+            return 'v'.$v;
         } else {
             return null;
         }
@@ -79,8 +79,8 @@ abstract class PublishCommand extends Command {
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $output->writeln("Current version: " . $this->version->getVersion());
-        $this->branch = $this->getCurrentGitBranch();     
-        $this->bumpVersion($input,$output);   
+        $this->branch = $this->getCurrentGitBranch();
+        $this->bumpVersion($input,$output);
         if ($this->branch === "master") {
             if ($this->isBranchClean()) {
                 $helper = $this->getHelper('question');
