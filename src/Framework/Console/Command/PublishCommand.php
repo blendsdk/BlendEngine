@@ -51,35 +51,34 @@ abstract class PublishCommand extends Command {
 
     protected function configure() {
         $this->setName('publish')
-                ->setDescription('Creates a new release version: defaults to build ' . $this->version->getBuild())
+                ->setDescription('Creates a new release version: defaults to build ' . ($this->version->getBuild() + 1))
                 ->addOption('bump', 'b', InputOption::VALUE_REQUIRED, 'The version part', 'build');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output) {
         $output->writeln("Current version: " . $this->version->getVersion());
         $this->branch = $this->getCurrentGitBranch();
+        $versionPart = $this->getAssetVersionPart($input->getOption("bump", "build"));
+        switch ($versionPart) {
+            case "major":
+                $this->version->bumpMajor();
+                break;
+            case "minor":
+                $this->version->bumpMinor();
+                break;
+            case "build":
+                $this->version->bumpBuild();
+                break;
+            case "release":
+                $this->version->serReleaseTag($versionPart);
+                break;
+            default:
+                $this->version->bumpBuild();
+        }
+        $output->writeln("Bumping to: " . $this->version->getVersion());
+        
         if ($this->branch === "master") {
             if ($this->isBranchClean()) {
-                $versionPart = $this->getAssetVersionPart($input->getOption("bump", "build"));
-
-                switch ($versionPart) {
-                    case "marjor":
-                        $this->version->bumpMajor();
-                        break;
-                    case "minor":
-                        $this->version->bumpMinor();
-                        break;
-                    case "build":
-                        $this->version->bumpBuild();
-                        break;
-                    case "release":
-                        $this->version->serReleaseTag($versionPart);
-                        break;
-                    default:
-                        $this->version->bumpBuild();
-                }
-                $output->writeln("Bumping to: " . $this->version->getVersion());
-
                 $helper = $this->getHelper('question');
                 $question = new ConfirmationQuestion('Continue with this action?', false);
 
@@ -109,7 +108,7 @@ abstract class PublishCommand extends Command {
 
     private function getAssetVersionPart($value) {
         $value = strtolower($value);
-        $allowed = array("major", "minior", "build", "release");
+        $allowed = array("major", "minor", "build", "release");
         if (!in_array($value, $allowed)) {
             throw new Exception("Invalid bump value $value. Only major, minor, build, or relase are allowed!");
         }
