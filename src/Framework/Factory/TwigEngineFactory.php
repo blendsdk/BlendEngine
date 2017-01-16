@@ -10,6 +10,9 @@
  */
 
 namespace Blend\Framework\Factory;
+use Blend\Component\DI\ObjectFactoryInterface;
+use Blend\Component\Configuration\Configuration;
+use Blend\Component\DI\Container;
 use Blend\Component\Templating\Twig\Extension\CommonTwigEngineExtensions;
 use Blend\Component\Templating\Twig\Extension\TwigEngineExtensionProviderInterface;
 use Blend\Framework\Templating\Twig\TwigEngineService;
@@ -37,7 +40,7 @@ class TwigEngineFactory implements ObjectFactoryInterface {
     public function __construct(Container $container, Configuration $config) {
         $this->container = $container;
         $this->config = $config;
-        $this->container->define(CommonTwigEngineExtensions::class);
+        $this->container->defineClass(CommonTwigEngineExtensions::class);
     }
 
     public function create() {
