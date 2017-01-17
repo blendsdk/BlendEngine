@@ -100,7 +100,7 @@ abstract class Application extends BaseApplication
         $this->routeCollection = new RouteCollection();
         $this->localCache = $localCache;
         $this->logger = $logger;
-        $config->mergeWith(['app.root.folder' => $rootFolder]);
+        $config->mergeWith(array('app.root.folder' => $rootFolder));
         $this->initialize($config);
     }
 
@@ -110,7 +110,7 @@ abstract class Application extends BaseApplication
         $this->container = new ServiceContainer();
         $this->dispatcher = new EventDispatcher();
         $this->filesystem = new Filesystem();
-        $this->container->setScalars([
+        $this->container->setScalars(array(
             LoggerInterface::class => $this->logger,
             Configuration::class => $config,
             LocalCache::class => $this->localCache,
@@ -119,7 +119,7 @@ abstract class Application extends BaseApplication
             RuntimeAttribute::APPLICATION_ROOT_FOLDER => $this->rootFolder,
             RuntimeAttribute::APPLICATION_CACHE_FOLDER => $this->localCache->getCacheFolder(),
             RuntimeAttribute::DEBUG => $config->get('debug', false),
-        ]);
+        ));
 
         /*
          * Adds the SecurityHandler class by default. This will
@@ -173,9 +173,9 @@ abstract class Application extends BaseApplication
         }
 
         /* @var $controllerResposeEvent GetControllerResponseEvent */
-        $controllerResposeEvent = $this->container->get(GetControllerResponseEvent::class, [
+        $controllerResposeEvent = $this->container->get(GetControllerResponseEvent::class, array(
             'controllerResponse' => $controllerResponse,
-        ]);
+        ));
         $this->dispatcher->dispatch(KernelEvents::CONTROLLER_RESPONSE, $controllerResposeEvent);
         if ($controllerResposeEvent->hasResponse()) {
             return $controllerResposeEvent->getResponse();
@@ -190,7 +190,7 @@ abstract class Application extends BaseApplication
             if (!$this->container->isDefined(SessionProviderInterface::class)) {
                 $savePath = $this->filesystem->assertFolderWritable($this->rootFolder.'/var/session');
                 $this->container->defineSingletonWithInterface(
-                        SessionProviderInterface::class, NativeSessionProvider::class, ['save_path' => $savePath]
+                        SessionProviderInterface::class, NativeSessionProvider::class, array('save_path' => $savePath)
                 );
             }
             /* @var $provider SessionProviderInterface */
@@ -202,9 +202,9 @@ abstract class Application extends BaseApplication
 
     protected function finalizeResponse(Response $response)
     {
-        $event = $this->container->get(GetFinalizeResponseEvent::class, [
+        $event = $this->container->get(GetFinalizeResponseEvent::class, array(
             'response' => $response,
-        ]);
+        ));
         $this->dispatcher->dispatch(KernelEvents::FINALIZE_RESPONSE, $event);
     }
 
@@ -237,15 +237,15 @@ abstract class Application extends BaseApplication
         $routes = $this->collectRoutes();
         $context->fromRequest($request);
 
-        $this->container->setScalars([
+        $this->container->setScalars(array(
             RouteCollection::class => $routes,
             RequestContext::class => $context,
-        ]);
+        ));
 
         $this->container->defineSingletonWithInterface(
                 UrlGeneratorInterface::class, UrlGenerator::class);
 
-        return [$routes, $context];
+        return array($routes, $context);
     }
 
     protected function matchRequestToRoutes(Request $request)
@@ -259,9 +259,9 @@ abstract class Application extends BaseApplication
     protected function handleRequestException(\Exception $ex, Request $request)
     {
         /* @var $event  GetExceptionResponseEvent */
-        $event = $this->container->get(GetExceptionResponseEvent::class, [
+        $event = $this->container->get(GetExceptionResponseEvent::class, array(
             'exception' => $ex,
-        ]);
+        ));
 
         $this->dispatcher->dispatch(KernelEvents::REQUEST_EXCEPTION, $event);
         if ($event->hasResponse()) {
@@ -286,12 +286,12 @@ abstract class Application extends BaseApplication
      */
     protected function createJSONExceptionResponse(\Exception $ex)
     {
-        return new JsonResponse([
+        return new JsonResponse(array(
             'message' => $ex->getMessage(),
             'code' => $ex->getCode(),
             'exception' => true,
             'exceptionTyle' => get_class($ex),
-                ], 500);
+                ), 500);
     }
 
     /**

@@ -56,7 +56,7 @@ class LocaleService implements EventSubscriberInterface
 
     public function __construct(Configuration $config)
     {
-        $this->availbleLocales = [];
+        $this->availbleLocales = array();
         $this->config = $config;
         $this->assertLocaleConfig();
     }
@@ -71,7 +71,7 @@ class LocaleService implements EventSubscriberInterface
          *  default to -> browser locale
          *  default to -> translation.defaultLocale
          */
-        $locales = [];
+        $locales = array();
         foreach (array(RouteAttribute::LOCALE, $this->localeParamName) as $item) {
             $locales[] = $request->attributes->get($item, null);
             $locales[] = $request->getSession()->get($item, null);
@@ -101,7 +101,7 @@ class LocaleService implements EventSubscriberInterface
     {
         $this->localeParamName = $this->config->get('translation.localeParameterName', '_lang');
         $this->defaultLocale = $this->config->get('translation.defaultLocale', null);
-        $this->availableLocales = $this->config->get('translation.availableLocales', []);
+        $this->availableLocales = $this->config->get('translation.availableLocales', array());
         if (empty($this->availableLocales)) {
             throw new InvalidConfigException(
             'Invalid or missing translation.availableLocales configuration!');
@@ -114,8 +114,8 @@ class LocaleService implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return [
-            KernelEvents::REQUEST => ['onRequest', KernelEvents::PRIORITY_HIGHT + 1000],
-        ];
+        return array(
+            KernelEvents::REQUEST => array('onRequest', KernelEvents::PRIORITY_HIGHT + 1000),
+        );
     }
 }

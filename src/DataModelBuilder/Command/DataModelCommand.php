@@ -91,12 +91,12 @@ class DataModelCommand extends Command
             $rootNamespace = $this->config->getModelRootNamespace();
             $appNamespace = $this->config->getApplicationNamespace();
             $converterInfo = null;
-            foreach ([ModelBuilder::class, FactoryBuilder::class, SchemaBuilder::class] as $builderClass) {
+            foreach (array(ModelBuilder::class, FactoryBuilder::class, SchemaBuilder::class) as $builderClass) {
                 /* @var $builderClass \Blend\DataModelBuilder\Builder\ClassBuilder */
-                $builder = $conatiner->get($builderClass, [
+                $builder = $conatiner->get($builderClass, array(
                     'relation' => $relation,
                     'includeSchema' => !$schema->isSingle(),
-                ]);
+                ));
                 $builder->setApplicationNamespace($appNamespace);
                 $builder->setRootNamespace($rootNamespace);
                 $builder->setRootPath($rootPath);
@@ -137,7 +137,7 @@ class DataModelCommand extends Command
     {
         $customizedModels = $this->config->getCustomizedRelationList();
         if (!is_array($customizedModels)) {
-            $customizedModels = [];
+            $customizedModels = array();
         }
 
         return in_array($relation->getName(), $customizedModels) || in_array($relation->getFQRN(), $customizedModels);
@@ -214,13 +214,13 @@ class DataModelCommand extends Command
      */
     private function createDatabaseInstance()
     {
-        return new Database([
+        return new Database(array(
             'username' => $this->getConfig('database.username'),
             'password' => $this->getConfig('database.password'),
             'database' => $this->getConfig('database.database'),
             'host' => $this->getConfig('database.host'),
             'port' => $this->getConfig('database.port'),
-        ]);
+        ));
     }
 
     /**
@@ -237,18 +237,18 @@ class DataModelCommand extends Command
             $configClass = DefaultBuilderConfig::class;
         }
         try {
-            $this->config = $this->container->get($configClass, [
+            $this->config = $this->container->get($configClass, array(
                 'projectFolder' => $this->getApplication()->getProjectFolder(),
-            ]);
+            ));
         } catch (ReflectionException $ex) {
-            $this->output->writeln([
+            $this->output->writeln(array(
                 "<warn>Unable to load the provided configuration [{$configClass}]</warn>",
                 '<warn>Will continue with the default configuration.</warn>',
-            ]);
+            ));
             $configClass = DefaultBuilderConfig::class;
-            $this->config = $this->container->get($configClass, [
+            $this->config = $this->container->get($configClass, array(
                 'projectFolder' => $this->getApplication()->getProjectFolder(),
-            ]);
+            ));
         }
         $this->output->writeln('<info>Using the '.get_class($this->config).' as configuration</info>');
     }

@@ -53,7 +53,7 @@ if (!function_exists('measure_time')) {
     {
         $start = microtime(true);
 
-        return [call_user_func($callback),  (microtime(true) - $start)];
+        return array(call_user_func($callback),  (microtime(true) - $start));
     }
 }
 

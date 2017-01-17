@@ -48,11 +48,11 @@ class RouteBuilder
      *
      * @return \Blend\Component\Routing\Route
      */
-    public function route($name, $path, array $controlerAction, array $defaults = [])
+    public function route($name, $path, array $controlerAction, array $defaults = array())
     {
-        $params = array_merge($defaults, [
+        $params = array_merge($defaults, array(
             RouteAttribute::CONTROLLER => $controlerAction,
-        ]);
+        ));
         $route = new Route($path, $params);
         $this->routes->add($name, $route);
 

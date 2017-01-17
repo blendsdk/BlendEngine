@@ -64,12 +64,12 @@ class SelectStatement extends ConditionableStatement
     public function __construct()
     {
         $this->lastFromIndex = null;
-        $this->columns = [];
-        $this->from = [];
-        $this->where = [];
-        $this->orderby = [];
-        $this->groupBy = [];
-        $this->groupByHaving = [];
+        $this->columns = array();
+        $this->from = array();
+        $this->where = array();
+        $this->orderby = array();
+        $this->groupBy = array();
+        $this->groupByHaving = array();
     }
 
     /**
@@ -180,10 +180,10 @@ class SelectStatement extends ConditionableStatement
 
         // wrap a single join in an array
         if ($sql_join[0] === '=') {
-            $sql_join = [$sql_join];
+            $sql_join = array($sql_join);
         }
 
-        $j = [];
+        $j = array();
         foreach ($sql_join as $item) {
             $j[] = "{$item[1]} {$item[0]} {$item[2]}";
         }

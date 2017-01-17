@@ -31,9 +31,9 @@ abstract class PostRedirectGetForm extends Form
         /*
          * We override this method to add the form state
          */
-        return array_merge(parent::createStateStorage(), [
+        return array_merge(parent::createStateStorage(), array(
             'formState' => self::STATE_INITIAL,
-        ]);
+        ));
     }
 
     /**
@@ -73,17 +73,17 @@ abstract class PostRedirectGetForm extends Form
      *
      * @return type
      */
-    protected function createContext(array $input = [])
+    protected function createContext(array $input = array())
     {
         $messages = $this->getMessages();
 
-        return array_merge($input, $messages, [
+        return array_merge($input, $messages, array(
             'request' => $this->request,
             'url' => $this->request->getPathInfo(),
             'csrf' => $this->getCSRF(),
             'form_state' => $this->getState(),
             'allmessages' => $messages,
-                ], $this->getCurrentValues());
+                ), $this->getCurrentValues());
     }
 
     protected function doProcess($submitted, $is_valid)

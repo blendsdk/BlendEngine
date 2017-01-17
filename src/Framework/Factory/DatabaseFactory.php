@@ -43,12 +43,12 @@ class DatabaseFactory implements ObjectFactoryInterface
     {
         $appname = strtolower($this->config->get('name'));
 
-        return new Database([
+        return new Database(array(
             'host' => $this->config->get('database.host', '127.0.0.1'),
             'port' => $this->config->get('database.port', 5432),
             'database' => $this->config->get('database.database', $appname),
             'username' => $this->config->get('database.username', $appname),
             'password' => $this->config->get('database.password'),
-                ], $this->logger);
+                ), $this->logger);
     }
 }

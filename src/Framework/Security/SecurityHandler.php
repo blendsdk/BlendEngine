@@ -95,7 +95,7 @@ class SecurityHandler implements EventSubscriberInterface
         /* @var $logger LoggerInterface */
         $logger = $this->container->get(LoggerInterface::class);
         $logger->warning('The requested security provides was'.
-                ' not met! Check your services', ['type' => $type]);
+                ' not met! Check your services', array('type' => $type));
 
         return null;
     }
@@ -111,9 +111,9 @@ class SecurityHandler implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return [
-            KernelEvents::REQUEST => ['onRequest', KernelEvents::PRIORITY_HIGHT + 900],
-            KernelEvents::FINALIZE_RESPONSE => ['onResponse', KernelEvents::PRIORITY_HIGHT + 900],
-        ];
+        return array(
+            KernelEvents::REQUEST => array('onRequest', KernelEvents::PRIORITY_HIGHT + 900),
+            KernelEvents::FINALIZE_RESPONSE => array('onResponse', KernelEvents::PRIORITY_HIGHT + 900),
+        );
     }
 }

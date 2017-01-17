@@ -59,9 +59,9 @@ class Configuration
         return array_key_exists($name, $this->params);
     }
 
-    public function __construct(array $configArray = [])
+    public function __construct(array $configArray = array())
     {
-        $this->params = [];
+        $this->params = array();
         $this->flatten_config($configArray, $this->params);
     }
 
@@ -72,7 +72,7 @@ class Configuration
      */
     public function mergeWith($configArray)
     {
-        $all = [];
+        $all = array();
         $this->flatten_config($configArray, $all);
         $this->params = array_merge($this->params, $all);
     }

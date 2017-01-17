@@ -45,17 +45,17 @@ class SchemaBuilder extends ClassBuilder
                 'className' => $this->relation->getName(true).'Schema',
                 'classNamespace' => $this->rootNamespace,
                 'classBaseClass' => $this->defaultBaseClassName,
-                'uses' => [
+                'uses' => array(
                     $this->defaultBaseClassFQN,
                     'Blend\Component\Database\SQL\SQLString',
-                ],
+                ),
             ),
         );
     }
 
     protected function preparBuildDefinition($def)
     {
-        $properties = [];
+        $properties = array();
         foreach ($this->relation->getColumns() as $column) {
             $name = $column->getName();
             $dbtype = $column->getField('data_type');

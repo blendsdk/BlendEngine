@@ -23,9 +23,9 @@ class Relation extends Record
     /**
      * @var Column[];
      */
-    private $columns = [];
-    protected $keys = [];
-    protected $keysByType = [];
+    private $columns = array();
+    protected $keys = array();
+    protected $keysByType = array();
 
     /**
      * Checks whether this relation is writable.
@@ -41,7 +41,8 @@ class Relation extends Record
      * Gets the relation name.
      *
      * @return string
-     * @param  mixed  $prettify
+     *
+     * @param mixed $prettify
      */
     public function getName($prettify = false)
     {
@@ -57,7 +58,8 @@ class Relation extends Record
      * Gets the schema name.
      *
      * @return string
-     * @param  mixed  $prettify
+     *
+     * @param mixed $prettify
      */
     public function getSchemaName($prettify = false)
     {
@@ -78,7 +80,8 @@ class Relation extends Record
      * Gets the custom keys to this Relation.
      *
      * @return Column[]
-     * @param  mixed    $type
+     *
+     * @param mixed $type
      */
     public function getCustomKeys($type)
     {

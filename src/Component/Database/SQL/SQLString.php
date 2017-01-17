@@ -265,7 +265,7 @@ class SQLString
     {
         if (!is_null($itemRenderer)) {
             foreach ($values as $key => $value) {
-                $values[$key] = call_user_func_array($itemRenderer, [$key, $value, $values]);
+                $values[$key] = call_user_func_array($itemRenderer, array($key, $value, $values));
             }
         }
 

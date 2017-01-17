@@ -32,7 +32,7 @@ class ServiceContainer extends Container
      *
      * @param type $services a dictionary array
      */
-    public function loadServices($services = [])
+    public function loadServices($services = array())
     {
         $classLoader = $this->getClassLoader();
         if (!is_array($services)) {

@@ -36,7 +36,7 @@ class UrlGenerator extends GeneratorBase
         $this->locale = $_locale;
     }
 
-    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
+    public function generate($name, $parameters = array(), $referenceType = self::ABSOLUTE_PATH)
     {
         if ($this->locale !== null && !isset($parameters[RouteAttribute::LOCALE])) {
             $parameters[RouteAttribute::LOCALE] = $this->locale;

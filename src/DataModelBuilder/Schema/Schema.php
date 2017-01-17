@@ -23,7 +23,7 @@ class Schema extends Record
     /**
      * @var Relation[]
      */
-    private $relations = [];
+    private $relations = array();
 
     /**
      * Gets if this is the only available schema in the database.

@@ -49,7 +49,7 @@ abstract class ClassBuilder
         $this->includeSchema = $includeSchema;
         $this->classNamePostfix = '';
         $this->fileSystem = new Filesystem();
-        $this->fieldConverterInfo = [];
+        $this->fieldConverterInfo = array();
         $this->fieldConverterClass = null;
         $this->fieldConverterClassParams = null;
     }
@@ -139,10 +139,10 @@ abstract class ClassBuilder
     public function resolveColumnConverter($schema, $relation, $column, $dbtype, $fqcn)
     {
         if ($this->columnConverterResolver) {
-            $converter = call_user_func_array($this->columnConverterResolver, [$schema, $relation, $column, $dbtype, $fqcn]);
+            $converter = call_user_func_array($this->columnConverterResolver, array($schema, $relation, $column, $dbtype, $fqcn));
             if (!is_null($converter)) {
                 if (!is_array($converter)) {
-                    $converter = [$converter];
+                    $converter = array($converter);
                 }
                 if (is_array($converter)) {
                     $this->fieldConverterInfo[$column] = $converter;
@@ -172,14 +172,14 @@ abstract class ClassBuilder
                     'className' => $className,
                     'classNamespace' => $this->rootNamespace,
                     'classBaseClass' => $className.'Base',
-                    'uses' => [$this->applicationNamespace.'\\'.$this->rootNamespace.'\\Base\\'.$className.' as '.$className.'Base'],
+                    'uses' => array($this->applicationNamespace.'\\'.$this->rootNamespace.'\\Base\\'.$className.' as '.$className.'Base'),
                 ),
                 array(
                     'classModifier' => 'abstract',
                     'className' => $className,
                     'classNamespace' => $this->rootNamespace.'\\Base',
                     'classBaseClass' => $this->defaultBaseClassName,
-                    'uses' => [$this->defaultBaseClassFQN],
+                    'uses' => array($this->defaultBaseClassFQN),
                     'generate' => true,
                 ),
             );
@@ -189,7 +189,7 @@ abstract class ClassBuilder
                     'className' => $className,
                     'classNamespace' => $this->rootNamespace,
                     'classBaseClass' => $this->defaultBaseClassName,
-                    'uses' => [$this->defaultBaseClassFQN],
+                    'uses' => array($this->defaultBaseClassFQN),
                     'generate' => true,
                 ),
             );

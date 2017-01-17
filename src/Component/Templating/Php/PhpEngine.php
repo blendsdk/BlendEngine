@@ -26,7 +26,7 @@ class PhpEngine implements TemplateEngineInterface
     protected $trimOutput;
     protected $defaults;
 
-    public function __construct($trimOutput = true, array $defaults = [])
+    public function __construct($trimOutput = true, array $defaults = array())
     {
         $this->trimOutput = $trimOutput;
         $this->defaults = $defaults;
@@ -38,7 +38,7 @@ class PhpEngine implements TemplateEngineInterface
         );
     }
 
-    protected function normalizeParameters(array $parameters = [])
+    protected function normalizeParameters(array $parameters = array())
     {
         return array_merge($this->defaults, $parameters);
     }

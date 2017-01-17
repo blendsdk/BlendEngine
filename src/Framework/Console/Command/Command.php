@@ -66,15 +66,15 @@ abstract class Command extends CommandBase
      */
     protected function initContainer()
     {
-        $this->container->setScalars([
+        $this->container->setScalars(array(
             'rootFolder' => $this->getApplication()->getProjectFolder(),
             'logFolder' => $this->getApplication()->getProjectFolder().'/var/log',
             'logName' => 'console',
             'logLevel' => LogLevel::DEBUG,
-        ]);
+        ));
 
         // By setting to the debug mode we ignore the cached config
-        $this->container->defineSingletonWithInterface(Configuration::class, ConfigurationFactory::class, ['debug' => true]);
+        $this->container->defineSingletonWithInterface(Configuration::class, ConfigurationFactory::class, array('debug' => true));
 
         $this->container->defineSingletonWithInterface(
                 LoggerInterface::class, CommonLoggerFactory::class);

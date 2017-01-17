@@ -50,9 +50,9 @@ class DateTimeConversionBuilder
         file_put_contents($tmpFile, $header.$settings);
         $settings = php_strip_whitespace($tmpFile);
         unlink($tmpFile);
-        render_php_template(dirname(__FILE__).'/Template/datetime.php', [
+        render_php_template(dirname(__FILE__).'/Template/datetime.php', array(
             'settings' => trim(str_replace($header, '', $settings)),
             'namespace' => $this->config->getApplicationNamespace().'\\'.$this->config->getModelRootNamespace(),
-                ], $this->config->getTargetRootFolder().'/Database/DateTimeConversion.php', false);
+                ), $this->config->getTargetRootFolder().'/Database/DateTimeConversion.php', false);
     }
 }

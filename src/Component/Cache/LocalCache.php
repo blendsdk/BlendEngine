@@ -126,18 +126,18 @@ class LocalCache
             if ($success) {
                 return $result;
             } else {
-                $this->logger->warning('APCU cache did not return correctly!', [
+                $this->logger->warning('APCU cache did not return correctly!', array(
                     'cache' => $name,
-                ]);
+                ));
 
                 return call_user_func($callback);
             }
         } else {
             $result = call_user_func($callback);
             if (!apcu_add($name, $result)) {
-                $this->logger->warning('Unable to store data in cache!', [
+                $this->logger->warning('Unable to store data in cache!', array(
                     'data' => $result,
-                ]);
+                ));
             }
 
             return $result;

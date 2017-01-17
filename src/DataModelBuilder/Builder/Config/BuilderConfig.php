@@ -59,6 +59,7 @@ abstract class BuilderConfig
     /**
      * Should return a converter identifier based on the fully qualified
      * column name, thatis schema.relation.column (public.userser.user_name).
+     *
      * @param mixed $schema
      * @param mixed $relation
      * @param mixed $column
@@ -102,7 +103,7 @@ abstract class BuilderConfig
     protected function addModelFactoryMethod($relation, $columns, $type = self::MODEL_FACTORY_RETURN_MULTIPLE)
     {
         if (!is_array($columns)) {
-            $columns = [$columns];
+            $columns = array($columns);
         }
 
         if (stripos($relation, '.') === false) {
@@ -110,12 +111,12 @@ abstract class BuilderConfig
         }
 
         if (!isset($this->modelFactoryMethods[$relation])) {
-            $this->modelFactoryMethods[$relation] = [];
+            $this->modelFactoryMethods[$relation] = array();
         }
-        $this->modelFactoryMethods[$relation][] = [
+        $this->modelFactoryMethods[$relation][] = array(
             'columns' => $columns,
             'type' => $type,
-        ];
+        );
     }
 
     /**
@@ -132,7 +133,7 @@ abstract class BuilderConfig
     {
         $this->projectFolder = $projectFolder;
         $this->targetRootFolder = $projectFolder.'/src';
-        $this->modelFactoryMethods = [];
+        $this->modelFactoryMethods = array();
         $fs = new Filesystem();
         $fs->ensureFolder($this->targetRootFolder);
         $this->registerModelFactoryMethods();

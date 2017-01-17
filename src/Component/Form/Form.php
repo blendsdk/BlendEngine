@@ -81,11 +81,11 @@ abstract class Form
      */
     protected function createStateStorage()
     {
-        return [
+        return array(
             'csrf' => null,
-            'messages' => [],
-            'savedValues' => [],
-        ];
+            'messages' => array(),
+            'savedValues' => array(),
+        );
     }
 
     /**
@@ -158,7 +158,7 @@ abstract class Form
      */
     protected function getCSRF()
     {
-        return [$this->csrf_key, $this->stateStorage['csrf']];
+        return array($this->csrf_key, $this->stateStorage['csrf']);
     }
 
     /**
@@ -192,12 +192,12 @@ abstract class Form
      * @param type  $message
      * @param array $context
      */
-    protected function addMessage($type, $message, array $context = [])
+    protected function addMessage($type, $message, array $context = array())
     {
         if (!isset($this->stateStorage['messages'][$type])) {
-            $this->stateStorage['messages'][$type] = [];
+            $this->stateStorage['messages'][$type] = array();
         }
-        $this->stateStorage['messages'][$type][] = [$message, $context];
+        $this->stateStorage['messages'][$type][] = array($message, $context);
     }
 
     /**
@@ -206,7 +206,7 @@ abstract class Form
      * @param type  $message
      * @param array $context
      */
-    protected function addError($message, array $context = [])
+    protected function addError($message, array $context = array())
     {
         $this->hasErrors = true;
         $this->addMessage('error', $message, $context);
@@ -218,7 +218,7 @@ abstract class Form
      * @param type  $message
      * @param array $context
      */
-    protected function addSuccess($message, array $context = [])
+    protected function addSuccess($message, array $context = array())
     {
         $this->addMessage('success', $message, $context);
     }
@@ -229,7 +229,7 @@ abstract class Form
      * @param type  $message
      * @param array $context
      */
-    protected function addWarning($message, array $context = [])
+    protected function addWarning($message, array $context = array())
     {
         $this->addMessage('warn', $message, $context);
     }
@@ -240,7 +240,7 @@ abstract class Form
      * @param type  $message
      * @param array $context
      */
-    protected function addInfo($message, array $context = [])
+    protected function addInfo($message, array $context = array())
     {
         $this->addMessage('info', $message, $context);
     }
@@ -253,7 +253,7 @@ abstract class Form
     protected function getMessages()
     {
         $result = $this->stateStorage['messages'];
-        $this->stateStorage['messages'] = [];
+        $this->stateStorage['messages'] = array();
 
         return $result;
     }
@@ -282,7 +282,7 @@ abstract class Form
      * @param string $message
      * @param array  $context
      */
-    protected function assertNotBlank($field, $message, array $context = [])
+    protected function assertNotBlank($field, $message, array $context = array())
     {
         if (empty($this->getField($field))) {
             $this->addError($message, $context);
@@ -298,10 +298,10 @@ abstract class Form
      * @param string $message
      * @param array  $context
      */
-    protected function assertSameValue($field1, $field2, $message, array $context = [])
+    protected function assertSameValue($field1, $field2, $message, array $context = array())
     {
         if ($this->getField($field1) !== $this->getField($field2)) {
-            $this->addError($message, array_merge($context, ['field1' => $field1, 'field2' => $field2]));
+            $this->addError($message, array_merge($context, array('field1' => $field1, 'field2' => $field2)));
         }
     }
 }

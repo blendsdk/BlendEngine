@@ -66,7 +66,7 @@ class ControllerHandler implements ControllerHandlerInterface
         } else {
             $error = 'The controller has an invalid [controller,action] signature!'.
                     ' You should check the Route creation!';
-            $this->logger->error($error, ['RequestAttributes' => $request->attributes->add(), $request->getPathInfo()]);
+            $this->logger->error($error, array('RequestAttributes' => $request->attributes->add(), $request->getPathInfo()));
             throw new InvalidParameterException($error);
         }
     }
@@ -100,7 +100,7 @@ class ControllerHandler implements ControllerHandlerInterface
         if (!$request->attributes->has(RouteAttribute::CONTROLLER)) {
             $error = 'The matched route does not have a controller '.
                     'key/value pair. You should check the Route creation!';
-            $this->logger->error($error, ['RequestAttributes' => $request->attributes->add(), $request->getPathInfo()]);
+            $this->logger->error($error, array('RequestAttributes' => $request->attributes->add(), $request->getPathInfo()));
             throw new InvalidParameterException($error);
         }
     }

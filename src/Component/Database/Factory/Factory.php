@@ -218,7 +218,7 @@ abstract class Factory
     protected function createAndCondition(array $params)
     {
         $condition = sqlstr('');
-        $conditionParameters = [];
+        $conditionParameters = array();
         $first = true;
         foreach ($params as $field => $value) {
             if (!$first) {
@@ -235,7 +235,7 @@ abstract class Factory
             $first = false;
         }
 
-        return [$condition, $conditionParameters];
+        return array($condition, $conditionParameters);
     }
 
     /**
@@ -251,7 +251,7 @@ abstract class Factory
     public function getAll($selectColumns, $orderDirective = null, $offsetLimitDirective = null)
     {
         return $this->getManyBy(
-                        $selectColumns, ['true' => true], $orderDirective, $offsetLimitDirective);
+                        $selectColumns, array('true' => true), $orderDirective, $offsetLimitDirective);
     }
 
     /**
@@ -272,7 +272,7 @@ abstract class Factory
 
         $result = $this->database->executeQuery($sql, $conditionParams);
         if (count($result) !== 0) {
-            return $this->container->get('model', ['data' => $this->convertFromRecord($result[0])]);
+            return $this->container->get('model', array('data' => $this->convertFromRecord($result[0])));
         } else {
             return null;
         }
@@ -289,7 +289,7 @@ abstract class Factory
         list($condition, $conditionParams) = $this->createAndCondition($byColumns);
         $result = $this->database->delete($this->relation, $condition, $conditionParams, $stmtResult);
         if ($stmtResult->getAffectedRecords() == 1) {
-            return $this->container->get('model', ['data' => $this->convertFromRecord($result[0])]);
+            return $this->container->get('model', array('data' => $this->convertFromRecord($result[0])));
         } elseif ($stmtResult->getAffectedRecords() > 1) {
             throw new DatabaseQueryException('The '.__FUNCTION__
             .' deleted more than one record!');
@@ -353,9 +353,9 @@ abstract class Factory
     protected function getManyBy($selectColumns, array $byColumns, $orderDirective = null, $offsetLimitDirective = null)
     {
         if (is_null($selectColumns)) {
-            $selectColumns = [self::ALL_COLUMNS];
+            $selectColumns = array(self::ALL_COLUMNS);
         } elseif (!is_array($selectColumns)) {
-            $selectColumns = [$selectColumns];
+            $selectColumns = array($selectColumns);
         }
 
         list($condition, $conditionParams) = $this->createAndCondition($byColumns);
@@ -382,7 +382,7 @@ abstract class Factory
     {
         if (is_array($records) && count($records) !== 0) {
             foreach ($records as $key => $record) {
-                $records[$key] = $this->container->get('model', ['data' => $this->convertFromRecord($record)]);
+                $records[$key] = $this->container->get('model', array('data' => $this->convertFromRecord($record)));
             }
 
             return $records;
@@ -402,7 +402,7 @@ abstract class Factory
     {
         $sql = '';
         if (is_array($offsetLimitDirective)) {
-            foreach (['limit', 'offset'] as $directive) {
+            foreach (array('limit', 'offset') as $directive) {
                 if (isset($offsetLimitDirective[$directive])) {
                     $sql .= ' '
                             .strtoupper($directive)

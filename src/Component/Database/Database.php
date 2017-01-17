@@ -160,7 +160,7 @@ class Database
         if (intval($this->connection->errorCode()) !== 0) {
             $exception = DatabaseQueryException::createFromStatement($this);
             if ($this->logger) {
-                $this->logger->error($exception->getMessage(), ['sql' => str_replace("\n", ' ', $sql)]);
+                $this->logger->error($exception->getMessage(), array('sql' => str_replace("\n", ' ', $sql)));
             }
             throw $exception;
         } else {
@@ -237,8 +237,8 @@ class Database
      */
     public function update($table_name, array $params, $condition, array $cparams, StatementResult &$statementResult = null, $resultType = \PDO::FETCH_ASSOC)
     {
-        $setkeys = [];
-        $setparams = [];
+        $setkeys = array();
+        $setparams = array();
         foreach ($params as $field => $value) {
             $param = ':sp_'.$field;
             $setkeys[] = $field.'='.$param;
@@ -276,11 +276,11 @@ class Database
      */
     private function normalizeConfig(array $config)
     {
-        $required = ['username', 'password', 'database'];
-        $default = [
+        $required = array('username', 'password', 'database');
+        $default = array(
             'host' => 'localhost',
             'port' => 5432,
-        ];
+        );
         foreach ($required as $item) {
             if (!array_key_exists($item, $config)) {
                 throw new InvalidConfigException("No {$item} configuration was provided!");

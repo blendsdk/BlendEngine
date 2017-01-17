@@ -25,12 +25,12 @@ class Guest implements UserProviderInterface
 
     public function getPermissions()
     {
-        return [];
+        return array();
     }
 
     public function getRoles()
     {
-        return [];
+        return array();
     }
 
     public function getUserID()

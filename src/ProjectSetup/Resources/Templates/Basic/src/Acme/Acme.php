@@ -15,6 +15,6 @@ class Acme implements RouteProviderInterface
 {
     public function loadRoutes(RouteBuilder $builder)
     {
-        $builder->route('home', '/', [AcmeController::class, 'index']);
+        $builder->route('home', '/', array(AcmeController::class, 'index'));
     }
 }

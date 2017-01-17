@@ -76,7 +76,7 @@ class Route extends RouteBase
      */
     public function setControllerAction($controller, $action)
     {
-        $this->setDefault(RouteAttribute::CONTROLLER, [$controller, $action]);
+        $this->setDefault(RouteAttribute::CONTROLLER, array($controller, $action));
 
         return $this;
     }

@@ -206,7 +206,7 @@ class InitCommand extends Command
                 $this->setSDKVersion();
 
                 $output->writeln(
-                        ['', '<info>Thank you for using BlendEngine :)</info>', '<info>Enjoy!</info>']
+                        array('', '<info>Thank you for using BlendEngine :)</info>', '<info>Enjoy!</info>')
                 );
             } else {
                 $output->writeln('<error>The requested template ['.$template.'] does not exist!</error>');
@@ -219,11 +219,11 @@ class InitCommand extends Command
     private function createVarFolders()
     {
         $fs = new Filesystem();
-        $folders = [
+        $folders = array(
             $this->workFolder.'/var/cache',
             $this->workFolder.'/var/log',
             $this->workFolder.'/var/session',
-        ];
+        );
         foreach ($folders as $folder) {
             $fs->ensureFolder($folder, 0777);
         }
@@ -339,7 +339,7 @@ class InitCommand extends Command
      */
     private function getTemplateNames()
     {
-        $result = [];
+        $result = array();
         $finder = new Finder();
         $finder->files()
                 ->directories()
@@ -414,7 +414,7 @@ class InitCommand extends Command
     {
         $p = new Process('git config --list');
         $p->enableOutput();
-        $result = [];
+        $result = array();
         $user = get_current_user();
         try {
             $p->mustRun();
@@ -456,14 +456,14 @@ class InitCommand extends Command
             return true;
         } catch (\Exception $e) {
             $log = $e->getMessage();
-            $output->writeln([
+            $output->writeln(array(
                 '',
                 '<warn>WARNING: Compass could not be verified on your system!</warn>',
                 '<warn>Perhaps it is not installed or your PATH settings are not correct.</warn>',
                 '<warn>Without compass you will not be able to compile the style sheets.</warn>',
                 '<warn>Check out http://compass-style.org/install for more information.</warn>',
                 '',
-            ]);
+            ));
 
             return false;
         }
@@ -485,22 +485,22 @@ class InitCommand extends Command
 
                 return true;
             } else {
-                $output->writeln([
+                $output->writeln(array(
                     '',
                     '<warn>WARNING: Could not verify your PostgreSQL installation!</warn>',
                     '<warn>Did you forget to install the pdo_psql extension?.</warn>',
                     '',
-                ]);
+                ));
 
                 return false;
             }
         } catch (\Exception $e) {
-            $output->writeln([
+            $output->writeln(array(
                 '',
                 '<warn>WARNING: Could not verify your PostgreSQL installation!</warn>',
                 '<warn>The PHP command line utility did not run correctly.</warn>',
                 '',
-            ]);
+            ));
 
             return false;
         }

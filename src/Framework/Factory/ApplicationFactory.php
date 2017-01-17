@@ -108,12 +108,12 @@ class ApplicationFactory implements ObjectFactoryInterface
      */
     private function createApplication()
     {
-        $args = [
+        $args = array(
             $this->config,
             $this->logger,
             $this->localCache,
             $this->rootFolder,
-        ];
+        );
 
         return (new \ReflectionClass($this->applicationClass))
                         ->newInstanceArgs($args);
@@ -148,9 +148,9 @@ class ApplicationFactory implements ObjectFactoryInterface
 
         $logLevel = $this->debug === true ? LogLevel::DEBUG : $this->config->get('logger.level', LogLevel::WARNING);
 
-        $args = [
+        $args = array(
             $logFolder, $this->config->get('logger.name', 'application'), $this->config->get('logger.filelogger.maxfiles', 10), $logLevel,
-        ];
+        );
 
         $this->logger = (new \ReflectionClass($this->loggerFactory))
                 ->newInstanceArgs($args)

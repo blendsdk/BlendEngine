@@ -29,8 +29,8 @@ class Container
 
     public function __construct()
     {
-        $this->definitions = [];
-        $this->byInterfaceIndex = [];
+        $this->definitions = array();
+        $this->byInterfaceIndex = array();
     }
 
     /**
@@ -55,14 +55,14 @@ class Container
     public function getByInterface($interface)
     {
         if (isset($this->byInterfaceIndex[$interface])) {
-            $result = [];
+            $result = array();
             foreach ($this->byInterfaceIndex[$interface] as $item) {
                 $result[] = $this->get($item);
             }
 
             return $result;
         } else {
-            return [];
+            return array();
         }
     }
 
@@ -76,7 +76,7 @@ class Container
      *
      * @return mixed
      */
-    public function call($interface, $method, array $params = [], array $interfaceParams = [])
+    public function call($interface, $method, array $params = array(), array $interfaceParams = array())
     {
         if (!$this->isDefined($interface)) {
             $this->defineClass($interface);
@@ -85,7 +85,7 @@ class Container
         $callArgs = $this->resolveCallParameters($interface, $callSignature, array_merge($defaultCallParams, $params), $method);
         $object = $this->get($interface, $interfaceParams);
 
-        return call_user_func_array([$object, $method], array_values($callArgs));
+        return call_user_func_array(array($object, $method), array_values($callArgs));
     }
 
     /**
@@ -115,7 +115,7 @@ class Container
      *
      * @return mixed
      */
-    public function get($interface, array $params = [])
+    public function get($interface, array $params = array())
     {
         if (!$this->isDefined($interface)) {
             $this->defineClass($interface, $params);
@@ -148,7 +148,7 @@ class Container
      */
     private function resolveCallParameters($interface, $callSignature, $params, $method = '__construct')
     {
-        $callArgs = [];
+        $callArgs = array();
         if (!empty($callSignature)) {
             $resolved = $this->resolve($callSignature, $params);
             $callArgs = array_intersect_key($resolved, $callSignature); // clear unwanted params
@@ -185,13 +185,13 @@ class Container
     {
         if (isset($this->definitions[$name]) && $this->definitions[$name]['kind'] === 'x') {
             // replace the scalar if it exists
-            $this->definitions[$name]['params'] = [$value];
+            $this->definitions[$name]['params'] = array($value);
         } else {
-            $this->define($name, [
+            $this->define($name, array(
                 'kind' => 'x',
                 'type' => gettype($value),
-                'params' => [$value],
-            ]);
+                'params' => array($value),
+            ));
         }
     }
 
@@ -202,13 +202,13 @@ class Container
      * @param string $className
      * @param array  $params
      */
-    public function defineSingletonWithInterface($interface, $className, array $params = [])
+    public function defineSingletonWithInterface($interface, $className, array $params = array())
     {
-        $this->define($interface, [
+        $this->define($interface, array(
             'kind' => 's',
             'type' => $className,
             'params' => $params,
-        ]);
+        ));
     }
 
     /**
@@ -217,13 +217,13 @@ class Container
      * @param string $className
      * @param array  $params
      */
-    public function defineSingleton($className, array $params = [])
+    public function defineSingleton($className, array $params = array())
     {
-        $this->define($className, [
+        $this->define($className, array(
             'kind' => 's',
             'type' => $className,
             'params' => $params,
-        ]);
+        ));
     }
 
     /**
@@ -233,13 +233,13 @@ class Container
      * @param string $className
      * @param array  $params
      */
-    public function defineClassWithInterface($interface, $className, array $params = [])
+    public function defineClassWithInterface($interface, $className, array $params = array())
     {
-        $this->define($interface, [
+        $this->define($interface, array(
             'kind' => 'c',
             'type' => $className,
             'params' => $params,
-        ]);
+        ));
     }
 
     /**
@@ -248,13 +248,13 @@ class Container
      * @param type  $className
      * @param array $params
      */
-    public function defineClass($className, array $params = [])
+    public function defineClass($className, array $params = array())
     {
-        $this->define($className, [
+        $this->define($className, array(
             'kind' => 'c',
             'type' => $className,
             'params' => $params,
-        ]);
+        ));
     }
 
     /**
@@ -263,29 +263,29 @@ class Container
      * @param type  $interface
      * @param array $data
      */
-    private function define($interface, array $data = [])
+    private function define($interface, array $data = array())
     {
         $this->assertNotExists($interface);
         list($kind, $type, $params) = array_values($data);
         if ($kind === 'c' || $kind === 's') {
             list($defaultCallParams, $callSignature, $reflection, $interfaces) = $this->reflect($type);
-            $this->definitions[$interface] = array_merge($data, [
+            $this->definitions[$interface] = array_merge($data, array(
                 'defCtorParams' => $defaultCallParams,
                 'callSignature' => $callSignature,
                 'reflection' => $reflection,
-            ]);
+            ));
             foreach ($interfaces as $item) {
                 if (!isset($this->byInterfaceIndex)) {
-                    $this->byInterfaceIndex[$item] = [];
+                    $this->byInterfaceIndex[$item] = array();
                 }
                 $this->byInterfaceIndex[$item][] = $interface;
             }
         } else {
-            $this->definitions[$interface] = array_merge($data, [
-                'defCtorParams' => [],
-                'callSignature' => [],
+            $this->definitions[$interface] = array_merge($data, array(
+                'defCtorParams' => array(),
+                'callSignature' => array(),
                 'reflection' => null,
-            ]);
+            ));
         }
     }
 
@@ -302,8 +302,8 @@ class Container
     private function reflect($type, $method = null)
     {
         $ref = new \ReflectionClass($type);
-        $defaultCallParams = [];
-        $callSignature = [];
+        $defaultCallParams = array();
+        $callSignature = array();
         if ($ref->isInterface()) {
             throw new InvalidConfigException(
             "Interface type [$type] cannot be defined in the DI Container!", 1000);
@@ -319,7 +319,7 @@ class Container
             list($defaultCallParams, $callSignature) = $this->reflectParameters($method);
         }
 
-        return [$defaultCallParams, $callSignature, $ref, $ref->getInterfaceNames()];
+        return array($defaultCallParams, $callSignature, $ref, $ref->getInterfaceNames());
     }
 
     /**
@@ -331,8 +331,8 @@ class Container
      */
     private function reflectParameters($ref)
     {
-        $defaultParameters = [];
-        $callSignature = [];
+        $defaultParameters = array();
+        $callSignature = array();
         if ($ref->getNumberOfParameters() !== 0) {
             foreach ($ref->getParameters() as $param) {
                 if ($param->isDefaultValueAvailable()) {
@@ -342,7 +342,7 @@ class Container
             }
         }
 
-        return [$defaultParameters, $callSignature];
+        return array($defaultParameters, $callSignature);
     }
 
     /**
@@ -370,7 +370,7 @@ class Container
         }
 
         if ($reflection->implementsInterface(ObjectFactoryInterface::class)) {
-            $instance = call_user_func([$instance, 'create']);
+            $instance = call_user_func(array($instance, 'create'));
             if ($instance === null) {
                 throw new InvalidConfigException($reflection->getName().'->create() did not return an object instance');
             }

@@ -18,7 +18,7 @@ namespace Blend\Component\Templating;
  */
 interface TemplateEngineInterface
 {
-    public function render($view, array $parameters = []);
+    public function render($view, array $parameters = array());
 
-    public function setViewPaths(array $paths = []);
+    public function setViewPaths(array $paths = array());
 }

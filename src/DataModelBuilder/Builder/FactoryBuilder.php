@@ -67,11 +67,11 @@ class FactoryBuilder extends ClassBuilder
                 .'\\'.$this->modelRootNamespace
                 .'\\Model\\'.$this->relation->getName(true);
         $def['modelClass'] = $modelClass;
-        $def['uses'] = [
+        $def['uses'] = array(
             'Blend\Component\Database\Database',
             'Blend\Component\Database\Factory\Factory',
             $modelClass,
-        ];
+        );
         if (count($this->fieldConverterInfo) !== 0) {
             $def['uses'][] = $this->fieldConverterClass;
             $ns = explode('\\', $modelClass);
@@ -99,10 +99,10 @@ class FactoryBuilder extends ClassBuilder
             foreach ($this->customFactoryMethods[$relName] as $methodDef) {
                 $constraint_name = md5(serialize($methodDef));
                 foreach ($methodDef['columns'] as $column) {
-                    $keyColumn = [
+                    $keyColumn = array(
                         'constraint_name' => $constraint_name,
                         'column_name' => $column,
-                    ];
+                    );
                     $this->relation->addKeyColumn($keyColumn, 'CUSTOM_'.($methodDef['type'] === 's' ? 'SINGLE' : 'MULTI'));
                 }
             }
@@ -111,7 +111,7 @@ class FactoryBuilder extends ClassBuilder
 
     protected function createDefinitionsForKeys($list)
     {
-        $result = [];
+        $result = array();
         if (is_array($list) && count($list) !== 0) {
             foreach ($list as $columns) {
                 $result[] = $this->createCallerDefinition($columns);
@@ -131,24 +131,24 @@ class FactoryBuilder extends ClassBuilder
      */
     private function createCallerDefinition(array $columns)
     {
-        $functionName = [];
-        $functionParams = [];
-        $functionCallParam = [];
+        $functionName = array();
+        $functionParams = array();
+        $functionCallParam = array();
         foreach ($columns as $column) {
             $argName = '$'.strtolower($column->getName());
             $colName = $column->getName();
             /* @var $column \Blend\DataModelBuilder\Schema\Column */
             $functionName[] = str_identifier(str_replace('_id', '_ID', $colName));
             $functionParams[] = $argName;
-            $functionParamsDoc[] = [$column->getField('udt_name'), $argName];
+            $functionParamsDoc[] = array($column->getField('udt_name'), $argName);
             $functionCallParam[] = "'$colName' => ".$argName;
         }
 
-        return [
+        return array(
             'functionName' => ucwords(implode('And', $functionName)),
             'functionParams' => implode(', ', $functionParams),
             'functionParamsDoc' => $functionParamsDoc,
             'functionCallParam' => implode(', ', $functionCallParam),
-        ];
+        );
     }
 }

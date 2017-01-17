@@ -45,7 +45,7 @@ class ConfigurationFactory implements ObjectFactoryInterface
             $config->dump($cacheFile);
         }
         if (!$config->has('debug')) {
-            $config->mergeWith(['debug' => $this->debug]);
+            $config->mergeWith(array('debug' => $this->debug));
         }
 
         return $config;

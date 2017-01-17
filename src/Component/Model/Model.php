@@ -26,14 +26,14 @@ class Model
     public function __construct($data = array())
     {
         $this->data = $data;
-        $this->updates = [];
+        $this->updates = array();
         $this->isNew = empty($data);
     }
 
     public function sync($data)
     {
         $this->data = $data;
-        $this->updates = [];
+        $this->updates = array();
         $this->isNew = false;
     }
 

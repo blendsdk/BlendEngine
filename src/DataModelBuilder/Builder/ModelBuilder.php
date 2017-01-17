@@ -49,7 +49,7 @@ class ModelBuilder extends ClassBuilder
      */
     protected function preparBuildDefinition($def)
     {
-        $properties = [];
+        $properties = array();
         foreach ($this->relation->getColumns() as $column) {
             $name = $column->getName();
             $type = 'mixed';

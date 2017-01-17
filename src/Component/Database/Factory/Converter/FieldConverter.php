@@ -29,9 +29,9 @@ if (!defined('FIELD_CONVERT_TO_MODEL')) {
  */
 abstract class FieldConverter
 {
-    protected $converters = [];
-    protected $cachedConverter = [];
-    protected $options = [];
+    protected $converters = array();
+    protected $cachedConverter = array();
+    protected $options = array();
 
     const DIR_FROM_RECORD = 'toModel';
     const DIR_FROM_MODEL = 'toDbRecord';
@@ -62,8 +62,8 @@ abstract class FieldConverter
             if (isset($this->cachedConverter[$field])) {
                 $converters = $this->cachedConverter[$field];
             } else {
-                $converters = [];
-                foreach ([$type, $field] as $item) {
+                $converters = array();
+                foreach (array($type, $field) as $item) {
                     if (isset($this->converters[$item])) {
                         $converters[] = $this->converters[$item];
                     }
@@ -75,7 +75,7 @@ abstract class FieldConverter
                 }
             }
             foreach ($converters as $converter) {
-                $record[$field] = call_user_func([$converter, $direction], $record[$field]);
+                $record[$field] = call_user_func(array($converter, $direction), $record[$field]);
             }
         }
 

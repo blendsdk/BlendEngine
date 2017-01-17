@@ -51,13 +51,13 @@ class SchemaReader
      */
     protected function getSchemas()
     {
-        $skip = ['pg_toast', 'pg_temp_1', 'pg_catalog', 'pg_toast_temp_1', 'information_schema'];
+        $skip = array('pg_toast', 'pg_temp_1', 'pg_catalog', 'pg_toast_temp_1', 'information_schema');
         $sql = new SelectStatement();
         $sql->from('information_schema.schemata')
                 ->selectAll()
                 ->where(sqlstr('schema_name')->notInList($skip, SQLString::STRING_RENDERER()));
 
-        $result = [];
+        $result = array();
         $list = $this->database->executeQuery($sql);
         $singleSchema = count($list) === 1;
         foreach ($list as $record) {
@@ -81,7 +81,7 @@ class SchemaReader
         $sql->from('information_schema.tables')
                 ->selectAll()
                 ->where(sqlstr('table_schema')->equalsTo(':table_schema'));
-        $params = [':table_schema' => $schema->getName()];
+        $params = array(':table_schema' => $schema->getName());
         foreach ($this->database->executeQuery($sql, $params) as $record) {
             $relation = new Relation($record);
             $schema->addRelation($relation);
@@ -101,7 +101,7 @@ class SchemaReader
             $a = 0;
         }
 
-        $constraint_type = ['UNIQUE', 'PRIMARY KEY', 'FOREIGN KEY'];
+        $constraint_type = array('UNIQUE', 'PRIMARY KEY', 'FOREIGN KEY');
         $tableConstQuery = new SelectStatement();
         $tableConstQuery->from('information_schema.table_constraints')
                 ->where(sqlstr('constraint_type')->inList($constraint_type, SQLString::STRING_RENDERER()))
@@ -144,7 +144,7 @@ class SchemaReader
                 ->where(sqlstr('table_schema')->equalsTo(':table_schema'))
                 ->andWhere(sqlstr('table_name')->equalsTo(':table_name'));
 
-        $params = [':table_schema' => $relation->getSchemaName(), ':table_name' => $relation->getName()];
+        $params = array(':table_schema' => $relation->getSchemaName(), ':table_name' => $relation->getName());
         foreach ($this->database->executeQuery($sql, $params) as $record) {
             $column = new Column($record);
             $relation->addColumn($column);
