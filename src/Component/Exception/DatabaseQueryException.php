@@ -17,11 +17,12 @@ namespace Blend\Component\Exception;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class DatabaseQueryException extends \Exception {
-
-    public static function createFromStatement($pdoStatement) {
+class DatabaseQueryException extends \Exception
+{
+    public static function createFromStatement($pdoStatement)
+    {
         $errorInfo = $pdoStatement->errorInfo();
-        return new DatabaseQueryException($errorInfo[2], 500);
-    }
 
+        return new self($errorInfo[2], 500);
+    }
 }

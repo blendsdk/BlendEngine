@@ -18,11 +18,12 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class RoutingExtension extends \Twig_Extension {
-
+class RoutingExtension extends \Twig_Extension
+{
     private $generator;
 
-    public function __construct(UrlGeneratorInterface $generator) {
+    public function __construct(UrlGeneratorInterface $generator)
+    {
         $this->generator = $generator;
     }
 
@@ -31,18 +32,21 @@ class RoutingExtension extends \Twig_Extension {
      *
      * @return array An array of functions
      */
-    public function getFunctions() {
+    public function getFunctions()
+    {
         return array(
             new \Twig_SimpleFunction('url', array($this, 'getUrl'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
             new \Twig_SimpleFunction('path', array($this, 'getPath'), array('is_safe_callback' => array($this, 'isUrlGenerationSafe'))),
         );
     }
 
-    public function getPath($name, $parameters = array(), $relative = false) {
+    public function getPath($name, $parameters = array(), $relative = false)
+    {
         return $this->generator->generate($name, $parameters, $relative ? UrlGeneratorInterface::RELATIVE_PATH : UrlGeneratorInterface::ABSOLUTE_PATH);
     }
 
-    public function getUrl($name, $parameters = array(), $schemeRelative = false) {
+    public function getUrl($name, $parameters = array(), $schemeRelative = false)
+    {
         return $this->generator->generate($name, $parameters, $schemeRelative ? UrlGeneratorInterface::NETWORK_PATH : UrlGeneratorInterface::ABSOLUTE_URL);
     }
 
@@ -68,7 +72,8 @@ class RoutingExtension extends \Twig_Extension {
      *
      * @return array An array with the contexts the URL is safe
      */
-    public function isUrlGenerationSafe(\Twig_Node $argsNode) {
+    public function isUrlGenerationSafe(\Twig_Node $argsNode)
+    {
         // support named arguments
         $paramsNode = $argsNode->hasNode('parameters') ? $argsNode->getNode('parameters') : (
                 $argsNode->hasNode(1) ? $argsNode->getNode(1) : null
@@ -86,8 +91,8 @@ class RoutingExtension extends \Twig_Extension {
     /**
      * {@inheritdoc}
      */
-    public function getName() {
+    public function getName()
+    {
         return 'routing';
     }
-
 }

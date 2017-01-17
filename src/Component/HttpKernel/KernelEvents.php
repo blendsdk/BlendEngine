@@ -12,12 +12,12 @@
 namespace Blend\Component\HttpKernel;
 
 /**
- * Description of KernelEvents
+ * Description of KernelEvents.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class KernelEvents {
-
+class KernelEvents
+{
     const REQUEST = 'http.request';
     const REQUEST_EXCEPTION = 'http.request.exception';
     const CONTROLLER_RESPONSE = 'http.controller.response';
@@ -25,6 +25,5 @@ class KernelEvents {
 
     const PRIORITY_HIGHT = 1500;
     const PRIORITY_MEDIUM = 1000;
-    CONST PRIORITY_LOW = 500;
-
+    const PRIORITY_LOW = 500;
 }

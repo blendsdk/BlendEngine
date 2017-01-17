@@ -15,21 +15,24 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Specialized Application class to be used in BlendEngine's unit testing
- * process
+ * process.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class ApplicationTestable extends Application {
-
-    public function loadServices($services) {
+abstract class ApplicationTestable extends Application
+{
+    public function loadServices($services)
+    {
         $this->container->loadServices($services);
     }
 
-    public function reInstallEventSubscribers() {
+    public function reInstallEventSubscribers()
+    {
         $this->installEventSubscribers();
     }
 
-    protected function installEventSubscribers() {
+    protected function installEventSubscribers()
+    {
         $subscribers = $this->container->getByInterface(EventSubscriberInterface::class);
         foreach ($subscribers as $subscriber) {
             $this->dispatcher->removeSubscriber($subscriber);
@@ -40,8 +43,8 @@ abstract class ApplicationTestable extends Application {
     /**
      * @return \Blend\Component\DI\ServiceContainer
      */
-    public function getContainer() {
+    public function getContainer()
+    {
         return $this->container;
     }
-
 }

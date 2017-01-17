@@ -16,16 +16,16 @@ use Blend\ProjectSetup\Command\InitCommand;
 use Blend\ProjectSetup\Command\PublishCommand;
 
 /**
- * ProjectSetupApplication
+ * ProjectSetupApplication.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class SetupApplication extends Application {
-
-    public function __construct($script_dir) {
+class SetupApplication extends Application
+{
+    public function __construct($script_dir)
+    {
         parent::__construct($script_dir, 'BlendEngine Setup Utility', '2.0');
         $this->add(new InitCommand());
         $this->add(new PublishCommand());
     }
-
 }

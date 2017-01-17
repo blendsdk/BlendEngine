@@ -11,21 +11,20 @@
 
 namespace Blend\Component\Database\Factory\Converter;
 
-use Blend\Component\Database\Factory\Converter\IConverter;
-
 /**
- * Description of PasswordConverter
+ * Description of PasswordConverter.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class PasswordConverter implements IConverter {
-    
-    public function toDbRecord($value) {
+class PasswordConverter implements IConverter
+{
+    public function toDbRecord($value)
+    {
         return sha1($value);
     }
 
-    public function toModel($value) {
+    public function toModel($value)
+    {
         return $value;
     }
-
 }

@@ -17,13 +17,13 @@ namespace Blend\Component\Exception;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class InvalidConfigException extends \Exception {
-
+class InvalidConfigException extends \Exception
+{
     /**
      * @return string The name of this exception
      */
-    public function getName() {
+    public function getName()
+    {
         return 'Invalid Configuration';
     }
-
 }

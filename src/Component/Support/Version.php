@@ -12,27 +12,28 @@
 namespace Blend\Component\Support;
 
 /**
- * This class provides functionality to parse and handle a version string
+ * This class provides functionality to parse and handle a version string.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Version {
-
+class Version
+{
     private $prefix;
     private $major;
     private $minor;
     private $build;
     private $release;
 
-    public function __construct($version_string = null) {
+    public function __construct($version_string = null)
+    {
         $this->parse($version_string);
     }
 
-    private function parse($source) {
+    private function parse($source)
+    {
         if (!empty($source)) {
             $temp = explode('.', strtolower(trim($source)));
             if (count($temp) != 0) {
-
                 $this->prefix = $this->parsePrefix($temp[0]);
                 $this->major = $this->makeNumber($temp[0]);
 
@@ -49,79 +50,99 @@ class Version {
     }
 
     /**
-     * Gets the major version part
+     * Gets the major version part.
+     *
      * @return type
      */
-    public function getMajor() {
+    public function getMajor()
+    {
         return $this->major;
     }
 
     /**
-     * Gets the minor version part
+     * Gets the minor version part.
+     *
      * @return type
      */
-    public function getMinor() {
+    public function getMinor()
+    {
         return $this->minor;
     }
 
     /**
-     * Gets the build version part
+     * Gets the build version part.
+     *
      * @return type
      */
-    public function getBuild() {
+    public function getBuild()
+    {
         return $this->build;
     }
 
     /**
-     * Gets the release version part
+     * Gets the release version part.
+     *
      * @return type
      */
-    public function getRelease() {
+    public function getRelease()
+    {
         return $this->release;
     }
 
     /**
-     * Bumps the major version
+     * Bumps the major version.
+     *
      * @return $this
      */
-    public function bumpMajor() {
+    public function bumpMajor()
+    {
         $this->major += 1;
         $this->minor = 0;
         $this->build = 0;
         $this->release = null;
+
         return $this;
     }
 
     /**
-     * Bumps the minor version
+     * Bumps the minor version.
+     *
      * @return $this
      */
-    public function bumpMinor() {
+    public function bumpMinor()
+    {
         $this->minor += 1;
         $this->build = 0;
         $this->release = null;
+
         return $this;
     }
 
     /**
-     * Bumps the build version
+     * Bumps the build version.
+     *
      * @return $this
      */
-    public function bumpBuild() {
+    public function bumpBuild()
+    {
         $this->build += 1;
         $this->release = null;
+
         return $this;
     }
 
     /**
-     * Sets the release tag name
+     * Sets the release tag name.
+     *
      * @param type $tag
      */
-    public function serReleaseTag($tag) {
+    public function serReleaseTag($tag)
+    {
         $this->release = $tag;
     }
 
-    private function makeNumber($data, $default = 0) {
+    private function makeNumber($data, $default = 0)
+    {
         $data = $this->clean($data);
         if (!is_numeric($data)) {
             return $default;
@@ -130,17 +151,20 @@ class Version {
         }
     }
 
-    private function parsePostfix($data) {
+    private function parsePostfix($data)
+    {
         if (!empty($data)) {
             $p = explode('-', $data);
             unset($p[0]);
+
             return implode('-', $p);
         } else {
             return null;
         }
     }
 
-    private function parsePrefix($data) {
+    private function parsePrefix($data)
+    {
         if (isset($data[0]) && $data[0] == 'v') {
             return 'v';
         } else {
@@ -148,11 +172,13 @@ class Version {
         }
     }
 
-    private function clean($data) {
+    private function clean($data)
+    {
         return preg_replace('/[^0-9,]|,[0-9]*$/', '', $data);
     }
 
-    public function getVersion() {
+    public function getVersion()
+    {
         $result = array();
 
         if (!empty($this->major)) {
@@ -176,22 +202,22 @@ class Version {
         $result = implode('.', $result);
 
         if (!empty($this->prefix)) {
-            $result = 'v' . $result;
+            $result = 'v'.$result;
         }
 
         if (!empty($this->release)) {
-            $result = $result . '-' . $this->release;
+            $result = $result.'-'.$this->release;
         }
 
         return $result;
     }
 
-    public static function fromFile($filename) {
-        return new Version(file_get_contents($filename));
+    public static function fromFile($filename)
+    {
+        return new self(file_get_contents($filename));
     }
-
 }
 
-class VersionException extends \Exception {
-
+class VersionException extends \Exception
+{
 }

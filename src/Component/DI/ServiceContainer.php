@@ -11,43 +11,43 @@
 
 namespace Blend\Component\DI;
 
-use Blend\Component\DI\Container;
 use Composer\Autoload\ClassLoader;
 
 /**
- * ServiceContainer
+ * ServiceContainer.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class ServiceContainer extends Container {
-
-    public function __construct() {
+class ServiceContainer extends Container
+{
+    public function __construct()
+    {
         parent::__construct();
         $this->setScalar(Container::class, $this);
     }
 
     /**
      * Loads the services from a dictionary array. The array keys should be
-     * the interface names and the values should be class names
+     * the interface names and the values should be class names.
+     *
      * @param type $services a dictionary array
      */
-    public function loadServices($services = []) {
+    public function loadServices($services = array())
+    {
         $classLoader = $this->getClassLoader();
         if (!is_array($services)) {
             $services = array($services);
         }
         foreach ($services as $interface => $serviceDescription) {
             if (is_string($serviceDescription)) {
-                $this->defineSingletonWithInterface($interface
-                        , $serviceDescription);
-            } else if ($classLoader !== null &&
+                $this->defineSingletonWithInterface($interface, $serviceDescription);
+            } elseif ($classLoader !== null &&
                     is_array($serviceDescription) &&
                     count($serviceDescription) == 2) {
                 list($folder, $className) = $serviceDescription;
                 $ns = explode('\\', $className);
-                $classLoader->addPsr4($ns[0] . '\\', $folder);
-                $this->defineSingletonWithInterface($interface
-                        , $className);
+                $classLoader->addPsr4($ns[0].'\\', $folder);
+                $this->defineSingletonWithInterface($interface, $className);
             }
         }
     }
@@ -55,7 +55,8 @@ class ServiceContainer extends Container {
     /**
      * @return ClassLoader
      */
-    private function getClassLoader() {
+    private function getClassLoader()
+    {
         $category = spl_autoload_functions();
         foreach ($category as $splLoaders) {
             foreach ($splLoaders as $loader) {
@@ -64,7 +65,7 @@ class ServiceContainer extends Container {
                 }
             }
         }
+
         return null;
     }
-
 }

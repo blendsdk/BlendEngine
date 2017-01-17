@@ -11,20 +11,20 @@
 
 namespace Blend\Framework\Factory;
 
-use Blend\Component\DI\ObjectFactoryInterface;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\DI\Container;
+use Blend\Component\DI\ObjectFactoryInterface;
 use Blend\Component\Templating\Twig\Extension\CommonTwigEngineExtensions;
 use Blend\Component\Templating\Twig\Extension\TwigEngineExtensionProviderInterface;
 use Blend\Component\Templating\Twig\TwigEngine;
 
 /**
- * Factory class for creating a TwigEngine object
+ * Factory class for creating a TwigEngine object.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class TwigEngineFactory implements ObjectFactoryInterface {
-
+class TwigEngineFactory implements ObjectFactoryInterface
+{
     /**
      * @var Container
      */
@@ -45,10 +45,8 @@ class TwigEngineFactory implements ObjectFactoryInterface {
      */
     protected $cacheFolder;
 
-    public function __construct(Container $container
-    , Configuration $config
-    , $_app_cache_folder
-    , $_debug = false) {
+    public function __construct(Container $container, Configuration $config, $_app_cache_folder, $_debug = false)
+    {
         $this->container = $container;
         $this->config = $config;
         $this->container->defineClass(CommonTwigEngineExtensions::class);
@@ -56,8 +54,8 @@ class TwigEngineFactory implements ObjectFactoryInterface {
         $this->cacheFolder = $_app_cache_folder;
     }
 
-    public function create() {
-
+    public function create()
+    {
         $twigEngine = new TwigEngine(null, $this->cacheFolder, $this->debug);
 
         $providers = $this->container
@@ -69,5 +67,4 @@ class TwigEngineFactory implements ObjectFactoryInterface {
 
         return $twigEngine;
     }
-
 }

@@ -14,44 +14,45 @@ namespace Blend\DataModelBuilder\Builder;
 use Blend\DataModelBuilder\Builder\Config\BuilderConfig;
 
 /**
- * DateTimeConversionBuilder creates the DateTimeConversion.php
+ * DateTimeConversionBuilder creates the DateTimeConversion.php.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class DateTimeConversionBuilder {
-
+class DateTimeConversionBuilder
+{
     /**
-     * @var BuilderConfig 
+     * @var BuilderConfig
      */
     protected $config;
 
     /**
      * @param BuilderConfig $config
      */
-    public function __construct(BuilderConfig $config) {
+    public function __construct(BuilderConfig $config)
+    {
         $this->config = $config;
     }
 
     /**
-     * Builds the settings file
+     * Builds the settings file.
      */
-    public function build() {
+    public function build()
+    {
         /**
          * To get a clean PHP source code from the getLocalDateTimeFormat()
-         * We use the var_export(...) function
+         * We use the var_export(...) function.
          */
-        $header = "<?php ";
+        $header = '<?php ';
         $settings = var_export(array(
-            'datetimeFormat' => $this->config->getLocalDateTimeFormat()
+            'datetimeFormat' => $this->config->getLocalDateTimeFormat(),
                 ), true);
-        $tmpFile = TEMP_DIR . '/' . uniqid() . '.php';
-        file_put_contents($tmpFile, $header . $settings);
+        $tmpFile = TEMP_DIR.'/'.uniqid().'.php';
+        file_put_contents($tmpFile, $header.$settings);
         $settings = php_strip_whitespace($tmpFile);
         unlink($tmpFile);
-        render_php_template(dirname(__FILE__) . '/Template/datetime.php', [
+        render_php_template(dirname(__FILE__).'/Template/datetime.php', array(
             'settings' => trim(str_replace($header, '', $settings)),
-            'namespace' => $this->config->getApplicationNamespace() . '\\' . $this->config->getModelRootNamespace()
-                ], $this->config->getTargetRootFolder() . '/Database/DateTimeConversion.php', false);
+            'namespace' => $this->config->getApplicationNamespace().'\\'.$this->config->getModelRootNamespace(),
+                ), $this->config->getTargetRootFolder().'/Database/DateTimeConversion.php', false);
     }
-
 }

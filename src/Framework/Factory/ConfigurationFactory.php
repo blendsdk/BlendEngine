@@ -16,25 +16,27 @@ use Blend\Component\DI\ObjectFactoryInterface;
 use Blend\Component\Filesystem\Filesystem;
 
 /**
- * Description of ConfigurationFactory
+ * Description of ConfigurationFactory.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class ConfigurationFactory implements ObjectFactoryInterface {
-
+class ConfigurationFactory implements ObjectFactoryInterface
+{
     protected $rootFolder;
     protected $filesystem;
     protected $debug;
 
-    public function __construct($rootFolder, $debug = false) {
+    public function __construct($rootFolder, $debug = false)
+    {
         $this->rootFolder = $rootFolder;
         $this->debug = $debug;
         $this->filesystem = new Filesystem();
     }
 
-    public function create() {
-        $configFile = $this->rootFolder . '/config/config.json';
-        $cacheFile = $this->rootFolder . '/var/cache/config.cache';
+    public function create()
+    {
+        $configFile = $this->rootFolder.'/config/config.json';
+        $cacheFile = $this->rootFolder.'/var/cache/config.cache';
         if ($this->filesystem->exists($cacheFile) && !$this->debug) {
             $config = new Configuration();
             $config->load($cacheFile);
@@ -43,13 +45,14 @@ class ConfigurationFactory implements ObjectFactoryInterface {
             $config->dump($cacheFile);
         }
         if (!$config->has('debug')) {
-            $config->mergeWith(['debug' => $this->debug]);
+            $config->mergeWith(array('debug' => $this->debug));
         }
+
         return $config;
     }
 
-    public function getType() {
+    public function getType()
+    {
         return Configuration::class;
     }
-
 }

@@ -11,32 +11,33 @@
 
 namespace Blend\Component\HttpKernel\Event;
 
-use Blend\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Description of GetRequestEvent
+ * Description of GetRequestEvent.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class GetResponseEvent extends KernelEvent {
-
+class GetResponseEvent extends KernelEvent
+{
     /**
-     * @var Response 
+     * @var Response
      */
     protected $response;
 
-    public function hasResponse() {
+    public function hasResponse()
+    {
         return $this->response !== null;
     }
 
-    public function getResponse() {
+    public function getResponse()
+    {
         return $this->response;
     }
 
-    public function setResponse(Response $response) {
+    public function setResponse(Response $response)
+    {
         return $this->response = $response;
         $this->stopPropagation();
     }
-
 }

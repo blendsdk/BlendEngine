@@ -15,19 +15,20 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Application
+ * Application.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class Application {
+abstract class Application
+{
+    abstract protected function handleRequest(Request $request);
 
-    protected abstract function handleRequest(Request $request);
+    abstract protected function finalizeResponse(Response $response);
 
-    protected abstract function finalizeResponse(Response $response);
+    abstract protected function handleRequestException(\Exception $ex, Request $request);
 
-    protected abstract function handleRequestException(\Exception $ex, Request $request);
-
-    public function run(Request $request = null) {
+    public function run(Request $request = null)
+    {
         try {
             if ($request === null) {
                 $request = Request::createFromGlobals();
@@ -44,5 +45,4 @@ abstract class Application {
         }
         $response->send();
     }
-
 }
