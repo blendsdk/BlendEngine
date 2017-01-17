@@ -12,14 +12,13 @@
 namespace Blend\Component\Routing;
 
 /**
- * RouteAttribute
+ * RouteAttribute.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class RouteAttribute {
-
+class RouteAttribute
+{
     const CONTROLLER = '_c';
     const JSON_RESPONSE = '_j';
     const LOCALE = '_locale';
-
 }

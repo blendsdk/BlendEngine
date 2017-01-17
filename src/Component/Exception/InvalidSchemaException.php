@@ -13,10 +13,10 @@ namespace Blend\Component\Exception;
 
 /**
  * InvalidSchemaException represents an exception caused by error when loading
- * the database schema
+ * the database schema.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class InvalidSchemaException extends \Exception {
-
+class InvalidSchemaException extends \Exception
+{
 }

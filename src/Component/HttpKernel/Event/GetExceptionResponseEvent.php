@@ -10,32 +10,33 @@
  */
 
 namespace Blend\Component\HttpKernel\Event;
-use Blend\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpFoundation\Request;
+
 use Blend\Component\DI\Container;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Description of GetExceptionResponseEvent
+ * Description of GetExceptionResponseEvent.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class GetExceptionResponseEvent extends GetResponseEvent {
-    
+class GetExceptionResponseEvent extends GetResponseEvent
+{
     /**
-     * @var \Exception 
+     * @var \Exception
      */
     private $exception;
-    
+
     /**
      * @return \Exception
      */
-    public function getEception() {
+    public function getEception()
+    {
         return $this->exception;
     }
-    
-    public function __construct(Request $request, Container $container,  \Exception $exception) {
+
+    public function __construct(Request $request, Container $container, \Exception $exception)
+    {
         parent::__construct($request, $container);
         $this->exception = $exception;
-    }    
-    
+    }
 }

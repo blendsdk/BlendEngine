@@ -17,31 +17,32 @@ use Monolog\Logger;
 use Psr\Log\LogLevel;
 
 /**
- * Description of CommonLoggerFactory
+ * Description of CommonLoggerFactory.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class CommonLoggerFactory implements ObjectFactoryInterface {
-
+class CommonLoggerFactory implements ObjectFactoryInterface
+{
     protected $logFolder;
     protected $name;
     protected $maxFiles;
     protected $level;
 
-    public function __construct($logFolder, $logName, $logMaxFiles = 10, $logLevel = LogLevel::WARNING) {
+    public function __construct($logFolder, $logName, $logMaxFiles = 10, $logLevel = LogLevel::WARNING)
+    {
         $this->logFolder = $logFolder;
         $this->name = $logName;
         $this->maxFiles = $logMaxFiles;
         $this->level = $logLevel;
     }
 
-    public function create() {
+    public function create()
+    {
         $logger = new Logger($this->name);
         $rotatingFileHandler = new RotatingFileHandler(
-                $this->logFolder . '/' . $this->name . '.log'
-                , $this->maxFiles, $this->level);
+                $this->logFolder.'/'.$this->name.'.log', $this->maxFiles, $this->level);
         $logger->pushHandler($rotatingFileHandler);
+
         return $logger;
     }
-
 }

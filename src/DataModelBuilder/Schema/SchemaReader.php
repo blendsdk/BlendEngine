@@ -12,42 +12,45 @@
 namespace Blend\DataModelBuilder\Schema;
 
 use Blend\Component\Database\Database;
-use Blend\Component\Database\SQL\Statement\SelectStatement;
 use Blend\Component\Database\SQL\SQLString;
-use Blend\DataModelBuilder\Schema\Schema;
-use Blend\DataModelBuilder\Schema\Column;
-use Blend\DataModelBuilder\Schema\Relation;
+use Blend\Component\Database\SQL\Statement\SelectStatement;
 
 /**
- * Read the database schema from a PostgreSQL Database for code 
+ * Read the database schema from a PostgreSQL Database for code.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class SchemaReader {
-
+class SchemaReader
+{
     /**
-     * Instance of a Database
-     * @var Database 
+     * Instance of a Database.
+     *
+     * @var Database
      */
     protected $database;
 
-    public function __construct(Database $database) {
+    public function __construct(Database $database)
+    {
         $this->database = $database;
     }
 
     /**
-     * Laods the database schemas with their tables, column and contraints
+     * Laods the database schemas with their tables, column and contraints.
+     *
      * @return Schema[] Array of Schema objects
      */
-    public function load() {
+    public function load()
+    {
         return $this->getSchemas();
     }
 
     /**
-     * Load the schemas from the database
+     * Load the schemas from the database.
+     *
      * @return Schema[]
      */
-    protected function getSchemas() {
+    protected function getSchemas()
+    {
         $skip = ['pg_toast', 'pg_temp_1', 'pg_catalog', 'pg_toast_temp_1', 'information_schema'];
         $sql = new SelectStatement();
         $sql->from('information_schema.schemata')
@@ -63,14 +66,17 @@ class SchemaReader {
             $this->loadRelationsForSchema($schema);
             $result[$schema->getName()] = $schema;
         }
+
         return $result;
     }
 
     /**
-     * Loads the Relations fro a given schema
+     * Loads the Relations fro a given schema.
+     *
      * @param Schema $schema
      */
-    protected function loadRelationsForSchema(Schema $schema) {
+    protected function loadRelationsForSchema(Schema $schema)
+    {
         $sql = new SelectStatement();
         $sql->from('information_schema.tables')
                 ->selectAll()
@@ -85,16 +91,16 @@ class SchemaReader {
     }
 
     /**
-     * Loads the contains for a given Relation
+     * Loads the contains for a given Relation.
+     *
      * @param Relation $relation
      */
-    protected function loadContraintsForRelation(Relation $relation) {
-        
-        if($relation->getName() === 'sys_order_item') {
+    protected function loadContraintsForRelation(Relation $relation)
+    {
+        if ($relation->getName() === 'sys_order_item') {
             $a = 0;
         }
-        
-        
+
         $constraint_type = ['UNIQUE', 'PRIMARY KEY', 'FOREIGN KEY'];
         $tableConstQuery = new SelectStatement();
         $tableConstQuery->from('information_schema.table_constraints')
@@ -104,10 +110,8 @@ class SchemaReader {
 
         $tableConstQueryParams = array(
             ':table_schema' => $relation->getSchemaName(),
-            ':table_name' => $relation->getName()
+            ':table_name' => $relation->getName(),
         );
-        
-        
 
         $constColumnQuery = new SelectStatement();
         $constColumnQuery->from('information_schema.constraint_column_usage')
@@ -129,10 +133,12 @@ class SchemaReader {
     }
 
     /**
-     * Loads columns for a given relation
+     * Loads columns for a given relation.
+     *
      * @param Relation $relation
      */
-    protected function loadColumnsForRelation(Relation $relation) {
+    protected function loadColumnsForRelation(Relation $relation)
+    {
         $sql = new SelectStatement();
         $sql->from('information_schema.columns')
                 ->where(sqlstr('table_schema')->equalsTo(':table_schema'))
@@ -144,5 +150,4 @@ class SchemaReader {
             $relation->addColumn($column);
         }
     }
-
 }

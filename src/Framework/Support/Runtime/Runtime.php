@@ -11,23 +11,22 @@
 
 namespace Blend\Framework\Support\Runtime;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Blend\Component\DI\Container;
-use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
+use Blend\Component\Security\Security;
 use Blend\Framework\Security\User\Guest;
 use Blend\Framework\Security\User\UserProviderInterface;
-use Blend\Component\Security\Security;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Runtime is essentially a wrapper around the Container that can be used
  * to be customized and passed round to get and set domain (project)
- * specific settings
+ * specific settings.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class Runtime implements RuntimeProviderInterface {
-
+abstract class Runtime implements RuntimeProviderInterface
+{
     /**
      * @var Container
      */
@@ -43,32 +42,39 @@ abstract class Runtime implements RuntimeProviderInterface {
      */
     protected $request;
 
-    public function __construct(Container $container) {
+    public function __construct(Container $container)
+    {
         $this->container = $container;
         $this->request = $this->container->get(Request::class);
     }
 
-    public function getApplicationName() {
+    public function getApplicationName()
+    {
         return $this->name;
     }
 
-    public function getAppRootFolder() {
+    public function getAppRootFolder()
+    {
         return $this->get(RuntimeAttribute::APPLICATION_ROOT_FOLDER);
     }
 
-    public function getAppCacheFolder() {
+    public function getAppCacheFolder()
+    {
         return $this->get(RuntimeAttribute::APPLICATION_CACHE_FOLDER);
     }
 
-    public function isDebug() {
+    public function isDebug()
+    {
         return $this->get(RuntimeAttribute::DEBUG);
     }
 
-    public function set($key, $value) {
+    public function set($key, $value)
+    {
         $this->container->setScalar($key, $value);
     }
 
-    public function get($key, $default = null) {
+    public function get($key, $default = null)
+    {
         if ($this->container->isDefined($key)) {
             return $this->container->get($key);
         } else {
@@ -78,10 +84,12 @@ abstract class Runtime implements RuntimeProviderInterface {
 
     /**
      * Returns the current user, if no user is authenticated it will return
-     * a Guest user
+     * a Guest user.
+     *
      * @return \Blend\Framework\Security\User\UserProviderInterface
      */
-    public function getCurrentUser() {
+    public function getCurrentUser()
+    {
         if ($this->request && $this->request->getSession()) {
             return $this->request->getSession()->get(Security::AUTHENTICATED_USER, new Guest());
         } else {
@@ -90,10 +98,12 @@ abstract class Runtime implements RuntimeProviderInterface {
     }
 
     /**
-     * The the current user of this runtime envirounment (application)
+     * The the current user of this runtime envirounment (application).
+     *
      * @param UserProviderInterface $user
      */
-    public function setCurrentUser(UserProviderInterface $user) {
+    public function setCurrentUser(UserProviderInterface $user)
+    {
         $this->request->getSession()->set(Security::AUTHENTICATED_USER, $user);
         $this->set(Security::AUTHENTICATED_USER, $user);
     }
@@ -101,28 +111,34 @@ abstract class Runtime implements RuntimeProviderInterface {
     /**
      * @return Container
      */
-    public function getContainer() {
+    public function getContainer()
+    {
         return $this->container;
     }
 
     /**
-     * Signout from the application by clearing the session
+     * Signout from the application by clearing the session.
+     *
      * @return RedirectResponse
      */
-    public function signOut() {
+    public function signOut()
+    {
         if ($this->request) {
             $this->request->getSession()->clear();
+
             return new RedirectResponse($this->request->getUri());
         }
+
         return null;
     }
 
     /**
-     * Returns an instance of the current request
+     * Returns an instance of the current request.
+     *
      * @return type
      */
-    public function getRequest() {
+    public function getRequest()
+    {
         return $this->request;
     }
-
 }

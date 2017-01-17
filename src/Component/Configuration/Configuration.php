@@ -17,24 +17,28 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
  * The Configuration class provides an option to read the application
  * configuration parameters In BlendEngine. This class also will look
  * for a file called the ".env.json" which can be used to overwrite the
- * configuration parameters with environment specific values
+ * configuration parameters with environment specific values.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Configuration {
-
+class Configuration
+{
     /**
-     * Holds the list of paremeters
+     * Holds the list of paremeters.
+     *
      * @var \ArrayAccess
      */
     private $params;
 
     /**
-     * Retuns a parameters value of null of the parameter does not exist
+     * Retuns a parameters value of null of the parameter does not exist.
+     *
      * @param string $name
+     *
      * @return object|null
      */
-    public function get($name, $default = null) {
+    public function get($name, $default = null)
+    {
         if (isset($this->params[$name])) {
             return $this->params[$name];
         } else {
@@ -43,24 +47,30 @@ class Configuration {
     }
 
     /**
-     * Checks if the given name exists in this configuration
+     * Checks if the given name exists in this configuration.
+     *
      * @param string $name
-     * @return boolean
+     *
+     * @return bool
      */
-    public function has($name) {
+    public function has($name)
+    {
         return array_key_exists($name, $this->params);
     }
 
-    public function __construct(array $configArray = []) {
+    public function __construct(array $configArray = [])
+    {
         $this->params = [];
         $this->flatten_config($configArray, $this->params);
     }
 
     /**
-     * Mergs the current configuration with another array
+     * Mergs the current configuration with another array.
+     *
      * @param type $configArray
      */
-    public function mergeWith($configArray) {
+    public function mergeWith($configArray)
+    {
         $all = [];
         $this->flatten_config($configArray, $all);
         $this->params = array_merge($this->params, $all);
@@ -68,20 +78,25 @@ class Configuration {
 
     /**
      * Factory method for creating a configution for a PHP file and
-     * optionally an .env.json file
+     * optionally an .env.json file.
+     *
      * @param type $filename
+     *
      * @return \Blend\Component\Configuration\Configuration
+     *
      * @throws FileNotFoundException
      */
-    public static function createFromFile($filename) {
+    public static function createFromFile($filename)
+    {
         if (file_exists($filename)) {
             $params = json_decode(file_get_contents($filename), true);
-            $config = new Configuration($params);
-            $envfile = dirname($filename) . '/.env.json';
+            $config = new self($params);
+            $envfile = dirname($filename).'/.env.json';
             if (file_exists($envfile)) {
                 $envparams = json_decode(file_get_contents($envfile), true);
                 $config->mergeWith($envparams);
             }
+
             return $config;
         } else {
             throw new FileNotFoundException($filename, 500);
@@ -89,19 +104,21 @@ class Configuration {
     }
 
     /**
-     * Flattens the oprovided array
-     * @param type $data
-     * @param type $all
+     * Flattens the oprovided array.
+     *
+     * @param type   $data
+     * @param type   $all
      * @param string $lastkey
      */
-    protected function flatten_config($data, &$all, $lastkey = '') {
+    protected function flatten_config($data, &$all, $lastkey = '')
+    {
         if (is_array_assoc($data)) {
             if (!empty($lastkey)) {
-                $lastkey = $lastkey . '.';
+                $lastkey = $lastkey.'.';
             }
 
             foreach ($data as $key => $value) {
-                $this->flatten_config($value, $all, $lastkey . $key);
+                $this->flatten_config($value, $all, $lastkey.$key);
             }
         } else {
             $all[$lastkey] = $data;
@@ -109,19 +126,22 @@ class Configuration {
     }
 
     /**
-     * Load a previously dumped configuration parameters
+     * Load a previously dumped configuration parameters.
+     *
      * @param array $data
      */
-    public function load($dumpFile) {
+    public function load($dumpFile)
+    {
         $this->params = unserialize(file_get_contents($dumpFile));
     }
 
     /**
-     * Dumps the current parameters to a file
+     * Dumps the current parameters to a file.
+     *
      * @param type $dumpFile
      */
-    public function dump($dumpFile) {
+    public function dump($dumpFile)
+    {
         file_put_contents($dumpFile, serialize($this->params));
     }
-
 }

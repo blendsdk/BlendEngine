@@ -13,10 +13,10 @@ namespace Blend\Component\Exception;
 
 /**
  * NotYetImplementedException represents an exception caused by calling a
- * code block that is not implemented yet
+ * code block that is not implemented yet.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class NotImplementedException extends \Exception {
-    
+class NotImplementedException extends \Exception
+{
 }

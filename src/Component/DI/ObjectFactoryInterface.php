@@ -12,11 +12,11 @@
 namespace Blend\Component\DI;
 
 /**
- * ObjectFactoryInterface
+ * ObjectFactoryInterface.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface ObjectFactoryInterface {
-
+interface ObjectFactoryInterface
+{
     public function create();
 }

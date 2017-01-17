@@ -11,14 +11,11 @@
 
 namespace Blend\Component\Database\Factory\Converter;
 
-use Blend\Component\Model\Model;
-
 /**
- *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface IConverter {
-
+interface IConverter
+{
     public function toDbRecord($value);
 
     public function toModel($value);

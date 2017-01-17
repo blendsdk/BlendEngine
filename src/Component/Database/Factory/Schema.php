@@ -14,20 +14,23 @@ namespace Blend\Component\Database\Factory;
 use Blend\Component\Database\SQL\SQLString;
 
 /**
- * Description of Schema
+ * Description of Schema.
+ *
  * @abstract
+ *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class Schema {
-
+abstract class Schema
+{
     protected $rel_alias;
 
     /**
-     * @var SQLString; 
+     * @var SQLString;
      */
     protected $rel_name;
 
-    public function __construct($rel_name, $rel_alias) {
+    public function __construct($rel_name, $rel_alias)
+    {
         $this->rel_name = $rel_name;
         $this->rel_alias = $rel_alias;
     }
@@ -35,16 +38,18 @@ abstract class Schema {
     /**
      * @return SQLString
      */
-    public function RELATION() {
+    public function RELATION()
+    {
         return sqlstr($this->rel_name);
     }
 
     /**
      * @param type $name
+     *
      * @return SQLString
      */
-    protected function column($name) {
+    protected function column($name)
+    {
         return sqlstr($name)->dotPrefix($this->rel_alias);
     }
-
 }

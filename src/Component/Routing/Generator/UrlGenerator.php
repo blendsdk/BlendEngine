@@ -11,23 +11,24 @@
 
 namespace Blend\Component\Routing\Generator;
 
-use Symfony\Component\Routing\Generator\UrlGenerator as GeneratorBase;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\RequestContext;
-use Psr\Log\LoggerInterface;
 use Blend\Component\Routing\RouteAttribute;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Routing\Generator\UrlGenerator as GeneratorBase;
+use Symfony\Component\Routing\RequestContext;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Customized UrlGenerator to include the current Locale
+ * Customized UrlGenerator to include the current Locale.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class UrlGenerator extends GeneratorBase {
-
+class UrlGenerator extends GeneratorBase
+{
     private $locale;
 
-    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null, $_locale = null) {
-        /**
+    public function __construct(RouteCollection $routes, RequestContext $context, LoggerInterface $logger = null, $_locale = null)
+    {
+        /*
          * The $_locale parameter is automatically retrieved from the container
          * if the LocaleService is available
          */
@@ -35,11 +36,12 @@ class UrlGenerator extends GeneratorBase {
         $this->locale = $_locale;
     }
 
-    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH) {
+    public function generate($name, $parameters = [], $referenceType = self::ABSOLUTE_PATH)
+    {
         if ($this->locale !== null && !isset($parameters[RouteAttribute::LOCALE])) {
             $parameters[RouteAttribute::LOCALE] = $this->locale;
         }
+
         return parent::generate($name, $parameters, $referenceType);
     }
-
 }

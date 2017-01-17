@@ -14,37 +14,37 @@ namespace Blend\Component\Templating\Php;
 use Blend\Component\Templating\TemplateEngineInterface;
 
 /**
- * Basic PHP PhpEngine
+ * Basic PHP PhpEngine.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class PhpEngine implements TemplateEngineInterface {
-
+class PhpEngine implements TemplateEngineInterface
+{
     /**
-     * @var boolean
+     * @var bool
      */
     protected $trimOutput;
     protected $defaults;
 
-    public function __construct($trimOutput = true, array $defaults = []) {
+    public function __construct($trimOutput = true, array $defaults = [])
+    {
         $this->trimOutput = $trimOutput;
         $this->defaults = $defaults;
     }
 
-    public function render($view, array $parameters = array()) {
-        return render_php_template($view
-                , $this->normalizeParameters($parameters)
-                , null
-                , $this->trimOutput
+    public function render($view, array $parameters = array())
+    {
+        return render_php_template($view, $this->normalizeParameters($parameters), null, $this->trimOutput
         );
     }
 
-    protected function normalizeParameters(array $parameters = []) {
+    protected function normalizeParameters(array $parameters = [])
+    {
         return array_merge($this->defaults, $parameters);
     }
 
-    public function setViewPaths(array $paths = array()) {
+    public function setViewPaths(array $paths = array())
+    {
         return false;
     }
-
 }

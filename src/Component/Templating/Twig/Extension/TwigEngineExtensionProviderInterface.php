@@ -16,10 +16,11 @@ use Blend\Component\Templating\Twig\TwigEngine;
 
 /**
  * This in interface is used to configure and load extensions into the Twig
- * rendering engine
+ * rendering engine.
+ *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface TwigEngineExtensionProviderInterface {
-
+interface TwigEngineExtensionProviderInterface
+{
     public function configure(TwigEngine $twigEngine, Container $container);
 }

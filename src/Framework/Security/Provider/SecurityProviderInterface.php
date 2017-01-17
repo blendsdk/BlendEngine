@@ -16,12 +16,12 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * SecurityProviderInterface provides a common interface for both form based
- * and api key based security
+ * and api key based security.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface SecurityProviderInterface {
-
+interface SecurityProviderInterface
+{
     public function getHandlerType();
 
     public function handle($accessMethod, Route $route);

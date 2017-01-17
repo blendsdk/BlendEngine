@@ -11,24 +11,24 @@
 
 namespace Blend\Framework\Locale;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Blend\Component\HttpKernel\KernelEvents;
-use Blend\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpFoundation\Request;
 use Blend\Component\Configuration\Configuration;
 use Blend\Component\Exception\InvalidConfigException;
+use Blend\Component\HttpKernel\Event\GetResponseEvent;
+use Blend\Component\HttpKernel\KernelEvents;
 use Blend\Component\Routing\RouteAttribute;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * LocaleService provides automatic locale recognition to be used
  * by a translation service or other locale aware service in the
  * application. The current active locale can be read from the
- * Container RouteAttribute::LOCALE key
+ * Container RouteAttribute::LOCALE key.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class LocaleService implements EventSubscriberInterface {
-
+class LocaleService implements EventSubscriberInterface
+{
     /**
      * @var Configuration
      */
@@ -54,13 +54,15 @@ class LocaleService implements EventSubscriberInterface {
      */
     protected $request;
 
-    public function __construct(Configuration $config) {
+    public function __construct(Configuration $config)
+    {
         $this->availbleLocales = [];
         $this->config = $config;
         $this->assertLocaleConfig();
     }
 
-    public function onRequest(GetResponseEvent $event) {
+    public function onRequest(GetResponseEvent $event)
+    {
         $request = $event->getRequest();
 
         /*
@@ -95,25 +97,25 @@ class LocaleService implements EventSubscriberInterface {
         $event->getContainer()->setScalar(RouteAttribute::LOCALE, $locale);
     }
 
-    private function assertLocaleConfig() {
-        $this->localeParamName = $this->config->get('translation.localeParameterName', "_lang");
+    private function assertLocaleConfig()
+    {
+        $this->localeParamName = $this->config->get('translation.localeParameterName', '_lang');
         $this->defaultLocale = $this->config->get('translation.defaultLocale', null);
         $this->availableLocales = $this->config->get('translation.availableLocales', []);
         if (empty($this->availableLocales)) {
             throw new InvalidConfigException(
-            "Invalid or missing translation.availableLocales configuration!");
+            'Invalid or missing translation.availableLocales configuration!');
         }
         if (empty($this->defaultLocale)) {
             throw new InvalidConfigException(
-            "Invalid or missing translation.defaultLocale configuration!");
+            'Invalid or missing translation.defaultLocale configuration!');
         }
     }
 
-    public static function getSubscribedEvents() {
+    public static function getSubscribedEvents()
+    {
         return [
-            KernelEvents::REQUEST => ['onRequest'
-                , KernelEvents::PRIORITY_HIGHT + 1000]
+            KernelEvents::REQUEST => ['onRequest', KernelEvents::PRIORITY_HIGHT + 1000],
         ];
     }
-
 }

@@ -11,21 +11,21 @@
 
 namespace Blend\DataModelBuilder\Command;
 
+use Blend\Component\Database\Database;
+use Blend\Component\DI\Container;
+use Blend\DataModelBuilder\Builder\Config\BuilderConfig;
+use Blend\DataModelBuilder\Builder\Config\DefaultBuilderConfig;
+use Blend\DataModelBuilder\Builder\DateTimeConversionBuilder;
+use Blend\DataModelBuilder\Builder\FactoryBuilder;
+use Blend\DataModelBuilder\Builder\ModelBuilder;
+use Blend\DataModelBuilder\Builder\SchemaBuilder;
+use Blend\DataModelBuilder\Schema\Relation;
+use Blend\DataModelBuilder\Schema\Schema;
+use Blend\DataModelBuilder\Schema\SchemaReader;
 use Blend\Framework\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Blend\DataModelBuilder\Builder\Config\DefaultBuilderConfig;
-use Blend\DataModelBuilder\Builder\Config\BuilderConfig;
-use Blend\Component\Database\Database;
-use Blend\DataModelBuilder\Schema\SchemaReader;
-use Blend\DataModelBuilder\Schema\Schema;
-use Blend\DataModelBuilder\Schema\Relation;
-use Blend\DataModelBuilder\Builder\ModelBuilder;
-use Blend\DataModelBuilder\Builder\FactoryBuilder;
-use Blend\DataModelBuilder\Builder\SchemaBuilder;
-use Blend\DataModelBuilder\Builder\DateTimeConversionBuilder;
-use Blend\Component\DI\Container;
 
 /**
  * Data Model Layer generator. This class will load the schemas, tables, etc...
@@ -33,8 +33,8 @@ use Blend\Component\DI\Container;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class DataModelCommand extends Command {
-
+class DataModelCommand extends Command
+{
     private $schemas;
 
     /**
@@ -43,33 +43,35 @@ class DataModelCommand extends Command {
     private $config = null;
     private $templateFolder;
 
-    protected function needSchemaHelper(Relation $relation) {
+    protected function needSchemaHelper(Relation $relation)
+    {
         $schemaHelperList = $this->config->getSchemaHelperListToGenerate();
         $frqn = $relation->getFQRN();
         $name = $relation->getName();
         if ($schemaHelperList === null) {
             return true;
-        } else if (is_array($schemaHelperList) && (in_array($frqn, $schemaHelperList) || in_array($name, $schemaHelperList))) {
+        } elseif (is_array($schemaHelperList) && (in_array($frqn, $schemaHelperList) || in_array($name, $schemaHelperList))) {
             return true;
-        } else if (is_string($schemaHelperList) && ($schemaHelperList === $frqn || $schemaHelperList === $name)) {
+        } elseif (is_string($schemaHelperList) && ($schemaHelperList === $frqn || $schemaHelperList === $name)) {
             return true;
         } else {
             return false;
         }
     }
 
-    protected function cleanBeforeBuild(Schema $schema) {
+    protected function cleanBeforeBuild(Schema $schema)
+    {
         $rootPath = $this->config->getTargetRootFolder()
-                . '/' . $this->config->getModelRootNamespace()
-                . (!$schema->isSingle() ? '/' . $schema->getName(true) : '');
-        $schemaPath = $rootPath . '/Schema';
+                .'/'.$this->config->getModelRootNamespace()
+                .(!$schema->isSingle() ? '/'.$schema->getName(true) : '');
+        $schemaPath = $rootPath.'/Schema';
         if ($this->fileSystem->exists($schemaPath)) {
             $this->fileSystem->remove($schemaPath);
         }
     }
 
-    protected function generateClasses(Schema $schema) {
-
+    protected function generateClasses(Schema $schema)
+    {
         $this->cleanBeforeBuild($schema);
 
         /**
@@ -80,11 +82,10 @@ class DataModelCommand extends Command {
          * redundant code.
          */
         $conatiner = new Container();
-        $converterResolver = function($schema, $relation, $column, $dbtype, $fqcn) {
+        $converterResolver = function ($schema, $relation, $column, $dbtype, $fqcn) {
             return $this->config->getConverterForField($schema, $relation, $column, $dbtype, $fqcn);
         };
         foreach ($schema->getRelations() as $relation) {
-
             $allowCustomize = $this->allowCustomize($relation);
             $rootPath = $this->config->getTargetRootFolder();
             $rootNamespace = $this->config->getModelRootNamespace();
@@ -94,7 +95,7 @@ class DataModelCommand extends Command {
                 /* @var $builderClass \Blend\DataModelBuilder\Builder\ClassBuilder */
                 $builder = $conatiner->get($builderClass, [
                     'relation' => $relation,
-                    'includeSchema' => !$schema->isSingle()
+                    'includeSchema' => !$schema->isSingle(),
                 ]);
                 $builder->setApplicationNamespace($appNamespace);
                 $builder->setRootNamespace($rootNamespace);
@@ -126,32 +127,37 @@ class DataModelCommand extends Command {
     }
 
     /**
-     * Check if the Relation needs to be customized later
+     * Check if the Relation needs to be customized later.
+     *
      * @param Relation $relation
+     *
      * @return type
      */
-    private function allowCustomize(Relation $relation) {
+    private function allowCustomize(Relation $relation)
+    {
         $customizedModels = $this->config->getCustomizedRelationList();
         if (!is_array($customizedModels)) {
             $customizedModels = [];
         }
-        return (in_array($relation->getName(), $customizedModels) || in_array($relation->getFQRN(), $customizedModels));
+
+        return in_array($relation->getName(), $customizedModels) || in_array($relation->getFQRN(), $customizedModels);
     }
 
-    protected function configure() {
+    protected function configure()
+    {
         $this->setName('datamodel:generate')
                 ->setDescription('Generates a Data Model Layer from the current database')
-                ->addOption('configclass', 'c'
-                        , InputArgument::OPTIONAL
-                        , 'A config class that is going to be used to generated the models');
+                ->addOption('configclass', 'c', InputArgument::OPTIONAL, 'A config class that is going to be used to generated the models');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output) {
+    protected function initialize(InputInterface $input, OutputInterface $output)
+    {
         parent::initialize($input, $output);
-        $this->templateFolder = realpath(dirname(__FILE__) . '/../Builder/Template');
+        $this->templateFolder = realpath(dirname(__FILE__).'/../Builder/Template');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
         $this->loadConfig();
         if ($this->loadDatabaseSchema()) {
             foreach ($this->schemas as $schemaName => $schema) {
@@ -164,19 +170,22 @@ class DataModelCommand extends Command {
     }
 
     /**
-     * Generates the DateTimeConversion file
+     * Generates the DateTimeConversion file.
      */
-    protected function generateDataTimeSettings() {
+    protected function generateDataTimeSettings()
+    {
         $builder = new DateTimeConversionBuilder($this->config);
         $builder->build();
     }
 
     /**
      * Load the Schema information from the database that is configured in the
-     * config.json
-     * @return boolean
+     * config.json.
+     *
+     * @return bool
      */
-    protected function loadDatabaseSchema() {
+    protected function loadDatabaseSchema()
+    {
         $database = $this->createDatabaseInstance();
         $schemaReader = new SchemaReader($database);
         $schemas = $schemaReader->load();
@@ -192,16 +201,19 @@ class DataModelCommand extends Command {
             }
         }
         if (!isset($this->schemas['public'])) {
-            $this->output->writeln("<warn>WARNING: The [public] schema from your database was not selected!</warn>");
+            $this->output->writeln('<warn>WARNING: The [public] schema from your database was not selected!</warn>');
         }
+
         return true;
     }
 
     /**
-     * Creates and a new Database instance
+     * Creates and a new Database instance.
+     *
      * @return Database
      */
-    private function createDatabaseInstance() {
+    private function createDatabaseInstance()
+    {
         return new Database([
             'username' => $this->getConfig('database.username'),
             'password' => $this->getConfig('database.password'),
@@ -212,30 +224,32 @@ class DataModelCommand extends Command {
     }
 
     /**
-     * Load the configuration file if possible
+     * Load the configuration file if possible.
+     *
      * @param InputInterface $input
+     *
      * @throws \InvalidArgumentException
      */
-    private function loadConfig() {
+    private function loadConfig()
+    {
         $configClass = $this->input->getOption('configclass');
         if (is_null($configClass)) {
             $configClass = DefaultBuilderConfig::class;
         }
         try {
             $this->config = $this->container->get($configClass, [
-                'projectFolder' => $this->getApplication()->getProjectFolder()
+                'projectFolder' => $this->getApplication()->getProjectFolder(),
             ]);
         } catch (ReflectionException $ex) {
             $this->output->writeln([
                 "<warn>Unable to load the provided configuration [{$configClass}]</warn>",
-                "<warn>Will continue with the default configuration.</warn>"
+                '<warn>Will continue with the default configuration.</warn>',
             ]);
             $configClass = DefaultBuilderConfig::class;
             $this->config = $this->container->get($configClass, [
-                'projectFolder' => $this->getApplication()->getProjectFolder()
+                'projectFolder' => $this->getApplication()->getProjectFolder(),
             ]);
         }
-        $this->output->writeln('<info>Using the ' . get_class($this->config) . ' as configuration</info>');
+        $this->output->writeln('<info>Using the '.get_class($this->config).' as configuration</info>');
     }
-
 }

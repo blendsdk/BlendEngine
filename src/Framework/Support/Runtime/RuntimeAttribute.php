@@ -12,14 +12,13 @@
 namespace Blend\Framework\Support\Runtime;
 
 /**
- * Description of RuntimeAttribute
+ * Description of RuntimeAttribute.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class RuntimeAttribute {
-
+class RuntimeAttribute
+{
     const APPLICATION_ROOT_FOLDER = '_app_root_folder';
     const APPLICATION_CACHE_FOLDER = '_app_cache_folder';
     const DEBUG = '_debug';
-
 }

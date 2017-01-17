@@ -14,11 +14,10 @@ namespace Blend\Framework\Support\Runtime;
 use Blend\Framework\Security\User\UserProviderInterface;
 
 /**
- *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface RuntimeProviderInterface {
-
+interface RuntimeProviderInterface
+{
     public function getRequest();
 
     public function getApplicationName();
@@ -48,7 +47,8 @@ interface RuntimeProviderInterface {
     /**
      * Signout by clearing the current session and return a redirect
      * response to the current request. This should trigger the security
-     * handler to redirect this request to an authentication workflow
+     * handler to redirect this request to an authentication workflow.
+     *
      * @return null|RedirectResponse
      */
     public function signOut();

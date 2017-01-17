@@ -11,26 +11,26 @@
 
 namespace Blend\Component\HttpKernel\Event;
 
-use Blend\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\HttpFoundation\Request;
 use Blend\Component\DI\Container;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Description of ControllerResponseEvent
+ * Description of ControllerResponseEvent.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class GetControllerResponseEvent extends GetResponseEvent {
-
+class GetControllerResponseEvent extends GetResponseEvent
+{
     protected $controllerResponse;
 
-    public function __construct(Request $request, Container $container, $controllerResponse) {
+    public function __construct(Request $request, Container $container, $controllerResponse)
+    {
         parent::__construct($request, $container);
         $this->controllerResponse = $controllerResponse;
     }
 
-    public function getControllerResult() {
+    public function getControllerResult()
+    {
         return $this->controllerResponse;
     }
-
 }

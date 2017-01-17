@@ -12,20 +12,29 @@
 namespace Blend\Framework\Security\User;
 
 /**
- * Generic interface for implementing a User
+ * Generic interface for implementing a User.
+ *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface UserProviderInterface {
-
+interface UserProviderInterface
+{
     public function getUserID();
-    public function getAPIKey();
-    public function getUsername();
-    public function getEmail();
-    public function getRoles();
-    public function hasRole($role);
-    public function getPermissions();
-    public function hasPermission($permission);
-    public function isActive();
-    public function isGuest();
 
+    public function getAPIKey();
+
+    public function getUsername();
+
+    public function getEmail();
+
+    public function getRoles();
+
+    public function hasRole($role);
+
+    public function getPermissions();
+
+    public function hasPermission($permission);
+
+    public function isActive();
+
+    public function isGuest();
 }

@@ -13,10 +13,10 @@ namespace Blend\Component\Exception;
 
 /**
  * InvalidOperationException represents an exception caused by an invalid
- * operation
+ * operation.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class InvalidOperationException extends \Exception {
-
+class InvalidOperationException extends \Exception
+{
 }
