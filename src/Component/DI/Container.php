@@ -15,7 +15,7 @@ use Blend\Component\Exception\InvalidConfigException;
 use ReflectionClass;
 
 /**
- * Conatiner provides a basic constructor based Dependecy Injection Container.
+ * Container provides a basic constructor based dependency Injection Container.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
@@ -196,7 +196,7 @@ class Container
     }
 
     /**
-     * Defines a singleton with an interface and creation paramaters.
+     * Defines a singleton with an interface and creation parameters.
      *
      * @param string $interface
      * @param string $className
@@ -212,7 +212,7 @@ class Container
     }
 
     /**
-     * Defines a singleton with creation paramaters.
+     * Defines a singleton with creation parameters.
      *
      * @param string $className
      * @param array  $params
@@ -227,7 +227,7 @@ class Container
     }
 
     /**
-     * Defines a class with an interface and creation paramaters.
+     * Defines a class with an interface and creation parameters.
      *
      * @param string $interface
      * @param string $className
@@ -243,7 +243,7 @@ class Container
     }
 
     /**
-     * Defines a class with creation paramaters.
+     * Defines a class with creation parameters.
      *
      * @param type  $className
      * @param array $params
@@ -372,7 +372,7 @@ class Container
         if ($reflection->implementsInterface(ObjectFactoryInterface::class)) {
             $instance = call_user_func(array($instance, 'create'));
             if ($instance === null) {
-                throw new InvalidConfigException($reflection->getName().'->create() did not return an object instance');
+                throw new InvalidConfigException($reflection->getName() . '->create() did not return an object instance');
             }
         }
 
@@ -395,7 +395,7 @@ class Container
     }
 
     /**
-     * Checks if the privided args matches the goven call signature.
+     * Checks if the provided arguments matches the given call signature.
      *
      * @param array  $callsig
      * @param array  $args
