@@ -13,28 +13,31 @@ namespace Blend\Component\Database;
 
 /**
  * The StatementResult is used to return additional query result information
- * after executing the Database->executeStatement
+ * after executing the Database->executeStatement.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class StatementResult {
-
+class StatementResult
+{
     private $affectedRecords;
 
     /**
-     * Get the number of affected records
-     * @return integer
+     * Get the number of affected records.
+     *
+     * @return int
      */
-    public function getAffectedRecords() {
+    public function getAffectedRecords()
+    {
         return $this->affectedRecords;
     }
 
     /**
-     * Populates this class with the results
+     * Populates this class with the results.
+     *
      * @param \PDOStatement $statement
      */
-    public function populate(\PDOStatement $statement) {
+    public function populate(\PDOStatement $statement)
+    {
         $this->affectedRecords = $statement->rowCount();
     }
-
 }

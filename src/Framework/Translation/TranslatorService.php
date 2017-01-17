@@ -11,19 +11,19 @@
 
 namespace Blend\Framework\Translation;
 
-use Symfony\Component\Translation\MessageSelector;
 use Blend\Component\Translation\Translator;
+use Symfony\Component\Translation\MessageSelector;
 
 /**
  * TranslatorService is a customized Translator to be used in the application's
- * Service container
+ * Service container.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class TranslatorService extends Translator {
-
-    public function __construct($locale, $cacheDir = null, $debug = false) {
+class TranslatorService extends Translator
+{
+    public function __construct($locale, $cacheDir = null, $debug = false)
+    {
         parent::__construct($locale, new MessageSelector(), $cacheDir, $debug);
     }
-
 }

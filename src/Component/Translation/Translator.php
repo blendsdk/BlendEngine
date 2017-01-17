@@ -14,19 +14,21 @@ namespace Blend\Component\Translation;
 use Symfony\Component\Translation\Translator as TranslatorBase;
 
 /**
- * Customized Translator class
+ * Customized Translator class.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Translator extends TranslatorBase {
-
+class Translator extends TranslatorBase
+{
     /**
-     * Check if a given loader exists
+     * Check if a given loader exists.
+     *
      * @param type $format
+     *
      * @return type
      */
-    public function hasLoader($format) {
+    public function hasLoader($format)
+    {
         return array_key_exists($format, $this->getLoaders());
     }
-
 }

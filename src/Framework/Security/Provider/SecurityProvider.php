@@ -12,15 +12,14 @@
 namespace Blend\Framework\Security\Provider;
 
 use Symfony\Component\HttpFoundation\Request;
-use Blend\Framework\Security\Provider\SecurityProviderInterface;
 
 /**
- * Base class for a SecurityProvider
+ * Base class for a SecurityProvider.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class SecurityProvider implements SecurityProviderInterface {
-
+abstract class SecurityProvider implements SecurityProviderInterface
+{
     const REFERER_URL = '_http_referer';
 
     /**
@@ -28,8 +27,8 @@ abstract class SecurityProvider implements SecurityProviderInterface {
      */
     protected $request;
 
-    public function __construct(Request $request) {
+    public function __construct(Request $request)
+    {
         $this->request = $request;
     }
-
 }

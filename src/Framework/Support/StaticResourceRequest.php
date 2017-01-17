@@ -14,17 +14,18 @@ namespace Blend\Framework\Support;
 
 /**
  * StaticResourceRequest is used to handle web requests to serve static
- * resources in development mode
+ * resources in development mode.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class StaticResourceRequest {
-
+class StaticResourceRequest
+{
     private $rootFolder;
     private $types;
     private $currentResource;
 
-    public function __construct($rootFolder) {
+    public function __construct($rootFolder)
+    {
         $this->rootFolder = $rootFolder;
         $this->types = array(
             'css' => 'text/css',
@@ -38,22 +39,26 @@ class StaticResourceRequest {
             'woff' => 'application/font-woff',
             'woff2' => 'application/font-woff2',
             'eot' => 'application/vnd.ms-fontobject',
-            'ttf' => 'font/opentype'
+            'ttf' => 'font/opentype',
         );
     }
 
-    public function isValid() {
+    public function isValid()
+    {
         $uri = $uri = trim(strtok($_SERVER['REQUEST_URI'], '?'));
-        $this->currentResource = realpath($this->rootFolder . '/' . $uri);
+        $this->currentResource = realpath($this->rootFolder.'/'.$uri);
+
         return file_exists($this->currentResource) === true && is_file($this->currentResource);
     }
 
-    public function serveLocalResource() {
-        header('Content-Type: ' . $this->getFileMIMEType());
+    public function serveLocalResource()
+    {
+        header('Content-Type: '.$this->getFileMIMEType());
         echo file_get_contents($this->currentResource);
     }
 
-    private function getFileMIMEType() {
+    private function getFileMIMEType()
+    {
         $pathInfo = pathinfo($this->currentResource);
         $extension = $pathInfo['extension'];
         if (isset($this->types[$extension])) {
@@ -62,5 +67,4 @@ class StaticResourceRequest {
             return 'text/plain';
         }
     }
-
 }

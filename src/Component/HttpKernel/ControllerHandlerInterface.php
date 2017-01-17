@@ -14,10 +14,9 @@ namespace Blend\Component\HttpKernel;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface ControllerHandlerInterface {
-
+interface ControllerHandlerInterface
+{
     public function handle(Request $request);
 }

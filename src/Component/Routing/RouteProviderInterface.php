@@ -11,13 +11,10 @@
 
 namespace Blend\Component\Routing;
 
-use Blend\Component\Routing\RouteBuilder;
-
 /**
- *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-interface RouteProviderInterface {
-
+interface RouteProviderInterface
+{
     public function loadRoutes(RouteBuilder $builder);
 }

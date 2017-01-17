@@ -13,29 +13,31 @@ namespace Blend\Component\Templating\Twig\Extension;
 
 /**
  * EuroCurrencyExtension provides converting an rendering of the
- * euro currency numbers
+ * euro currency numbers.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class EuroCurrencyExtension extends \Twig_Extension {
-
-    public function getName() {
+class EuroCurrencyExtension extends \Twig_Extension
+{
+    public function getName()
+    {
         return 'euro-currency';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFilters() {
+    public function getFilters()
+    {
         return array(
             new \Twig_SimpleFilter('euro', array($this, 'euroCurrency'), array('is_safe' => array('all'))),
         );
     }
 
-    public function euroCurrency($number, $sign = true, $decimals = 2) {
+    public function euroCurrency($number, $sign = true, $decimals = 2)
+    {
         $result = number_format($number, $decimals, ',', '.');
 
-        return ($sign === true ? '&euro;' : '') . str_replace(',00', ',-', $result);
+        return ($sign === true ? '&euro;' : '').str_replace(',00', ',-', $result);
     }
-
 }

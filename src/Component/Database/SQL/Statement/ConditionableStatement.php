@@ -13,48 +13,59 @@ namespace Blend\Component\Database\SQL\Statement;
 
 /**
  * ConditionableStatement is the base class for SELECT, UPDATE, and the DELETE
- * statements providing the ability to set add a WHERE clause to the statement
+ * statements providing the ability to set add a WHERE clause to the statement.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class ConditionableStatement {
-
+class ConditionableStatement
+{
     protected $where;
 
     /**
      * @param type $condition
+     *
      * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
-    public function where($condition) {
+    public function where($condition)
+    {
         $this->where[] = $condition;
+
         return $this;
     }
 
     /**
      * @param type $condition
+     *
      * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
-    public function andWhere($condition) {
-        $this->where[] = 'AND ' . $condition;
+    public function andWhere($condition)
+    {
+        $this->where[] = 'AND '.$condition;
+
         return $this;
     }
 
     /**
      * @param type $condition
+     *
      * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
-    public function orWhere($condition) {
-        $this->where[] = 'OR ' . $condition;
+    public function orWhere($condition)
+    {
+        $this->where[] = 'OR '.$condition;
+
         return $this;
     }
 
     /**
-     * Retins the WHERE clause
+     * Retins the WHERE clause.
+     *
      * @return string
      */
-    protected function getWhereClause() {
+    protected function getWhereClause()
+    {
         if (count($this->where) !== 0) {
-            return ' WHERE ' . implode(' ', $this->where);
+            return ' WHERE '.implode(' ', $this->where);
         } else {
             return '';
         }
@@ -63,17 +74,20 @@ class ConditionableStatement {
     /**
      * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
-    public function whereScope() {
+    public function whereScope()
+    {
         $this->where[] = '(';
+
         return $this;
     }
 
     /**
      * @return \Blend\Component\Database\SQL\Statement\ConditionableStatement
      */
-    public function endWhereScope() {
+    public function endWhereScope()
+    {
         $this->where[] = ')';
+
         return $this;
     }
-
 }

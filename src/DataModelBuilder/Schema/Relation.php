@@ -11,65 +11,80 @@
 
 namespace Blend\DataModelBuilder\Schema;
 
-use Blend\DataModelBuilder\Schema\Record;
 use Blend\Component\Exception\InvalidSchemaException;
 
 /**
- * Relation represents a table of a view from a PostgreSQL database
+ * Relation represents a table of a view from a PostgreSQL database.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Relation extends Record {
+class Relation extends Record
+{
+    /**
+     * @var Column[];
+     */
+    private $columns = array();
+    protected $keys = array();
+    protected $keysByType = array();
 
     /**
-     * @var Column[]; 
+     * Checks whether this relation is writable.
+     *
+     * @return bool
      */
-    private $columns = [];
-    protected $keys = [];
-    protected $keysByType = [];
-
-    /**
-     * Checks whether this relation is writable
-     * @return boolean
-     */
-    public function writable() {
+    public function writable()
+    {
         return $this->record['table_type'] === 'BASE TABLE';
     }
 
     /**
-     * Gets the relation name
+     * Gets the relation name.
+     *
      * @return string
+     *
+     * @param mixed $prettify
      */
-    public function getName($prettify = false) {
+    public function getName($prettify = false)
+    {
         return $this->getString('table_name', $prettify);
     }
 
-    public function getFQRN() {
-        return $this->getSchemaName() . '.' . $this->getName();
+    public function getFQRN()
+    {
+        return $this->getSchemaName().'.'.$this->getName();
     }
 
     /**
-     * Gets the schema name
+     * Gets the schema name.
+     *
      * @return string
+     *
+     * @param mixed $prettify
      */
-    public function getSchemaName($prettify = false) {
-        return $this->getString('table_schema'
-                        , $prettify, array('public' => 'Common'));
+    public function getSchemaName($prettify = false)
+    {
+        return $this->getString('table_schema', $prettify, array('public' => 'Common'));
     }
 
     /**
-     * Gets the list of the columns in this Relation
+     * Gets the list of the columns in this Relation.
+     *
      * @return Column[]
      */
-    public function getColumns() {
+    public function getColumns()
+    {
         return $this->columns;
     }
 
     /**
-     * Gets the custom keys to this Relation
+     * Gets the custom keys to this Relation.
+     *
      * @return Column[]
+     *
+     * @param mixed $type
      */
-    public function getCustomKeys($type) {
+    public function getCustomKeys($type)
+    {
         $result = array();
         $keys = array();
         if (isset($this->keysByType[$type])) {
@@ -79,14 +94,17 @@ class Relation extends Record {
         foreach ($keys as $key) {
             $result[$key] = $this->keys[$key];
         }
+
         return $result;
     }
 
     /**
-     * Gets the foreign keys to this Relation
+     * Gets the foreign keys to this Relation.
+     *
      * @return Column[]
      */
-    public function getForeignKeys() {
+    public function getForeignKeys()
+    {
         $result = array();
         $keys = array();
         if (isset($this->keysByType['FOREIGN KEY'])) {
@@ -96,14 +114,17 @@ class Relation extends Record {
         foreach ($keys as $key) {
             $result[$key] = $this->keys[$key];
         }
+
         return $result;
     }
 
     /**
-     * Gets the keys local to this Relation
+     * Gets the keys local to this Relation.
+     *
      * @return Column[]
      */
-    public function getUniqueKeys() {
+    public function getUniqueKeys()
+    {
         $result = array();
         $keys = array();
         foreach (array('PRIMARY KEY', 'UNIQUE') as $type) {
@@ -115,30 +136,35 @@ class Relation extends Record {
         foreach ($keys as $key) {
             $result[$key] = $this->keys[$key];
         }
+
         return $result;
     }
 
     /**
-     * Adds a Column to the list of columns
+     * Adds a Column to the list of columns.
+     *
      * @param \Blend\Component\Database\Schema\Column $column
+     *
      * @throws InvalidSchemaException
      */
-    public function addColumn(Column $column) {
+    public function addColumn(Column $column)
+    {
         $name = $column->getName();
         if (!isset($this->columns[$name])) {
             $this->columns[$name] = $column;
         } else {
-
-            Throw new InvalidSchemaException("Column {$column} already exists in {$this->getName()}");
+            throw new InvalidSchemaException("Column {$column} already exists in {$this->getName()}");
         }
     }
 
     /**
-     * Adds key column to the list of keys
+     * Adds key column to the list of keys.
+     *
      * @param type $keyColumn
      * @param type $constraint_type
      */
-    public function addKeyColumn($keyColumn, $constraint_type) {
+    public function addKeyColumn($keyColumn, $constraint_type)
+    {
         $name = $keyColumn['constraint_name'];
         if (stripos($name, '_pkey') !== false) {
             $name = $constraint_type;
@@ -146,5 +172,4 @@ class Relation extends Record {
         $this->keysByType[$constraint_type][] = $name;
         $this->keys[$name][] = $this->columns[$keyColumn['column_name']];
     }
-
 }

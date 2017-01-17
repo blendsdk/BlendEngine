@@ -11,27 +11,29 @@
 
 namespace Blend\DataModelBuilder\Builder;
 
-use Blend\DataModelBuilder\Builder\ClassBuilder;
 use Blend\DataModelBuilder\Schema\Relation;
 
 /**
- * ModelBuilder builds a Model class for a given Relation (table/view)
+ * ModelBuilder builds a Model class for a given Relation (table/view).
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class ModelBuilder extends ClassBuilder {
-
-    public function __construct(Relation $relation, $includeSchema) {
+class ModelBuilder extends ClassBuilder
+{
+    public function __construct(Relation $relation, $includeSchema)
+    {
         parent::__construct('model', $relation, $includeSchema);
         $this->defaultBaseClassName = 'Model';
         $this->defaultBaseClassFQN = 'Blend\Component\Model\Model';
     }
 
     /**
-     * Sets the root namespace where the models will be generated
+     * Sets the root namespace where the models will be generated.
+     *
      * @param type $schema
      */
-    public function setRootNamespace($schema) {
+    public function setRootNamespace($schema)
+    {
         parent::setRootNamespace($schema);
         $this->rootNamespace .= '\\Model';
     }
@@ -39,12 +41,15 @@ class ModelBuilder extends ClassBuilder {
     /**
      * Here we loop the columns and create a property definition.
      * We also resolve an optional field converter for a given property
-     * that we provided in the builder configuration file
+     * that we provided in the builder configuration file.
+     *
      * @param array $def
+     *
      * @return type
      */
-    protected function preparBuildDefinition($def) {
-        $properties = [];
+    protected function preparBuildDefinition($def)
+    {
+        $properties = array();
         foreach ($this->relation->getColumns() as $column) {
             $name = $column->getName();
             $type = 'mixed';
@@ -54,13 +59,13 @@ class ModelBuilder extends ClassBuilder {
             $this->resolveColumnConverter($schema, $relation, $column->getName(), $dbtype, $column->getFQCN());
             $properties[] = array(
                 'name' => $name,
-                'getter' => 'get' . str_identifier(strtolower($name)),
-                'setter' => 'set' . str_identifier(strtolower($name)),
-                'type' => $type
+                'getter' => 'get'.str_identifier(strtolower($name)),
+                'setter' => 'set'.str_identifier(strtolower($name)),
+                'type' => $type,
             );
         }
         $def['props'] = $properties;
+
         return $def;
     }
-
 }

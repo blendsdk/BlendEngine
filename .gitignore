@@ -7,3 +7,4 @@ docs
 temp
 /nbproject/private/
 nbproject
+.php_cs.cache

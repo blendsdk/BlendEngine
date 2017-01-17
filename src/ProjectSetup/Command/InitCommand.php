@@ -11,131 +11,145 @@
 
 namespace Blend\ProjectSetup\Command;
 
+use Blend\Component\Filesystem\Filesystem;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
-use Blend\Component\Filesystem\Filesystem;
 
 /**
- * InitCommand helps to initialize a new BlendEngine Application
+ * InitCommand helps to initialize a new BlendEngine Application.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class InitCommand extends Command {
-
+class InitCommand extends Command
+{
     /**
-     * Points to the workfolder getcwd
+     * Points to the workfolder getcwd.
+     *
      * @var string
      */
     private $workFolder;
 
     /**
-     * Points to the folder where the templates are located
+     * Points to the folder where the templates are located.
+     *
      * @var string
      */
     private $templatesFolder;
 
     /**
-     * List of available templates
+     * List of available templates.
+     *
      * @var array
      */
     private $templates;
 
     /**
-     * Mapping table that is used to rename template files
+     * Mapping table that is used to rename template files.
+     *
      * @var array
      */
     private $renameTable;
 
     /**
-     * Mapping table that is used to generate files based on a PHP template
+     * Mapping table that is used to generate files based on a PHP template.
+     *
      * @var array
      */
     private $renderTable;
 
     /**
-     * The name of the application to generate
+     * The name of the application to generate.
+     *
      * @var string
      */
     private $applicationName;
 
     /**
-     * Flag to generate a testable Application
+     * Flag to generate a testable Application.
+     *
      * @var type
      */
     private $testable;
 
     /**
-     * Mapping table to be used when rendering files
+     * Mapping table to be used when rendering files.
+     *
      * @var array
      */
     private $renderContext;
 
     /**
-     * Indicates if compass is installed
-     * @var boolean
+     * Indicates if compass is installed.
+     *
+     * @var bool
      */
     private $hasCompass;
 
     /**
-     * Indicates if PostgreSQL is installed
-     * @var boolean
+     * Indicates if PostgreSQL is installed.
+     *
+     * @var bool
      */
     private $hasPostgres;
 
     /**
-     * The current version of installed BlendEngine
+     * The current version of installed BlendEngine.
+     *
      * @var string
      */
     private $installedSDKVersion;
 
-    protected function configure() {
-
+    protected function configure()
+    {
         parent::configure();
 
-        $this->templatesFolder = realpath(__DIR__ . '/../Resources/Templates');
+        $this->templatesFolder = realpath(__DIR__.'/../Resources/Templates');
         $this->workFolder = getcwd();
         $this->applicationName = str_identifier((new \SplFileInfo($this->workFolder))->getBasename());
         $this->templates = $this->getTemplateNames();
         $this->installedSDKVersion = $this->getInstalledBlendEngineVersion();
 
         $this->setName('init')
-                ->setDescription('Initializes a new BlendEngine project in [' . $this->workFolder . ']')
-                ->addOption('template', 't', InputOption::VALUE_OPTIONAL, 'Name of the template to generate this project (' . implode(',', $this->templates) . ')', 'Basic')
+                ->setDescription('Initializes a new BlendEngine project in ['.$this->workFolder.']')
+                ->addOption('template', 't', InputOption::VALUE_OPTIONAL, 'Name of the template to generate this project ('.implode(',', $this->templates).')', 'Basic')
                 ->addOption('appname', 'a', InputOption::VALUE_OPTIONAL, 'Name of the application to generate', $this->applicationName)
                 ->addOption('testable', 'x', InputOption::VALUE_OPTIONAL, 'Expose the application internals for testing. (Internal use only)', false);
     }
 
     /**
      * Creates a rendering context array to be used when rendering
-     * template files
+     * template files.
+     *
      * @return array
      */
-    private function createRenderContext() {
+    private function createRenderContext()
+    {
         $lowerAppName = strtolower($this->applicationName);
         $gitInfo = $this->getCurrentGitUser();
+
         return array(
             'testable' => $this->testable,
             'applicationName' => $this->applicationName,
             'applicationScriptName' => $lowerAppName,
             'applicationNamespace' => $this->applicationName,
-            'applicationPackageName' => get_current_user() . '/' . $lowerAppName,
-            'applicationCommandClassName' => $this->applicationName . 'Application',
-            'applicationClassName' => $this->applicationName . 'Application',
+            'applicationPackageName' => get_current_user().'/'.$lowerAppName,
+            'applicationCommandClassName' => $this->applicationName.'Application',
+            'applicationClassName' => $this->applicationName.'Application',
             'applicationDatabaseName' => $lowerAppName,
             'currentUserName' => $gitInfo['user.name'],
-            'currentUserEmail' => $gitInfo['user.email']
+            'currentUserEmail' => $gitInfo['user.email'],
         );
     }
 
     /**
-     * Prepare interval variables
+     * Prepare interval variables.
      */
-    private function prepareTablesAndContext() {
-
+    private function prepareTablesAndContext()
+    {
         $applicationCommandClassName = $applicationScriptName = null;
         $lowerName = strtolower($this->applicationName);
         $this->renderContext = $this->createRenderContext();
@@ -145,15 +159,15 @@ class InitCommand extends Command {
             'gitignore' => '.gitignore',
             'config/gitignore' => 'config/.gitignore',
             'resources/gitignore' => 'resources/.gitignore',
-            'resources/sass/app.scss' => 'resources/sass/' . $applicationScriptName . '.scss',
-            'bin/app' => 'bin/' . $lowerName,
-            'bin/app.bat' => 'bin/' . $lowerName . '.bat',
-            'bin/app.php' => 'bin/' . $lowerName . '.php',
-            'src/Console/Application.php' => 'src/Console/' . $applicationCommandClassName . '.php',
-            'src/Application.php' => 'src/' . $applicationClassName . '.php',
-            'web/app_dev.php' => 'web/' . $lowerName . '_dev.php',
-            'web/app.php' => 'web/' . $lowerName . '.php',
-            'src/Runtime.php' => 'src/' . $applicationName . 'Runtime.php',
+            'resources/sass/app.scss' => 'resources/sass/'.$applicationScriptName.'.scss',
+            'bin/app' => 'bin/'.$lowerName,
+            'bin/app.bat' => 'bin/'.$lowerName.'.bat',
+            'bin/app.php' => 'bin/'.$lowerName.'.php',
+            'src/Console/Application.php' => 'src/Console/'.$applicationCommandClassName.'.php',
+            'src/Application.php' => 'src/'.$applicationClassName.'.php',
+            'web/app_dev.php' => 'web/'.$lowerName.'_dev.php',
+            'web/app.php' => 'web/'.$lowerName.'.php',
+            'src/Runtime.php' => 'src/'.$applicationName.'Runtime.php',
         );
 
         $this->renderTable = array(
@@ -169,14 +183,14 @@ class InitCommand extends Command {
             'src/Runtime.php',
             'web/app_dev.php',
             'web/app.php',
-            'src/Console/Command/PublishCommand.php'
+            'src/Console/Command/PublishCommand.php',
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) {
-        $output->writeln($this->getApplication()->getLongVersion() . "\n");
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $output->writeln($this->getApplication()->getLongVersion()."\n");
         if ($this->checkSanity()) {
-
             $this->hasCompass = $this->checkForCompass($output);
             $this->hasPostgres = $this->checkForPostgreSQL($output);
 
@@ -184,7 +198,7 @@ class InitCommand extends Command {
             if ($this->checkTemplate($template)) {
                 $this->applicationName = $input->getOption('appname');
                 $this->testable = $input->getOption('testable');
-                $output->writeln('<info>Generating ' . $this->applicationName . ' :)</info>');
+                $output->writeln('<info>Generating '.$this->applicationName.' :)</info>');
                 $this->prepareTablesAndContext();
                 $this->generateWithTemplate($template, $output);
                 $this->runCompass($output);
@@ -192,58 +206,61 @@ class InitCommand extends Command {
                 $this->setSDKVersion();
 
                 $output->writeln(
-                        [""
-                            , "<info>Thank you for using BlendEngine :)</info>"
-                            , "<info>Enjoy!</info>"]
+                        array('', '<info>Thank you for using BlendEngine :)</info>', '<info>Enjoy!</info>')
                 );
             } else {
-                $output->writeln("<error>The requested template [" . $template . '] does not exist!</error>');
+                $output->writeln('<error>The requested template ['.$template.'] does not exist!</error>');
             }
         } else {
-            $output->writeln("<error>Looks like the " . $this->workFolder . ' is not empty!</error>');
+            $output->writeln('<error>Looks like the '.$this->workFolder.' is not empty!</error>');
         }
     }
 
-    private function createVarFolders() {
+    private function createVarFolders()
+    {
         $fs = new Filesystem();
-        $folders = [
-            $this->workFolder . '/var/cache',
-            $this->workFolder . '/var/log',
-            $this->workFolder . '/var/session',
-        ];
+        $folders = array(
+            $this->workFolder.'/var/cache',
+            $this->workFolder.'/var/log',
+            $this->workFolder.'/var/session',
+        );
         foreach ($folders as $folder) {
             $fs->ensureFolder($folder, 0777);
         }
     }
 
     /**
-     * Run compass to compile the default stylesheets
+     * Run compass to compile the default stylesheets.
+     *
      * @param type $output
      */
-    private function runCompass($output) {
+    private function runCompass($output)
+    {
         $p = new Process('compass compile');
-        $p->setWorkingDirectory($this->workFolder . '/resources');
+        $p->setWorkingDirectory($this->workFolder.'/resources');
         try {
-            $output->writeln("<info>Compiling default sass files.</info>");
+            $output->writeln('<info>Compiling default sass files.</info>');
             $p->mustRun();
         } catch (\Exception $e) {
-            $output->writeln("<warn>" . $e->getMessage() . "</warn>");
+            $output->writeln('<warn>'.$e->getMessage().'</warn>');
         }
     }
 
     /**
-     * Generates an application based on a template
-     * @param string $template
+     * Generates an application based on a template.
+     *
+     * @param string          $template
      * @param OutputInterface $output
      */
-    private function generateWithTemplate($template, OutputInterface $output) {
+    private function generateWithTemplate($template, OutputInterface $output)
+    {
         $fs = new Filesystem();
         $templateSource = $this->getTemplateFolder($template);
         $finder = new Finder();
         $finder->in($templateSource);
         foreach ($finder as $source) {
             $relativeName = str_replace(DIRECTORY_SEPARATOR, '/', $source->getRelativePathName());
-            $dest = $this->workFolder . '/' . $this->getDestFilename($relativeName);
+            $dest = $this->workFolder.'/'.$this->getDestFilename($relativeName);
             if ($source->isDir()) {
                 $fs->ensureFolder($dest);
             } else {
@@ -253,32 +270,37 @@ class InitCommand extends Command {
     }
 
     /**
-     * Render of copy the file to the correct location
-     * @param Filesystem $fs
-     * @param string $relativeName
-     * @param SplFileInfo $source
-     * @param string $dest
+     * Render of copy the file to the correct location.
+     *
+     * @param Filesystem      $fs
+     * @param string          $relativeName
+     * @param SplFileInfo     $source
+     * @param string          $dest
      * @param OutputInterface $output
      */
-    private function processFile($fs, $relativeName, $source, $dest, OutputInterface $output) {
+    private function processFile($fs, $relativeName, $source, $dest, OutputInterface $output)
+    {
         if (in_array($relativeName, $this->renderTable)) {
-            $output->writeln("Rendering " . $relativeName);
+            $output->writeln('Rendering '.$relativeName);
             render_php_template($source, $this->renderContext, $dest);
             if ($relativeName === 'bin/app') {
                 chmod($dest, 0750);
             }
         } else {
-            $output->writeln("Processing " . $relativeName);
+            $output->writeln('Processing '.$relativeName);
             $fs->copy($source, $dest);
         }
     }
 
     /**
-     * Get the correct destination file name by looping at the rename table
+     * Get the correct destination file name by looping at the rename table.
+     *
      * @param string $name name of the file to lookup
+     *
      * @return string
      */
-    private function getDestFilename($name) {
+    private function getDestFilename($name)
+    {
         if (isset($this->renameTable[$name])) {
             return $this->renameTable[$name];
         } else {
@@ -287,29 +309,37 @@ class InitCommand extends Command {
     }
 
     /**
-     * Get the template folder based on a given template name
+     * Get the template folder based on a given template name.
+     *
      * @param string $template
+     *
      * @return string
      */
-    private function getTemplateFolder($template) {
-        return realpath($this->templatesFolder . '/' . $this->templates[$template]);
+    private function getTemplateFolder($template)
+    {
+        return realpath($this->templatesFolder.'/'.$this->templates[$template]);
     }
 
     /**
-     * Checks if a given template exists
+     * Checks if a given template exists.
+     *
      * @param string $template
-     * @return boolean
+     *
+     * @return bool
      */
-    private function checkTemplate($template) {
+    private function checkTemplate($template)
+    {
         return array_key_exists($template, $this->templates);
     }
 
     /**
-     * Find the names of currently available templates
+     * Find the names of currently available templates.
+     *
      * @return type
      */
-    private function getTemplateNames() {
-        $result = [];
+    private function getTemplateNames()
+    {
+        $result = array();
         $finder = new Finder();
         $finder->files()
                 ->directories()
@@ -318,35 +348,41 @@ class InitCommand extends Command {
         foreach ($finder as $folder) {
             $result[strtolower($folder->getFilename())] = $folder->getFilename();
         }
+
         return $result;
     }
 
     /**
-     * Checks if the working folder is empty
-     * @return boolean
+     * Checks if the working folder is empty.
+     *
+     * @return bool
      */
-    private function checkSanity() {
+    private function checkSanity()
+    {
         $finder = new Finder();
         $finder->files()
                 ->in($this->workFolder)
                 ->ignoreVCS(true)
                 ->ignoreDotFiles(true)
                 ->exclude('vendor')
-                ->notName("composer.*")
-                ->notName("reset-project.*");
+                ->notName('composer.*')
+                ->notName('reset-project.*');
+
         return $finder->count() === 0;
     }
 
     /**
-     * Get the current version of the installed BlendEngine
+     * Get the current version of the installed BlendEngine.
+     *
      * @return string
      */
-    private function getInstalledBlendEngineVersion() {
-        $fname = $this->workFolder . '/composer.json';
+    private function getInstalledBlendEngineVersion()
+    {
+        $fname = $this->workFolder.'/composer.json';
         if (file_exists($fname) && is_file($fname)) {
             $config = json_decode(file_get_contents($fname), true);
-            if (isset($config["require"]["blendsdk/blendengine"])) {
-                return $config["require"]["blendsdk/blendengine"];
+            if (isset($config['require']['blendsdk/blendengine'])) {
+                return $config['require']['blendsdk/blendengine'];
             } else {
                 return null;
             }
@@ -356,26 +392,29 @@ class InitCommand extends Command {
     }
 
     /**
-     * Set the correct SDK version in the newly created/initialized project
+     * Set the correct SDK version in the newly created/initialized project.
      */
-    private function setSDKVersion() {
+    private function setSDKVersion()
+    {
         if ($this->installedSDKVersion !== null) {
-            $fname = $this->workFolder . '/composer.json';
+            $fname = $this->workFolder.'/composer.json';
             $config = json_decode(file_get_contents($fname), true);
-            $config["require"]["blendsdk/blendengine"] = $this->installedSDKVersion;
+            $config['require']['blendsdk/blendengine'] = $this->installedSDKVersion;
             file_put_contents($fname, json_encode($config, JSON_PRETTY_PRINT));
         }
     }
 
     /**
      * Get the current git user information. We need this to extract
-     * the user name and email to put into the generated files
+     * the user name and email to put into the generated files.
+     *
      * @return mixed
      */
-    private function getCurrentGitUser() {
+    private function getCurrentGitUser()
+    {
         $p = new Process('git config --list');
         $p->enableOutput();
-        $result = [];
+        $result = array();
         $user = get_current_user();
         try {
             $p->mustRun();
@@ -392,69 +431,78 @@ class InitCommand extends Command {
             if (!isset($result['user.email'])) {
                 $result['user.email'] = $user;
             }
+
             return $result;
         } catch (\Exception $e) {
             return array(
                 'user.name' => $user,
-                'user.email' => $user
+                'user.email' => $user,
             );
         }
     }
 
     /**
-     * Check to see if ruby compass is installed
+     * Check to see if ruby compass is installed.
+     *
      * @param OutputInterface $output
      */
-    private function checkForCompass(OutputInterface $output) {
+    private function checkForCompass(OutputInterface $output)
+    {
         $p = new Process('compass --version');
         try {
             $p->mustRun();
-            $output->writeln("<info>Compass is installed on your system, great.</info>");
+            $output->writeln('<info>Compass is installed on your system, great.</info>');
+
             return true;
         } catch (\Exception $e) {
             $log = $e->getMessage();
-            $output->writeln([
-                "",
-                "<warn>WARNING: Compass could not be verified on your system!</warn>",
-                "<warn>Perhaps it is not installed or your PATH settings are not correct.</warn>",
-                "<warn>Without compass you will not be able to compile the style sheets.</warn>",
-                "<warn>Check out http://compass-style.org/install for more information.</warn>",
-                ""
-            ]);
+            $output->writeln(array(
+                '',
+                '<warn>WARNING: Compass could not be verified on your system!</warn>',
+                '<warn>Perhaps it is not installed or your PATH settings are not correct.</warn>',
+                '<warn>Without compass you will not be able to compile the style sheets.</warn>',
+                '<warn>Check out http://compass-style.org/install for more information.</warn>',
+                '',
+            ));
+
             return false;
         }
     }
 
     /**
-     * Check to see if ruby compass is installed
+     * Check to see if ruby compass is installed.
+     *
      * @param OutputInterface $output
      */
-    private function checkForPostgreSQL(OutputInterface $output) {
+    private function checkForPostgreSQL(OutputInterface $output)
+    {
         $p = new Process('php -m');
         try {
             $p->mustRun();
             $lines = explode("\n", trim($p->getOutput()));
             if (in_array('pdo_pgsql', $lines)) {
-                $output->writeln("<info>PostgreSQL is installed on your system, great.</info>");
+                $output->writeln('<info>PostgreSQL is installed on your system, great.</info>');
+
                 return true;
             } else {
-                $output->writeln([
-                    "",
-                    "<warn>WARNING: Could not verify your PostgreSQL installation!</warn>",
-                    "<warn>Did you forget to install the pdo_psql extension?.</warn>",
-                    ""
-                ]);
+                $output->writeln(array(
+                    '',
+                    '<warn>WARNING: Could not verify your PostgreSQL installation!</warn>',
+                    '<warn>Did you forget to install the pdo_psql extension?.</warn>',
+                    '',
+                ));
+
                 return false;
             }
         } catch (\Exception $e) {
-            $output->writeln([
-                "",
-                "<warn>WARNING: Could not verify your PostgreSQL installation!</warn>",
-                "<warn>The PHP command line utility did not run correctly.</warn>",
-                ""
-            ]);
+            $output->writeln(array(
+                '',
+                '<warn>WARNING: Could not verify your PostgreSQL installation!</warn>',
+                '<warn>The PHP command line utility did not run correctly.</warn>',
+                '',
+            ));
+
             return false;
         }
     }
-
 }

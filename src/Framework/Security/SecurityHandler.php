@@ -11,27 +11,27 @@
 
 namespace Blend\Framework\Security;
 
-use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\HttpFoundation\Response;
-use Blend\Component\HttpKernel\KernelEvents;
-use Blend\Component\HttpKernel\Event\GetResponseEvent;
-use Blend\Component\HttpKernel\Event\GetFinalizeResponseEvent;
 use Blend\Component\DI\Container;
+use Blend\Component\HttpKernel\Event\GetFinalizeResponseEvent;
+use Blend\Component\HttpKernel\Event\GetResponseEvent;
+use Blend\Component\HttpKernel\Event\KernelEvent;
+use Blend\Component\HttpKernel\KernelEvents;
 use Blend\Component\Routing\Route;
 use Blend\Component\Security\Security;
 use Blend\Framework\Security\Provider\SecurityProviderInterface;
-use Blend\Component\HttpKernel\Event\KernelEvent;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\RouteCollection;
 
 /**
  * Listens to the incomming requests and handles the security based on the
- * Route
+ * Route.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class SecurityHandler implements EventSubscriberInterface {
-
+class SecurityHandler implements EventSubscriberInterface
+{
     /**
      * @var Container
      */
@@ -52,7 +52,8 @@ class SecurityHandler implements EventSubscriberInterface {
      */
     protected $route;
 
-    protected function initialize(KernelEvent $event) {
+    protected function initialize(KernelEvent $event)
+    {
         $request = $event->getRequest();
         $this->container = $event->getContainer();
         /* @var $routes RouteCollection */
@@ -61,7 +62,8 @@ class SecurityHandler implements EventSubscriberInterface {
         $this->accessMethod = $this->route->getAccessMethod();
     }
 
-    public function onRequest(GetResponseEvent $event) {
+    public function onRequest(GetResponseEvent $event)
+    {
         $this->initialize($event);
         if ($this->accessMethod === Security::ACCESS_PUBLIC) {
             return; //no-op
@@ -78,9 +80,11 @@ class SecurityHandler implements EventSubscriberInterface {
 
     /**
      * @param mixed $type
+     *
      * @return SecurityProviderInterface
      */
-    private function getSecurityHandler($type) {
+    private function getSecurityHandler($type)
+    {
         $providers = $this->container->getByInterface(SecurityProviderInterface::class);
         foreach ($providers as $provider) {
             /* @var $provider SecurityProviderInterface */
@@ -90,12 +94,14 @@ class SecurityHandler implements EventSubscriberInterface {
         }
         /* @var $logger LoggerInterface */
         $logger = $this->container->get(LoggerInterface::class);
-        $logger->warning("The requested security provides was" .
-                " not met! Check your services", ['type' => $type]);
+        $logger->warning('The requested security provides was'.
+                ' not met! Check your services', array('type' => $type));
+
         return null;
     }
 
-    public function onResponse(GetFinalizeResponseEvent $event) {
+    public function onResponse(GetFinalizeResponseEvent $event)
+    {
         $this->initialize($event);
         $handler = $this->getSecurityHandler($this->route->getSecurityType());
         if ($handler !== null) {
@@ -103,13 +109,11 @@ class SecurityHandler implements EventSubscriberInterface {
         }
     }
 
-    public static function getSubscribedEvents() {
-        return [
-            KernelEvents::REQUEST => ['onRequest'
-                , KernelEvents::PRIORITY_HIGHT + 900],
-            KernelEvents::FINALIZE_RESPONSE => ['onResponse'
-                , KernelEvents::PRIORITY_HIGHT + 900]
-        ];
+    public static function getSubscribedEvents()
+    {
+        return array(
+            KernelEvents::REQUEST => array('onRequest', KernelEvents::PRIORITY_HIGHT + 900),
+            KernelEvents::FINALIZE_RESPONSE => array('onResponse', KernelEvents::PRIORITY_HIGHT + 900),
+        );
     }
-
 }

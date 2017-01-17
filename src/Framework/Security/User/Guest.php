@@ -10,53 +10,61 @@
  */
 
 namespace Blend\Framework\Security\User;
-use Blend\Framework\Security\User\UserProviderInterface;
 
 /**
- * Guest
+ * Guest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Guest implements UserProviderInterface {
-
-    public function getEmail() {
+class Guest implements UserProviderInterface
+{
+    public function getEmail()
+    {
         return null;
     }
 
-    public function getPermissions() {
-        return [];
+    public function getPermissions()
+    {
+        return array();
     }
 
-    public function getRoles() {
-        return [];
+    public function getRoles()
+    {
+        return array();
     }
 
-    public function getUserID() {
+    public function getUserID()
+    {
         return null;
     }
 
-    public function getUsername() {
+    public function getUsername()
+    {
         return null;
     }
 
-    public function hasPermission($permission) {
+    public function hasPermission($permission)
+    {
         return false;
     }
 
-    public function hasRole($role) {
+    public function hasRole($role)
+    {
         return false;
     }
 
-    public function isActive() {
+    public function isActive()
+    {
         return false;
     }
 
-    public function isGuest() {
+    public function isGuest()
+    {
         return true;
     }
 
-    public function getAPIKey() {
+    public function getAPIKey()
+    {
         return null;
     }
-
 }

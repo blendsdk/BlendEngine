@@ -12,34 +12,34 @@
 namespace Blend\DataModelBuilder\Schema;
 
 /**
- * Record is the base class for a record from the database
+ * Record is the base class for a record from the database.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class Record {
-
+abstract class Record
+{
     protected $record;
 
-    public function __construct(array $record) {
+    public function __construct(array $record)
+    {
         $this->record = $this->normalize($record);
     }
 
-    protected function normalize(array $record) {
+    protected function normalize(array $record)
+    {
         return $record;
     }
 
-    protected function getString($name, $prettify = false, $replace = array()) {
+    protected function getString($name, $prettify = false, $replace = array())
+    {
         $name = $this->record[$name];
         if ($prettify) {
             return str_identifier(
                     str_replace(
-                            array_keys($replace)
-                            , array_values($replace)
-                            , $name)
+                            array_keys($replace), array_values($replace), $name)
             );
         } else {
             return $name;
         }
     }
-
 }

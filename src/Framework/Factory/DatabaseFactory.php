@@ -11,18 +11,18 @@
 
 namespace Blend\Framework\Factory;
 
-use Psr\Log\LoggerInterface;
-use Blend\Component\Database\Database;
 use Blend\Component\Configuration\Configuration;
+use Blend\Component\Database\Database;
 use Blend\Component\DI\ObjectFactoryInterface;
+use Psr\Log\LoggerInterface;
 
 /**
- * DatabaseFactory
+ * DatabaseFactory.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class DatabaseFactory implements ObjectFactoryInterface {
-
+class DatabaseFactory implements ObjectFactoryInterface
+{
     /**
      * @var LoggerInterface
      */
@@ -33,20 +33,22 @@ class DatabaseFactory implements ObjectFactoryInterface {
      */
     protected $config;
 
-    public function __construct(LoggerInterface $logger, Configuration $config) {
+    public function __construct(LoggerInterface $logger, Configuration $config)
+    {
         $this->logger = $logger;
         $this->config = $config;
     }
 
-    public function create() {
+    public function create()
+    {
         $appname = strtolower($this->config->get('name'));
-        return new Database([
+
+        return new Database(array(
             'host' => $this->config->get('database.host', '127.0.0.1'),
             'port' => $this->config->get('database.port', 5432),
             'database' => $this->config->get('database.database', $appname),
             'username' => $this->config->get('database.username', $appname),
             'password' => $this->config->get('database.password'),
-                ], $this->logger);
+                ), $this->logger);
     }
-
 }

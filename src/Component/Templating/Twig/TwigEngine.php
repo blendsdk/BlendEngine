@@ -14,12 +14,12 @@ namespace Blend\Component\Templating\Twig;
 use Blend\Component\Templating\TemplateEngineInterface;
 
 /**
- * TwigEngine provides rendering Twig templates
+ * TwigEngine provides rendering Twig templates.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class TwigEngine implements TemplateEngineInterface {
-
+class TwigEngine implements TemplateEngineInterface
+{
     const TRIM_RESULT = '_twig_trim';
 
     /**
@@ -32,20 +32,22 @@ class TwigEngine implements TemplateEngineInterface {
      */
     protected $loader;
 
-    public function __construct($viewRootFolder, $cacheFolder, $debug = false) {
-        $this->twigEnvironment = $this->createTwig($viewRootFolder
-                , $cacheFolder
-                , $debug);
+    public function __construct($viewRootFolder, $cacheFolder, $debug = false)
+    {
+        $this->twigEnvironment = $this->createTwig($viewRootFolder, $cacheFolder, $debug);
     }
 
     /**
-     * Creates a Twig rendering engine
+     * Creates a Twig rendering engine.
+     *
      * @param type $viewRootFolder
      * @param type $cacheFolder
      * @param type $debug
+     *
      * @return \Twig_Environment
      */
-    protected function createTwig($viewRootFolder, $cacheFolder, $debug) {
+    protected function createTwig($viewRootFolder, $cacheFolder, $debug)
+    {
         $this->loader = new \Twig_Loader_Filesystem($viewRootFolder);
         $twig = new \Twig_Environment($this->loader);
         $twig->enableStrictVariables();
@@ -55,20 +57,26 @@ class TwigEngine implements TemplateEngineInterface {
             $twig->disableDebug();
             $twig->setCache($cacheFolder);
         }
+
         return $twig;
     }
 
     /**
-     * Adds an extension to the twig
+     * Adds an extension to the twig.
+     *
      * @param \Twig_ExtensionInterface $extension
+     *
      * @return $this
      */
-    public function addExtension(\Twig_ExtensionInterface $extension) {
+    public function addExtension(\Twig_ExtensionInterface $extension)
+    {
         $this->twigEnvironment->addExtension($extension);
+
         return $this;
     }
 
-    public function render($view, array $parameters = array()) {
+    public function render($view, array $parameters = array())
+    {
         if (isset($parameters[self::TRIM_RESULT]) && $parameters[self::TRIM_RESULT] === true) {
             return trim($this->twigEnvironment->render($view, $parameters));
         } else {
@@ -77,13 +85,16 @@ class TwigEngine implements TemplateEngineInterface {
     }
 
     /**
-     * Sets the views path for this TwigEngine
+     * Sets the views path for this TwigEngine.
+     *
      * @param array $paths
+     *
      * @return $this
      */
-    public function setViewPaths(array $paths = array()) {
+    public function setViewPaths(array $paths = array())
+    {
         $this->loader->setPaths($paths);
+
         return $this;
     }
-
 }

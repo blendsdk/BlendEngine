@@ -11,36 +11,38 @@
 
 namespace Blend\DataModelBuilder\Schema;
 
-use Blend\DataModelBuilder\Schema\Record;
-use Blend\DataModelBuilder\Schema\Relation;
 use Blend\Component\Exception\InvalidSchemaException;
 
 /**
- * Schema represents a schema from a PostgreSQL database
+ * Schema represents a schema from a PostgreSQL database.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Schema extends Record {
-
+class Schema extends Record
+{
     /**
-     * @var Relation[] 
+     * @var Relation[]
      */
-    private $relations = [];
+    private $relations = array();
 
     /**
-     * Gets if this is the only available schema in the database
+     * Gets if this is the only available schema in the database.
+     *
      * @return type
      */
-    public function isSingle() {
+    public function isSingle()
+    {
         return $this->record['is_single'];
     }
 
-    public function getName($prettify = false) {
+    public function getName($prettify = false)
+    {
         $name = $this->getString('schema_name');
         if ($prettify) {
             if ($name == 'public') {
                 $name = 'common';
             }
+
             return str_identifier($name);
         } else {
             return $this->getString('schema_name');
@@ -48,19 +50,24 @@ class Schema extends Record {
     }
 
     /**
-     * Retusn the list of relations
+     * Retusn the list of relations.
+     *
      * @return Relation[]
      */
-    public function getRelations() {
+    public function getRelations()
+    {
         return $this->relations;
     }
 
     /**
-     * Adds Relation to the list of relations in this Schema
+     * Adds Relation to the list of relations in this Schema.
+     *
      * @param Relation $relation
+     *
      * @throws InvalidSchemaException
      */
-    public function addRelation(Relation $relation) {
+    public function addRelation(Relation $relation)
+    {
         $name = $relation->getName();
         if (!isset($this->relations[$name])) {
             $this->relations[$name] = $relation;
@@ -68,5 +75,4 @@ class Schema extends Record {
             throw new InvalidSchemaException("Relation {$name} already exists in {$this->getName()} schema!");
         }
     }
-
 }
