@@ -226,7 +226,8 @@ class SQLString
     }
 
     /**
-     * @param array $values
+     * @param array      $values
+     * @param null|mixed $itemRenderer
      *
      * @return \Blend\Component\Database\SQL\SQLString
      */
@@ -239,7 +240,8 @@ class SQLString
     }
 
     /**
-     * @param array $values
+     * @param array      $values
+     * @param null|mixed $itemRenderer
      *
      * @return \Blend\Component\Database\SQL\SQLString
      */

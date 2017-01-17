@@ -41,6 +41,7 @@ class Relation extends Record
      * Gets the relation name.
      *
      * @return string
+     * @param  mixed  $prettify
      */
     public function getName($prettify = false)
     {
@@ -56,6 +57,7 @@ class Relation extends Record
      * Gets the schema name.
      *
      * @return string
+     * @param  mixed  $prettify
      */
     public function getSchemaName($prettify = false)
     {
@@ -76,6 +78,7 @@ class Relation extends Record
      * Gets the custom keys to this Relation.
      *
      * @return Column[]
+     * @param  mixed    $type
      */
     public function getCustomKeys($type)
     {

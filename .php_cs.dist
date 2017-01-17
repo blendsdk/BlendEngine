@@ -12,7 +12,9 @@ return PhpCsFixer\Config::create()
     ->setRules(array(
         '@Symfony' => true,
         'ordered_imports' => true,
-        'no_unused_imports' => true
+        'array_syntax' => array('syntax' => 'long'),
+        'no_unused_imports' => true,
+        'phpdoc_add_missing_param_annotation' => true
     ))
     ->setFinder(
         PhpCsFixer\Finder::create()

@@ -292,7 +292,8 @@ class Container
     /**
      * Reflects a type to get the constructor and its call arguments.
      *
-     * @param string $type
+     * @param string     $type
+     * @param null|mixed $method
      *
      * @return mixed
      *
@@ -399,6 +400,7 @@ class Container
      * @param array  $callsig
      * @param array  $args
      * @param string $name
+     * @param mixed  $methodName
      *
      * @throws \InvalidArgumentException
      */

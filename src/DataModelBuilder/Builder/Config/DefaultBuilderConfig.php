@@ -84,6 +84,11 @@ class DefaultBuilderConfig extends BuilderConfig
     /**
      * Should return a converter identifier based on the fully qualified
      * column name, thatis schema.relation.column (public.userser.user_name).
+     * @param mixed $schema
+     * @param mixed $relation
+     * @param mixed $column
+     * @param mixed $dbtype
+     * @param mixed $fqcn
      */
     public function getConverterForField($schema, $relation, $column, $dbtype, $fqcn)
     {

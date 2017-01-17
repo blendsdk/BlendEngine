@@ -33,7 +33,8 @@ class Configuration
     /**
      * Retuns a parameters value of null of the parameter does not exist.
      *
-     * @param string $name
+     * @param string     $name
+     * @param null|mixed $default
      *
      * @return object|null
      */
@@ -129,6 +130,7 @@ class Configuration
      * Load a previously dumped configuration parameters.
      *
      * @param array $data
+     * @param mixed $dumpFile
      */
     public function load($dumpFile)
     {

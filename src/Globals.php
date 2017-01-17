@@ -38,6 +38,7 @@ if (!function_exists('array_reindex')) {
      *
      * @param array    $array
      * @param callable $indexer
+     * @param mixed    $single
      *
      * @return array
      */
