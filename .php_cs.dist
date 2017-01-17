@@ -1,11 +1,12 @@
 <?php
 
 $header = <<<'EOF'
-This file is part of PHP CS Fixer.
-(c) Fabien Potencier <fabien@symfony.com>
-    Dariusz Rumiński <dariusz.ruminski@gmail.com>
-This source file is subject to the MIT license that is bundled
-with this source code in the file LICENSE.
+ This file is part of the BlendEngine framework.
+
+ (c) Gevik Babakhani <gevikb@gmail.com>
+
+ For the full copyright and license information, please view the LICENSE
+ file that was distributed with this source code.
 EOF;
 
 return PhpCsFixer\Config::create()
@@ -15,7 +16,8 @@ return PhpCsFixer\Config::create()
         'array_syntax' => array('syntax' => 'long'),
         'no_unused_imports' => true,
         'concat_space' => false,
-        'phpdoc_add_missing_param_annotation' => true
+        'phpdoc_add_missing_param_annotation' => true,
+        'header_comment' => array('header' => $header)
     ))
     ->setFinder(
         PhpCsFixer\Finder::create()

@@ -1,11 +1,10 @@
 <?php
 
 /*
- * Place you globals function here. For example:
+ *  This file is part of the BlendEngine framework.
  *
- * if (!function_exists('my_function')) {
- *     function my_function(....) {
- *         // do something
- *     }
- * }
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
