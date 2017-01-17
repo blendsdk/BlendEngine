@@ -81,7 +81,7 @@ class DataModelCommand extends Command
          * to feed the Factory building. This is primarily done to avoid writing
          * redundant code.
          */
-        $conatiner = new Container();
+        $container = new Container();
         $converterResolver = function ($schema, $relation, $column, $dbtype, $fqcn) {
             return $this->config->getConverterForField($schema, $relation, $column, $dbtype, $fqcn);
         };
@@ -93,7 +93,7 @@ class DataModelCommand extends Command
             $converterInfo = null;
             foreach (array(ModelBuilder::class, FactoryBuilder::class, SchemaBuilder::class) as $builderClass) {
                 /* @var $builderClass \Blend\DataModelBuilder\Builder\ClassBuilder */
-                $builder = $conatiner->get($builderClass, array(
+                $builder = $container->get($builderClass, array(
                     'relation' => $relation,
                     'includeSchema' => !$schema->isSingle(),
                 ));

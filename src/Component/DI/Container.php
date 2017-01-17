@@ -159,7 +159,7 @@ class Container
     }
 
     /**
-     * Sets a list of scalers into the conatiner.
+     * Sets a list of scalers into the container.
      *
      * @param array $scalars
      *
