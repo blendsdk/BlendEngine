@@ -5,7 +5,6 @@ namespace Blend\Tests\Component\Database\Schema;
 use Blend\Tests\Component\Database\DatabaseTestBase;
 use Blend\Component\Database\Schema\SchemaReader;
 
-
 class SchemaReaderTest extends DatabaseTestBase
 {
 
@@ -46,6 +45,10 @@ class SchemaReaderTest extends DatabaseTestBase
 
         $const_table = $relations['const_table'];
         $this->assertEquals(2, count($const_table->getConstraints()));
+
+        /* @var $table1 Relation */
+        $child_table = $relations['child_table'];
+        $this->assertEquals(2, count($child_table->getConstraints()));
     }
 
     public static function setUpSchema()
