@@ -53,6 +53,7 @@ class SchemaReaderTest extends DatabaseTestBase
 
     public static function setUpSchema()
     {
-        self::$currentDatabase->executeScript(file_get_contents(__DIR__ . '/../scripts/schema.sql'));
+        self::$currentDatabase->executeScript(
+                file_get_contents(__DIR__ . '/../scripts/schema.sql'));
     }
 }
