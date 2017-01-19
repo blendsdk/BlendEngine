@@ -158,7 +158,7 @@ class Database
         $this->connect();
         $this->connection->exec($sql);
         if (intval($this->connection->errorCode()) !== 0) {
-            $exception = DatabaseQueryException::createFromStatement($this);
+            $exception = DatabaseQueryException::createFromStatement($this->connection);
             if ($this->logger) {
                 $this->logger->error($exception->getMessage(), array('sql' => str_replace("\n", ' ', $sql)));
             }
