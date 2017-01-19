@@ -12,7 +12,6 @@
 namespace Blend\Component\Database\Factory;
 
 use Blend\Component\Database\Database;
-use Blend\Component\Database\Factory\Converter\FieldConverter;
 use Blend\Component\Database\StatementResult;
 use Blend\Component\DI\Container;
 use Blend\Component\Exception\DatabaseQueryException;
@@ -54,18 +53,12 @@ abstract class Factory
      */
     protected $container;
 
-    /**
-     * @var FieldConverter
-     */
-    protected $fieldConverter;
-
     public function __construct(Database $database, $modelClass)
     {
         $this->database = $database;
         $this->modelClass = $modelClass;
         $this->container = new Container();
         $this->container->defineClassWithInterface('model', $modelClass);
-        $this->fieldConverter = null;
     }
 
     /**
@@ -329,7 +322,7 @@ abstract class Factory
     }
 
     /**
-     * Retuns the count of all records in the relation.
+     * Returns the count of all records in the relation.
      *
      * @return int
      */

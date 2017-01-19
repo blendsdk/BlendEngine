@@ -31,7 +31,7 @@ class Configuration
     private $params;
 
     /**
-     * Retuns a parameters value of null of the parameter does not exist.
+     * Returns a parameters value of null of the parameter does not exist.
      *
      * @param string     $name
      * @param null|mixed $default
