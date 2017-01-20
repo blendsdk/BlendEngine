@@ -438,7 +438,7 @@ class Container
                          * then throw the exception, otherwise we will go further
                          * with that default argument
                          */
-                        if ($exc->getCode() === 1000 && !in_array($name, $callParams)) {
+                        if ($exc->getCode() === 1000 && !array_key_exists($name, $callParams)) {
                             throw $exc;
                         }
                     }
