@@ -4,6 +4,7 @@ namespace <?php echo $applicationNamespace; ?>\Console;
 
 use Blend\Framework\Console\Application;
 use Blend\Framework\Console\Command\ServeCommand;
+use Blend\Framework\Console\Command\DataAccessCommand;
 use <?php echo $applicationNamespace; ?>\Console\Command\PublishCommand;
 
 /**
@@ -17,6 +18,7 @@ class <?php echo $applicationCommandClassName; ?> extends Application {
         parent::__construct($scriptPath, '<?php echo $applicationName?> Command Utility', '1.0');
         $this->add(new ServeCommand());
         $this->add(new PublishCommand());
+        $this->add(new DataAccessCommand());
     }
 
 }
