@@ -19,7 +19,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
- * PublishCommand creates a new release version of a product
+ * PublishCommand creates a new release version of a product.
+ *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 abstract class PublishCommand extends Command

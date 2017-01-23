@@ -125,4 +125,9 @@ class Relation extends Record
     {
         return $this->constraints[$name];
     }
+
+    public function getFQRN()
+    {
+        return $this->getSchema()->getName() . '.' . $this->getName();
+    }
 }

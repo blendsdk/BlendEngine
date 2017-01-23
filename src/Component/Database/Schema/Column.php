@@ -42,10 +42,19 @@ class Column extends Record
     /**
      * Gets the Relation of this Column.
      *
-     * @return type
+     * @return Relation
      */
     public function getRelation()
     {
         return $this->relation;
+    }
+
+    /**
+     * Gets the data type of this column
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->getValue('data_type');
     }
 }
