@@ -216,3 +216,25 @@ if (!function_exists('array_get_key_value')) {
         }
     }
 }
+
+if(!function_exists('is_windows')) {
+
+    /**
+    * Check if we are running on Windows OS
+    * @returns boolean
+    */
+    function is_windows() {
+        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    }
+}
+
+if (!function_exists('path_join')) {
+    /**
+     * Joins all given path segments together using the platform specific 
+     * separator as a delimiter
+     * @returns string
+     */
+    function path_join() {
+        return implode(DIRECTORY_SEPARATOR,func_get_args());
+    }
+}

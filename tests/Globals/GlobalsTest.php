@@ -9,6 +9,14 @@ namespace Blend\Tests\Component\Globals;
  */
 class GlobalsTest extends \PHPUnit_Framework_TestCase {
 
+    public function testPathJoin() {
+        if(is_windows()) {
+            $this->assertEquals('c:\windows\test',path_join("c:","windows","test"));
+        } else {
+            $this->assertEquals('/home/user/test',path_join(DIRECTORY_SEPARATOR ,"home","user",'test'));
+        }
+    }
+
     public function testIsArrayAssoc() {
         $this->assertFalse(is_array_assoc(null));
         $this->assertFalse(is_array_assoc(true));
