@@ -23,7 +23,7 @@ class Record
      */
     private $data;
 
-    public function __construct(array $data)
+    public function __construct(array $data = array())
     {
         $this->data = $data;
     }
@@ -38,5 +38,26 @@ class Record
     public function getValue($column)
     {
         return $this->data[$column];
+    }
+
+    /**
+     * Gets the data collection from this Record.
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * Sets a value of a field in the collection.
+     *
+     * @param string $name
+     * @param mixed  $value
+     */
+    public function setValue($name, $value)
+    {
+        $this->data[$name] = $value;
     }
 }

@@ -145,7 +145,7 @@ class LocalCache
     }
 
     /**
-     * Retuns the path to the cache folder.
+     * Returns the path to the cache folder.
      */
     public function getCacheFolder()
     {

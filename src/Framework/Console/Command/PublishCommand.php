@@ -18,6 +18,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 
+/**
+ * PublishCommand creates a new release version of a product.
+ *
+ * @author Gevik Babakhani <gevikb@gmail.com>
+ */
 abstract class PublishCommand extends Command
 {
     /**
@@ -46,7 +51,7 @@ abstract class PublishCommand extends Command
                 }
             }
 
-            return 'v'.$v;
+            return 'v' . $v;
         } else {
             return null;
         }
@@ -55,7 +60,7 @@ abstract class PublishCommand extends Command
     protected function configure()
     {
         $this->setName('publish')
-                ->setDescription('Creates a new release version: defaults to build '.($this->version->getBuild() + 1))
+                ->setDescription('Creates a new release version: defaults to build ' . ($this->version->getBuild() + 1))
                 ->addOption('bump', 'b', InputOption::VALUE_REQUIRED, 'The version part', 'build');
     }
 
@@ -79,12 +84,12 @@ abstract class PublishCommand extends Command
             default:
                 $this->version->bumpBuild();
         }
-        $output->writeln('Bumping to: '.$this->version->getVersion());
+        $output->writeln('Bumping to: ' . $this->version->getVersion());
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Current version: '.$this->version->getVersion());
+        $output->writeln('Current version: ' . $this->version->getVersion());
         $this->branch = $this->getCurrentGitBranch();
         $this->bumpVersion($input, $output);
         if ($this->branch === 'master') {
@@ -115,7 +120,7 @@ abstract class PublishCommand extends Command
     private function createNewGitTag(OutputInterface $output)
     {
         $version = $this->version->getVersion();
-        $output->writeln('Tagging to: '.$version);
+        $output->writeln('Tagging to: ' . $version);
 
         return `git tag -a $version -m"Release version $version"`;
     }

@@ -1,4 +1,4 @@
-<?php print_php_header();?>
+<?php print_php_header(); ?>
 
 if (!ini_get('date.timezone')) {
     ini_set('date.timezone', 'Europe/Amsterdam');
@@ -23,9 +23,9 @@ if (!defined('BLEND_COMPOSER_INSTALL')) {
 
 require BLEND_COMPOSER_INSTALL;
 
-use <?php echo $applicationNamespace;?>\Console\<?php echo $applicationCommandClassName?>;
+use <?php echo $applicationNamespace; ?>\Console\<?php echo $applicationCommandClassName?>;
 
-define('BLEND_APPLICATION_NAMESPACE', '<?php echo $applicationNamespace;?>');
+define('BLEND_APPLICATION_NAMESPACE', '<?php echo $applicationNamespace; ?>');
 
 $app = new <?php echo $applicationCommandClassName?>(__DIR__.'/../');
 $app->run();
