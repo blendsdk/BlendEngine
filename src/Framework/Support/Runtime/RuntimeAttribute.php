@@ -12,7 +12,7 @@
 namespace Blend\Framework\Support\Runtime;
 
 /**
- * Description of RuntimeAttribute.
+ * RuntimeAttribute.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

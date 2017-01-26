@@ -15,7 +15,7 @@ use Blend\Component\Templating\TemplateEngineInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Description of TwigController.
+ * TwigController.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

@@ -14,7 +14,7 @@ namespace Blend\Tests\Component\Templating;
 use Blend\Component\Templating\Php\PhpEngine;
 
 /**
- * Description of PhpEngineTest.
+ * PhpEngineTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

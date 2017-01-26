@@ -15,7 +15,7 @@ use Blend\Component\Routing\RouteBuilder;
 use Blend\Component\Routing\RouteProviderInterface;
 
 /**
- * Description of TwigModule.
+ * TwigModule.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHa
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 /**
- * Description of NativeSessionProvider.
+ * NativeSessionProvider.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

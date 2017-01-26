@@ -18,7 +18,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
- * Description of CustomRequestExceptionHandler.
+ * CustomRequestExceptionHandler.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

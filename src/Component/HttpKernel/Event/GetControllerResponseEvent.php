@@ -15,7 +15,7 @@ use Blend\Component\DI\Container;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Description of ControllerResponseEvent.
+ * ControllerResponseEvent.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

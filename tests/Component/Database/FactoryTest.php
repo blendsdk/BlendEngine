@@ -73,7 +73,7 @@ class TesterFactory extends Factory
 }
 
 /**
- * Description of FactoryTest.
+ * FactoryTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
 /**
- * Description of TranslationTest.
+ * TranslationTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

@@ -18,7 +18,7 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\ProcessUtils;
 
 /**
- * Description of ServeCommand.
+ * ServeCommand.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

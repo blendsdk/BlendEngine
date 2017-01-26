@@ -14,7 +14,7 @@ namespace Blend\Tests\Component\Form\Stubs;
 use Blend\Component\Form\Form;
 
 /**
- * Description of TestForm.
+ * TestForm.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

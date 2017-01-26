@@ -14,7 +14,7 @@ namespace Blend\Tests\Framework\Application\Stubs;
 use Blend\Framework\Application\Application;
 
 /**
- * Description of DummyApplication.
+ * DummyApplication.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

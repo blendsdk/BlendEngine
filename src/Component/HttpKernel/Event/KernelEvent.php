@@ -16,7 +16,7 @@ use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Description of GetRequest.
+ * GetRequest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

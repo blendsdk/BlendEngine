@@ -14,7 +14,7 @@ namespace Blend\Tests\ProjectSetup;
 use Blend\Tests\ProjectUtil;
 
 /**
- * Description of SetupApplicationTest.
+ * SetupApplicationTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

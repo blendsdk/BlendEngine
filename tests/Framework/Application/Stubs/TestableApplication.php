@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Description of TestableApplication.
+ * TestableApplication.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

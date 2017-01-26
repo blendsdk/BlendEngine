@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Description of GetFinalizeResponseEvent.
+ * GetFinalizeResponseEvent.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

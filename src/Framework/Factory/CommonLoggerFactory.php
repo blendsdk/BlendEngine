@@ -17,7 +17,7 @@ use Monolog\Logger;
 use Psr\Log\LogLevel;
 
 /**
- * Description of CommonLoggerFactory.
+ * CommonLoggerFactory.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

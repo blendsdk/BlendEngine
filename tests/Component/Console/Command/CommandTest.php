@@ -15,7 +15,7 @@ use Blend\Framework\Console\Application;
 use Blend\Tests\ProjectUtil;
 
 /**
- * Description of CommandTest.
+ * CommandTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

@@ -20,7 +20,7 @@ use Blend\Tests\ProjectUtil;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Description of ApplicationFactoryTest.
+ * ApplicationFactoryTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

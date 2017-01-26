@@ -15,7 +15,7 @@ use Blend\Component\DI\Container;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Description of GetExceptionResponseEvent.
+ * GetExceptionResponseEvent.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

@@ -12,7 +12,7 @@
 namespace Blend\Tests\Component\DI\Stubs;
 
 /**
- * Description of Service.
+ * Service.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

@@ -18,7 +18,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Description of TestCommand.
+ * TestCommand.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

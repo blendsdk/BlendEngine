@@ -17,7 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * Description of Application.
+ * Application.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

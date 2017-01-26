@@ -16,7 +16,7 @@ use Blend\Component\DI\Container;
 use Blend\Framework\Application\ApplicationTestable;
 
 /**
- * Description of TestableApplication.
+ * TestableApplication.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

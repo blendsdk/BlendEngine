@@ -16,7 +16,7 @@ use Blend\Component\DI\ObjectFactoryInterface;
 use Blend\Component\Filesystem\Filesystem;
 
 /**
- * Description of ConfigurationFactory.
+ * ConfigurationFactory.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

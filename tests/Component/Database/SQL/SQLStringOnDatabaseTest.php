@@ -16,7 +16,7 @@ use Blend\Component\Database\SQL\Statement\SelectStatement;
 use Blend\Tests\Component\Database\DatabaseTestBase;
 
 /**
- * Description of SQLStringOnDatabaseTest.
+ * SQLStringOnDatabaseTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

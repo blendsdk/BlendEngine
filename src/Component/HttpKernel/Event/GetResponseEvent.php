@@ -14,7 +14,7 @@ namespace Blend\Component\HttpKernel\Event;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Description of GetRequestEvent.
+ * GetRequestEvent.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

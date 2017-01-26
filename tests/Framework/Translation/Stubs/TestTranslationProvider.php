@@ -17,7 +17,7 @@ use Blend\Component\Translation\Translator;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 
 /**
- * Description of TestTranslationProvider.
+ * TestTranslationProvider.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

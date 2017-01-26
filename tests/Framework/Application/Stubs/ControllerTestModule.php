@@ -17,7 +17,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Description of ControllerTestModule.
+ * ControllerTestModule.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

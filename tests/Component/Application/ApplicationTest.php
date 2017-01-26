@@ -14,7 +14,7 @@ namespace Blend\Tests\Component\Application;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * Description of ApplicationTest.
+ * ApplicationTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

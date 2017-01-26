@@ -14,7 +14,7 @@ namespace Blend\Tests\Component\Templating;
 use Blend\Component\Templating\Twig\TwigEngine;
 
 /**
- * Description of TwigEngineTest.
+ * TwigEngineTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

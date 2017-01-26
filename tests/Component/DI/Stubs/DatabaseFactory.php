@@ -14,7 +14,7 @@ namespace Blend\Tests\Component\DI\Stubs;
 use Blend\Component\DI\ObjectFactoryInterface;
 
 /**
- * Description of DatabaseFactory.
+ * DatabaseFactory.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */

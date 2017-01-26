@@ -12,7 +12,7 @@
 namespace Blend\Component\HttpKernel;
 
 /**
- * Description of KernelEvents.
+ * KernelEvents.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
