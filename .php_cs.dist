@@ -23,7 +23,6 @@ return PhpCsFixer\Config::create()
         PhpCsFixer\Finder::create()
             ->in(__DIR__)
             ->exclude(array(
-                'tests',
                 'temp',
                 'vendor',
                 'src/Framework/Console/Command/Orm/templates'
