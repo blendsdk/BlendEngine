@@ -25,6 +25,8 @@ use Blend\Framework\Factory\DatabaseFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Blend\Component\Database\Factory\Factory;
+use Blend\Component\Model\Model;
 
 /**
  * OrmCommand creates a data access layer based on a PostgreSQL
@@ -129,11 +131,14 @@ class OrmCommand extends Command
     {
         $template = new FactoryClassTemplate();
         $this->setupTemplate($relation, $template);
-        $template->setBaseClassName('Factory');
-        $template->addUses(array(
+        $baseClass = $this->ormConfig->getBaseClass('factory', $relation->getFQRN(), Factory::class);
+        $template->setBaseClassName($baseClass['class_name']);
+        $uses = array(
             'Blend\Component\Database\Database',
-            'Blend\Component\Database\Factory\Factory',
-        ));
+            $baseClass['use'],
+        );
+
+        $template->addUses(array_unique($uses));
         $template->setModelClass(str_identifier($relation->getName()));
 
         foreach ($relation->getConstraintsByType() as $type => $constraints) {
@@ -203,9 +208,10 @@ class OrmCommand extends Command
     {
         $template = new ModelClassTemplate();
         $this->setupTemplate($relation, $template);
-        $template->setBaseClassName('Model');
+        $baseClass = $this->ormConfig->getBaseClass('model', $relation->getFQRN(), Model::class);
+        $template->setBaseClassName($baseClass['class_name']);
         $template->addUses(array(
-            'Blend\Component\Model\Model',
+            $baseClass['use'],
         ));
         foreach ($relation->getColumns() as $column) {
             $template->addProperty($this->normalizeName($column->getName()), $column->getType());
