@@ -21,10 +21,15 @@ class OrmConfig
     private $outputFolder;
     private $rootFolder;
     private $tables;
+    private $baseclass;
 
     public function __construct()
     {
         $this->tables = array();
+        $this->baseclass = array(
+            'factory' => array(),
+            'model' => array()
+        );
     }
 
     public function setRootFolder($folder)
@@ -39,6 +44,33 @@ class OrmConfig
         $this->tables[] = array($schema, $table);
 
         return $this;
+    }
+
+    public function setFactoryBaseClass($table, $class)
+    {
+        return $this->setBaseClass('factory', $table, $class);
+    }
+
+    public function setModelBaseClass($table, $class)
+    {
+        return $this->setBaseClass('model', $table, $class);
+    }
+
+    private function setBaseClass($type, $table, $class)
+    {
+        $this->baseclass[$type][$table] = $class;
+        return $this;
+    }
+
+    public function getBaseClass($type, $table, $default)
+    {
+        if (isset($this->baseclass[$type][$table])) {
+            $clazz = $this->baseclass[$type][$table];
+        } else {
+            $clazz = $default;
+        }
+        $classRef = new \ReflectionClass($clazz);
+        return array('use' => $classRef->getName(), 'class_name' => str_replace($classRef->getNamespaceName() . '\\', '', $classRef->getName()));
     }
 
     public function getTables()

@@ -13,10 +13,10 @@ namespace Blend\Framework\Console\Command\Orm;
 
 class FactoryClassTemplate extends ClassTemplate
 {
+
     public function __construct(array $data = array())
     {
         parent::__construct($data);
-        $this->setValue('generate', true);
         $this->setValue('methods', array());
     }
 
@@ -34,6 +34,7 @@ class FactoryClassTemplate extends ClassTemplate
 
     public function setClassNamespace($value)
     {
+        $value = $this->getValue('appNamespace') . '\\' . $value;
         parent::setClassNamespace($value . '\\Factory');
         $this->setValue('modelNamespace', $value . '\\Model');
     }
