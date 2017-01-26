@@ -242,8 +242,11 @@ abstract class Factory
      *
      * @return type
      */
-    public function getAll($selectColumns, $orderDirective = null, $offsetLimitDirective = null)
+    public function getAll($selectColumns = null, $orderDirective = null, $offsetLimitDirective = null)
     {
+        if($selectColumns === null) {
+            $selectColumns = self::ALL_COLUMNS;
+        }
         return $this->getManyBy(
                         $selectColumns, array('true' => true), $orderDirective, $offsetLimitDirective);
     }
@@ -327,7 +330,7 @@ abstract class Factory
      *
      * @return int
      */
-    protected function countAll()
+    public function countAll()
     {
         $sql = 'SELECT COUNT(true) FROM ' . $this->relation;
 
