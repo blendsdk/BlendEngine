@@ -1,25 +1,26 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
 namespace Blend\Tests\Component\Database\SQL\Statement;
 
-use Blend\Tests\Component\Database\DatabaseTestBase;
 use Blend\Component\Database\SQL\Statement\SelectStatement;
+use Blend\Tests\Component\Database\DatabaseTestBase;
 
 /**
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class SelectTest extends DatabaseTestBase {
-
-    public function testSimpleSelect() {
+class SelectTest extends DatabaseTestBase
+{
+    public function testSimpleSelect()
+    {
         $s = new SelectStatement();
         $s->from('table1')
                 ->select('col1')
@@ -27,7 +28,8 @@ class SelectTest extends DatabaseTestBase {
         $this->assertEquals('SELECT col1, col2 FROM table1', $s);
     }
 
-    public function testSimpleSelectWithAlias() {
+    public function testSimpleSelectWithAlias()
+    {
         $s = new SelectStatement();
         $s->from(sqlstr('table1')->tableAlias('t1'))
                 ->select(sqlstr('col1')->dotPrefix('t1'))
@@ -35,7 +37,8 @@ class SelectTest extends DatabaseTestBase {
         $this->assertEquals('SELECT t1.col1, t1.col2 FROM table1 t1', $s);
     }
 
-    public function testSimpleSelectMultiFrom() {
+    public function testSimpleSelectMultiFrom()
+    {
         $s = new SelectStatement();
         $s
                 ->from(sqlstr('table1')->tableAlias('t1'))
@@ -45,7 +48,8 @@ class SelectTest extends DatabaseTestBase {
         $this->assertEquals('SELECT t1.col1, t2.col1 FROM table1 t1, table2 t2', $s);
     }
 
-    public function testInnerJoin1() {
+    public function testInnerJoin1()
+    {
         $s = new SelectStatement();
         $s
                 ->from(sqlstr('table1')->tableAlias('t1'))
@@ -54,7 +58,8 @@ class SelectTest extends DatabaseTestBase {
         $this->assertEquals('SELECT * FROM table1 t1 INNER JOIN table2 t2 ON t1.id = t2.id', $s . '');
     }
 
-    public function testSelectCountWithColumn() {
+    public function testSelectCountWithColumn()
+    {
         $s = new SelectStatement();
         $s
                 ->selectCount(null, 'field1')
@@ -63,7 +68,8 @@ class SelectTest extends DatabaseTestBase {
         $this->assertEquals('SELECT COUNT(field1) FROM table1 WHERE field1 = 5', $s . '');
     }
 
-    public function testSelectCountWithColumnAndAlias() {
+    public function testSelectCountWithColumnAndAlias()
+    {
         $s = new SelectStatement();
         $s
                 ->selectCount('numbers', 'field1')
@@ -72,7 +78,8 @@ class SelectTest extends DatabaseTestBase {
         $this->assertEquals('SELECT COUNT(field1) AS numbers FROM table1 WHERE field1 = 5', $s . '');
     }
 
-    public function testSelectCountTest() {
+    public function testSelectCountTest()
+    {
         $s = new SelectStatement();
         $s
                 ->selectCount()
@@ -81,7 +88,8 @@ class SelectTest extends DatabaseTestBase {
         $this->assertEquals('SELECT COUNT(*) FROM table1 WHERE field1 = 5', $s . '');
     }
 
-    public function testSelectCountWithAliasTest() {
+    public function testSelectCountWithAliasTest()
+    {
         $s = new SelectStatement();
         $s
                 ->selectCount('numbers')
@@ -89,5 +97,4 @@ class SelectTest extends DatabaseTestBase {
                 ->where(sqlstr('field1')->equalsTo(5));
         $this->assertEquals('SELECT COUNT(*) AS numbers FROM table1 WHERE field1 = 5', $s . '');
     }
-
 }

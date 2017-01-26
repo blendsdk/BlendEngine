@@ -1,100 +1,110 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
 namespace Blend\Tests\Component\Database;
 
-use Blend\Tests\Component\Database\DatabaseTestBase;
-use Blend\Component\Database\StatementResult;
-use Blend\Component\Database\Factory\Factory;
-use Blend\Component\Model\Model;
 use Blend\Component\Database\Database;
+use Blend\Component\Database\Factory\Factory;
+use Blend\Component\Database\StatementResult;
+use Blend\Component\Model\Model;
 
-class TesterModel extends Model {
-
-    public function getId() {
+class TesterModel extends Model
+{
+    public function getId()
+    {
         return $this->getValue('id');
     }
 
-    public function getField1() {
+    public function getField1()
+    {
         return $this->getValue('field1');
     }
-
 }
 
-class TesterFactory extends Factory {
-
-    public function __construct(Database $database) {
-        parent::__construct($database, TesterModel::class);
-        $this->relation = 'public.table1';
+class TesterFactory extends Factory
+{
+    public function __construct(Database $database)
+    {
+        parent::__construct($database, TesterModel::class, 'public.table1');
     }
 
-    public function countAllTest() {
+    public function countAllTest()
+    {
         return $this->countAll();
     }
 
-    public function countByTest(array $byCondition) {
+    public function countByTest(array $byCondition)
+    {
         return $this->countBy($byCondition);
     }
 
-    public function getOneByTest($selectColumns, $byColumns) {
+    public function getOneByTest($selectColumns, $byColumns)
+    {
         return $this->getOneBy($selectColumns, $byColumns);
     }
 
-    public function getManyByTest($selectColumns, array $byColumns, $orderDirective = null, $offsetLimitDirective = null) {
+    public function getManyByTest($selectColumns, array $byColumns, $orderDirective = null, $offsetLimitDirective = null)
+    {
         return $this->getManyBy($selectColumns, $byColumns, $orderDirective, $offsetLimitDirective);
     }
 
-    public function getAllTest($selectColumns, $orderDirective = null, $offsetLimitDirective = null) {
+    public function getAllTest($selectColumns, $orderDirective = null, $offsetLimitDirective = null)
+    {
         return $this->getAll($selectColumns, $orderDirective, $offsetLimitDirective);
     }
 
-    public function deleteOneByTest($byColumns) {
+    public function deleteOneByTest($byColumns)
+    {
         return $this->deleteOneBy($byColumns);
     }
 
-    public function deleteManyByTest(array $byColumns, StatementResult $stmtResult = null) {
+    public function deleteManyByTest(array $byColumns, StatementResult $stmtResult = null)
+    {
         return $this->deleteManyBy($byColumns, $stmtResult);
     }
-
 }
 
 /**
- * Description of FactoryTest
+ * FactoryTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class FactoryTest extends DatabaseTestBase {
-
-    public function testCountAll() {
+class FactoryTest extends DatabaseTestBase
+{
+    public function testCountAll()
+    {
         $factory = new TesterFactory(self::$currentDatabase);
         $this->assertEquals(100, $factory->countAllTest());
     }
 
-    public function testCountBy() {
+    public function testCountBy()
+    {
         $factory = new TesterFactory(self::$currentDatabase);
-        $this->assertEquals(9, $factory->countByTest(['field3' => 0]));
+        $this->assertEquals(9, $factory->countByTest(array('field3' => 0)));
     }
 
-    public function testDeleteManyRecordsNoResult() {
+    public function testDeleteManyRecordsNoResult()
+    {
         $stmtResult = new StatementResult();
         $factory = new TesterFactory(self::$currentDatabase);
-        $result = $factory->deleteManyByTest(['field3' => 9999], $stmtResult);
+        $result = $factory->deleteManyByTest(array('field3' => 9999), $stmtResult);
         $this->assertEquals(0, $stmtResult->getAffectedRecords());
         $this->assertCount(0, $result);
     }
 
-    public function testDeleteManyRecords() {
+    public function testDeleteManyRecords()
+    {
         $stmtResult = new StatementResult();
         $factory = new TesterFactory(self::$currentDatabase);
-        $result = $factory->deleteManyByTest(['field3' => 0], $stmtResult);
+        $result = $factory->deleteManyByTest(array('field3' => 0), $stmtResult);
         $this->assertEquals(9, $stmtResult->getAffectedRecords());
         $this->assertCount(9, $result);
     }
@@ -102,70 +112,71 @@ class FactoryTest extends DatabaseTestBase {
     /**
      * @expectedException \Blend\Component\Exception\DatabaseQueryException
      */
-    public function testDeleteOnRecordMultiple() {
+    public function testDeleteOnRecordMultiple()
+    {
         $factory = new TesterFactory(self::$currentDatabase);
-        $model = $factory->deleteOneByTest(['field3' => 0]);
+        $model = $factory->deleteOneByTest(array('field3' => 0));
     }
 
-    public function testDeleteOnRecordNoDelete() {
+    public function testDeleteOnRecordNoDelete()
+    {
         $factory = new TesterFactory(self::$currentDatabase);
-        $model = $factory->deleteOneByTest(['id' => 9999]);
+        $model = $factory->deleteOneByTest(array('id' => 9999));
         $this->assertNull($model);
     }
 
-    public function testDeleteOneRecord() {
+    public function testDeleteOneRecord()
+    {
         $factory = new TesterFactory(self::$currentDatabase);
-        $model = $factory->deleteOneByTest(['id' => 10]);
+        $model = $factory->deleteOneByTest(array('id' => 10));
         $this->assertEquals(10, $model->getId());
     }
 
-    public function testGetRecords() {
+    public function testGetRecords()
+    {
         $factory = new TesterFactory(self::$currentDatabase);
-        $model = $factory->getOneByTest(['*'], ['id' => 2]);
+        $model = $factory->getOneByTest(array('*'), array('id' => 2));
         $this->assertEquals($model->getField1(), 'value2');
 
-        $list = $factory->getManyByTest(['*'], ['field3' => 0]);
+        $list = $factory->getManyByTest(array('*'), array('field3' => 0));
         $this->assertCount(9, $list);
 
-        $list2 = $factory->getManyByTest(['*'], ['true' => true], ['id' => 'DESC', 'field1' => 'ASC']);
+        $list2 = $factory->getManyByTest(array('*'), array('true' => true), array('id' => 'DESC', 'field1' => 'ASC'));
         $this->assertEquals(100, $list2[0]->getId());
 
-        $list3 = $factory->getManyByTest(['*'], ['true' => true], null, ['offset' => 10, 'limit' => '2']);
+        $list3 = $factory->getManyByTest(array('*'), array('true' => true), null, array('offset' => 10, 'limit' => '2'));
         $this->assertCount(2, $list3);
 
         $list4 = $factory->getManyByTest(
-                ['*']
-                , ['true' => true]
-                , ['id' => 'DESC', 'field1' => 'ASC']
-                , ['offset' => 10, 'limit' => '3']
+                array('*'), array('true' => true), array('id' => 'DESC', 'field1' => 'ASC'), array('offset' => 10, 'limit' => '3')
         );
         $this->assertCount(3, $list4);
-
 
         $list5 = $factory->getAllTest(null);
         $this->assertCount(100, $list5);
     }
 
-    public static function getTestingDatabaseConfig() {
-        return [
+    public static function getTestingDatabaseConfig()
+    {
+        return array(
             'username' => 'postgres',
             'password' => 'postgres',
-            'database' => 'factory_test'
-        ];
+            'database' => 'factory_test',
+        );
     }
 
-    protected function setUp() {
+    protected function setUp()
+    {
         self::$currentDatabase->executeQuery('drop table if exists table1 cascade');
         self::$currentDatabase->executeQuery('create table table1(id serial not null primary key,field1 varchar, field2 integer,field3 integer)');
-        for ($a = 0; $a != 100; $a++) {
+        for ($a = 0; $a != 100; ++$a) {
             $b = (1 + $a);
-            self::$currentDatabase->insert('table1', [
+            self::$currentDatabase->insert('table1', array(
                 'id' => $b,
                 'field1' => 'value' . $b,
                 'field2' => $b,
-                'field3' => intval($b / 10)
-            ]);
+                'field3' => intval($b / 10),
+            ));
         }
     }
-
 }

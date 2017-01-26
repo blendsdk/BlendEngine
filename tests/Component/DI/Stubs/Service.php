@@ -1,36 +1,35 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
 namespace Blend\Tests\Component\DI\Stubs;
 
-use Blend\Tests\Component\DI\Stubs\Database;
-
 /**
- * Description of Service
+ * Service.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Service {
-
+class Service
+{
     /**
      * @var Database;
      */
     protected $database;
 
-    public function __construct(Database $database) {
+    public function __construct(Database $database)
+    {
         $this->database = $database;
     }
 
-    public function getUsername() {
+    public function getUsername()
+    {
         return $this->database->getUsername();
     }
-
 }

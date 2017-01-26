@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
 /**
@@ -151,7 +151,7 @@ if (!function_exists('str_identifier')) {
      */
     function str_identifier($string, $prefix = '', $postfix = '')
     {
-        return $prefix.str_replace(' ', '', ucwords(str_replace('_', ' ', $string))).$postfix;
+        return $prefix . str_replace(' ', '', ucwords(str_replace('_', ' ', $string))) . $postfix;
     }
 }
 
@@ -214,5 +214,30 @@ if (!function_exists('array_get_key_value')) {
         } else {
             return $default;
         }
+    }
+}
+
+if (!function_exists('is_windows')) {
+    /**
+     * Check if we are running on Windows OS.
+     *
+     * @returns boolean
+     */
+    function is_windows()
+    {
+        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    }
+}
+
+if (!function_exists('path_join')) {
+    /**
+     * Joins all given path segments together using the platform specific
+     * separator as a delimiter.
+     *
+     * @returns string
+     */
+    function path_join()
+    {
+        return str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
     }
 }

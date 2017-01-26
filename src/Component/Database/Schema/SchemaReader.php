@@ -1,33 +1,32 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
-namespace Blend\DataModelBuilder\Schema;
+namespace Blend\Component\Database\Schema;
 
 use Blend\Component\Database\Database;
 use Blend\Component\Database\SQL\SQLString;
 use Blend\Component\Database\SQL\Statement\SelectStatement;
 
 /**
- * Read the database schema from a PostgreSQL Database for code.
+ * The SchemaReader can be used to read a PostgreSQL database schema
+ * to be processed further by a code generator.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class SchemaReader
 {
     /**
-     * Instance of a Database.
-     *
      * @var Database
      */
-    protected $database;
+    private $database;
 
     public function __construct(Database $database)
     {
@@ -35,21 +34,21 @@ class SchemaReader
     }
 
     /**
-     * Laods the database schemas with their tables, column and contraints.
+     * Reads the schemas from the database.
      *
-     * @return Schema[] Array of Schema objects
+     * @return Schema
      */
-    public function load()
+    public function read()
     {
-        return $this->getSchemas();
+        return $this->readSchemas();
     }
 
     /**
-     * Load the schemas from the database.
+     * Read the Schemas from the database.
      *
-     * @return Schema[]
+     * @return \Blend\Component\Database\Schema\Schema
      */
-    protected function getSchemas()
+    private function readSchemas()
     {
         $skip = array('pg_toast', 'pg_temp_1', 'pg_catalog', 'pg_toast_temp_1', 'information_schema');
         $sql = new SelectStatement();
@@ -59,23 +58,21 @@ class SchemaReader
 
         $result = array();
         $list = $this->database->executeQuery($sql);
-        $singleSchema = count($list) === 1;
         foreach ($list as $record) {
-            $record['is_single'] = $singleSchema;
             $schema = new Schema($record);
-            $this->loadRelationsForSchema($schema);
             $result[$schema->getName()] = $schema;
+            $this->readRelations($schema);
         }
 
         return $result;
     }
 
     /**
-     * Loads the Relations fro a given schema.
+     * Reads relations of a Schema.
      *
-     * @param Schema $schema
+     * @param \Blend\Component\Database\Schema\Schema $schema
      */
-    protected function loadRelationsForSchema(Schema $schema)
+    private function readRelations(Schema $schema)
     {
         $sql = new SelectStatement();
         $sql->from('information_schema.tables')
@@ -83,24 +80,39 @@ class SchemaReader
                 ->where(sqlstr('table_schema')->equalsTo(':table_schema'));
         $params = array(':table_schema' => $schema->getName());
         foreach ($this->database->executeQuery($sql, $params) as $record) {
-            $relation = new Relation($record);
+            $relation = new Relation($record, $schema);
             $schema->addRelation($relation);
-            $this->loadColumnsForRelation($relation);
-            $this->loadContraintsForRelation($relation);
+            $this->readColumns($relation);
+            $this->readConstraints($relation);
         }
     }
 
     /**
-     * Loads the contains for a given Relation.
+     * Read columns of a Relation.
      *
-     * @param Relation $relation
+     * @param \Blend\Component\Database\Schema\Relation $relation
      */
-    protected function loadContraintsForRelation(Relation $relation)
+    protected function readColumns(Relation $relation)
     {
-        if ($relation->getName() === 'sys_order_item') {
-            $a = 0;
-        }
+        $sql = new SelectStatement();
+        $sql->from('information_schema.columns')
+                ->where(sqlstr('table_schema')->equalsTo(':table_schema'))
+                ->andWhere(sqlstr('table_name')->equalsTo(':table_name'));
 
+        $params = array(':table_schema' => $relation->getSchema()->getName(), ':table_name' => $relation->getName());
+        foreach ($this->database->executeQuery($sql, $params) as $record) {
+            $column = new Column($record, $relation);
+            $relation->addColumn($column);
+        }
+    }
+
+    /**
+     * Reads the constrains of a relation.
+     *
+     * @param \Blend\Component\Database\Schema\Relation $relation
+     */
+    protected function readConstraints(Relation $relation)
+    {
         $constraint_type = array('UNIQUE', 'PRIMARY KEY', 'FOREIGN KEY');
         $tableConstQuery = new SelectStatement();
         $tableConstQuery->from('information_schema.table_constraints')
@@ -109,45 +121,28 @@ class SchemaReader
                 ->andWhere(sqlstr('table_name')->equalsTo(':table_name'));
 
         $tableConstQueryParams = array(
-            ':table_schema' => $relation->getSchemaName(),
+            ':table_schema' => $relation->getSchema()->getName(),
             ':table_name' => $relation->getName(),
         );
 
         $constColumnQuery = new SelectStatement();
         $constColumnQuery->from('information_schema.constraint_column_usage')
                 ->where(sqlstr('table_schema')->equalsTo(':table_schema'))
-                //->andWhere(sqlstr('table_name')->equalsTo(':table_name'))
                 ->andWhere(sqlstr('constraint_name')->equalsTo(':constraint_name'));
 
         foreach ($this->database->executeQuery($tableConstQuery, $tableConstQueryParams) as $tableConst) {
             $constColumnParams = array(
                 ':table_schema' => $tableConst['table_schema'],
-                //':table_name' => $tableConst['table_name'],
                 ':constraint_name' => $tableConst['constraint_name'],
             );
+
             $constColumns = $this->database->executeQuery($constColumnQuery, $constColumnParams);
+
+            $constraint = new Constraint($tableConst);
             foreach ($constColumns as $constColumn) {
-                $relation->addKeyColumn($constColumn, $tableConst['constraint_type']);
+                $constraint->addColumn($relation->getColumn($constColumn['column_name']));
             }
-        }
-    }
-
-    /**
-     * Loads columns for a given relation.
-     *
-     * @param Relation $relation
-     */
-    protected function loadColumnsForRelation(Relation $relation)
-    {
-        $sql = new SelectStatement();
-        $sql->from('information_schema.columns')
-                ->where(sqlstr('table_schema')->equalsTo(':table_schema'))
-                ->andWhere(sqlstr('table_name')->equalsTo(':table_name'));
-
-        $params = array(':table_schema' => $relation->getSchemaName(), ':table_name' => $relation->getName());
-        foreach ($this->database->executeQuery($sql, $params) as $record) {
-            $column = new Column($record);
-            $relation->addColumn($column);
+            $relation->addConstraint($constraint);
         }
     }
 }

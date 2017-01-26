@@ -1,18 +1,17 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
 namespace Blend\Component\Database\Factory;
 
 use Blend\Component\Database\Database;
-use Blend\Component\Database\Factory\Converter\FieldConverter;
 use Blend\Component\Database\StatementResult;
 use Blend\Component\DI\Container;
 use Blend\Component\Exception\DatabaseQueryException;
@@ -54,18 +53,13 @@ abstract class Factory
      */
     protected $container;
 
-    /**
-     * @var FieldConverter
-     */
-    protected $fieldConverter;
-
-    public function __construct(Database $database, $modelClass)
+    public function __construct(Database $database, $modelClass, $relationName)
     {
         $this->database = $database;
         $this->modelClass = $modelClass;
+        $this->relation = $relationName;
         $this->container = new Container();
         $this->container->defineClassWithInterface('model', $modelClass);
-        $this->fieldConverter = null;
     }
 
     /**
@@ -103,7 +97,7 @@ abstract class Factory
             } else {
                 throw new \LogicException(
                 'The delete operation did not return exactly one record! '
-                .'The Model must have been changed or deleted by another operation!');
+                . 'The Model must have been changed or deleted by another operation!');
             }
         } else {
             throw new \LogicException('Unable to delete an unsaved model!');
@@ -135,7 +129,7 @@ abstract class Factory
         } else {
             throw new \LogicException(
             'The update operation did not return exactly one record! '
-            .'The Model must have been changed or deleted by another operation!');
+            . 'The Model must have been changed or deleted by another operation!');
         }
     }
 
@@ -228,7 +222,7 @@ abstract class Factory
             if (is_null($value)) {
                 $condition->isNull();
             } else {
-                $param = ':cc_'.$field;
+                $param = ':cc_' . $field;
                 $condition->equalsTo($param);
                 $conditionParameters[$param] = $value;
             }
@@ -248,8 +242,12 @@ abstract class Factory
      *
      * @return type
      */
-    public function getAll($selectColumns, $orderDirective = null, $offsetLimitDirective = null)
+    public function getAll($selectColumns = null, $orderDirective = null, $offsetLimitDirective = null)
     {
+        if ($selectColumns === null) {
+            $selectColumns = self::ALL_COLUMNS;
+        }
+
         return $this->getManyBy(
                         $selectColumns, array('true' => true), $orderDirective, $offsetLimitDirective);
     }
@@ -266,9 +264,9 @@ abstract class Factory
     {
         list($condition, $conditionParams) = $this->createAndCondition($byColumns);
         $sql = 'SELECT '
-                .implode(', ', $selectColumns)
-                .' FROM '.$this->relation
-                .' WHERE '.$condition;
+                . implode(', ', $selectColumns)
+                . ' FROM ' . $this->relation
+                . ' WHERE ' . $condition;
 
         $result = $this->database->executeQuery($sql, $conditionParams);
         if (count($result) !== 0) {
@@ -291,8 +289,8 @@ abstract class Factory
         if ($stmtResult->getAffectedRecords() == 1) {
             return $this->container->get('model', array('data' => $this->convertFromRecord($result[0])));
         } elseif ($stmtResult->getAffectedRecords() > 1) {
-            throw new DatabaseQueryException('The '.__FUNCTION__
-            .' deleted more than one record!');
+            throw new DatabaseQueryException('The ' . __FUNCTION__
+            . ' deleted more than one record!');
         } else {
             return null;
         }
@@ -322,20 +320,20 @@ abstract class Factory
     {
         list($condition, $conditionParams) = $this->createAndCondition($byCondition);
         $sql = 'SELECT COUNT(true)'
-                .' FROM '.$this->relation
-                .' WHERE '.$condition;
+                . ' FROM ' . $this->relation
+                . ' WHERE ' . $condition;
 
         return $this->database->executeScalar($sql, $conditionParams);
     }
 
     /**
-     * Retuns the count of all records in the relation.
+     * Returns the count of all records in the relation.
      *
      * @return int
      */
-    protected function countAll()
+    public function countAll()
     {
-        $sql = 'SELECT COUNT(true) FROM '.$this->relation;
+        $sql = 'SELECT COUNT(true) FROM ' . $this->relation;
 
         return $this->database->executeScalar($sql);
     }
@@ -360,11 +358,11 @@ abstract class Factory
 
         list($condition, $conditionParams) = $this->createAndCondition($byColumns);
         $sql = 'SELECT '
-                .implode(', ', $selectColumns)
-                .' FROM '.$this->relation
-                .' WHERE '.$condition
-                .$this->createOrderDirective($orderDirective)
-                .$this->createOffsetLimitDirective($offsetLimitDirective);
+                . implode(', ', $selectColumns)
+                . ' FROM ' . $this->relation
+                . ' WHERE ' . $condition
+                . $this->createOrderDirective($orderDirective)
+                . $this->createOffsetLimitDirective($offsetLimitDirective);
 
         $result = $this->database->executeQuery($sql, $conditionParams);
 
@@ -405,8 +403,8 @@ abstract class Factory
             foreach (array('limit', 'offset') as $directive) {
                 if (isset($offsetLimitDirective[$directive])) {
                     $sql .= ' '
-                            .strtoupper($directive)
-                            .' '.$offsetLimitDirective[$directive];
+                            . strtoupper($directive)
+                            . ' ' . $offsetLimitDirective[$directive];
                 }
             }
         }
@@ -426,9 +424,9 @@ abstract class Factory
         $sql = '';
         if (is_array($orderDirective) && count($orderDirective) !== 0) {
             foreach ($orderDirective as $col => $orderType) {
-                $orderDirective[$col] = $col.' '.$orderType;
+                $orderDirective[$col] = $col . ' ' . $orderType;
             }
-            $sql .= ' ORDER BY '.implode(', ', $orderDirective);
+            $sql .= ' ORDER BY ' . implode(', ', $orderDirective);
         }
 
         return $sql;

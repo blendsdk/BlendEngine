@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
 namespace Blend\Component\Database;
@@ -158,7 +158,7 @@ class Database
         $this->connect();
         $this->connection->exec($sql);
         if (intval($this->connection->errorCode()) !== 0) {
-            $exception = DatabaseQueryException::createFromStatement($this);
+            $exception = DatabaseQueryException::createFromStatement($this->connection);
             if ($this->logger) {
                 $this->logger->error($exception->getMessage(), array('sql' => str_replace("\n", ' ', $sql)));
             }

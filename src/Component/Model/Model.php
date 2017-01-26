@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
 namespace Blend\Component\Model;
@@ -84,7 +84,7 @@ class Model
     }
 
     /**
-     * Retuns an array with the updated data.
+     * Returns an array with the updated data.
      *
      * @return type
      */
@@ -94,7 +94,7 @@ class Model
     }
 
     /**
-     * Retuns an array with the initial data that was provided by the
+     * Returns an array with the initial data that was provided by the
      * constructor.
      *
      * @return type
@@ -105,7 +105,7 @@ class Model
     }
 
     /**
-     * Retuns an array with the current state of the record.
+     * Returns an array with the current state of the record.
      *
      * @return array
      */
