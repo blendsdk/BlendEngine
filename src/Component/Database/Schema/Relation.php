@@ -130,4 +130,18 @@ class Relation extends Record
     {
         return $this->getSchema()->getName() . '.' . $this->getName();
     }
+
+    public function getConstraintsByType()
+    {
+        $result = array();
+        foreach ($this->getConstraints() as $item) {
+            $type = strtolower(str_identifier($item->getType()));
+            if (!isset($result[$type])) {
+                $result[$type] = array();
+            }
+            $result[$type][] = $item;
+        }
+
+        return $result;
+    }
 }

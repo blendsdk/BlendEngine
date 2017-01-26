@@ -37,6 +37,7 @@ class OrmConfig
     public function addTable($table, $schema = 'public')
     {
         $this->tables[] = array($schema, $table);
+
         return $this;
     }
 

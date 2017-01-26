@@ -12,16 +12,19 @@
 namespace Blend\Framework\Console\Command;
 
 use Blend\Component\Database\Database;
-use Blend\Component\Database\Schema\Schema;
+use Blend\Component\Database\Schema\Constraint;
 use Blend\Component\Database\Schema\Relation;
+use Blend\Component\Database\Schema\Schema;
 use Blend\Component\Database\Schema\SchemaReader;
+use Blend\Framework\Console\Command\Orm\ClassTemplate;
+use Blend\Framework\Console\Command\Orm\FactoryClassTemplate;
+use Blend\Framework\Console\Command\Orm\Method;
+use Blend\Framework\Console\Command\Orm\ModelClassTemplate;
+use Blend\Framework\Console\Command\Orm\OrmConfig;
 use Blend\Framework\Factory\DatabaseFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Blend\Framework\Console\Command\Orm\OrmConfig;
-use Blend\Framework\Console\Command\Orm\ModelClassTemplate;
-use Blend\Framework\Console\Command\Orm\ClassTemplate;
 
 /**
  * OrmCommand creates a data access layer based on a PostgreSQL
@@ -69,8 +72,10 @@ class OrmCommand extends Command
     }
 
     /**
-     * Normalizes named to de-conflict with built-in names
+     * Normalizes named to de-conflict with built-in names.
+     *
      * @param type $name
+     *
      * @return string
      */
     private function normalizeName($name)
@@ -78,7 +83,7 @@ class OrmCommand extends Command
         if ($name === 'public') {
             return 'common';
         } else {
-            return $name;
+            return str_replace('_id', '_ID', $name);
         }
     }
 
@@ -109,12 +114,7 @@ class OrmCommand extends Command
 
     private function getSchemaNamespace(Relation $relation)
     {
-        return "Database\\" . str_identifier($this->normalizeName($relation->getSchema()->getName()));
-    }
-
-    private function createFactory(Relation $relation, $factoryFolder)
-    {
-
+        return 'Database\\' . str_identifier($this->normalizeName($relation->getSchema()->getName()));
     }
 
     private function setupTemplate(Relation $relation, ClassTemplate $template)
@@ -125,27 +125,103 @@ class OrmCommand extends Command
         $template->setFQRN($relation->getFQRN());
     }
 
+    private function createFactory(Relation $relation, $factoryFolder)
+    {
+        $template = new FactoryClassTemplate();
+        $this->setupTemplate($relation, $template);
+        $template->setBaseClassName('Factory');
+        $template->addUses(array(
+            'Blend\Component\Database\Database',
+            'Blend\Component\Database\Factory\Factory',
+        ));
+        $template->setModelClass(str_identifier($relation->getName()));
+
+        foreach ($relation->getConstraintsByType() as $type => $constraints) {
+            foreach ($constraints as $constraint) {
+                $this->createMethod($relation, $constraint, $template);
+            }
+        }
+
+        $template->renderToFile($factoryFolder . '/' . str_identifier($relation->getName()) . 'Factory.php');
+    }
+
+    /**
+     * Creates a Method from a Constraint.
+     *
+     * @param Constraint $constraint
+     *
+     * @return Method
+     */
+    private function createMethod(Relation $relation, Constraint $constraint, FactoryClassTemplate $template)
+    {
+        if ($constraint->getType() === 'FOREIGN KEY') {
+            $get_method = $this->newMethod($constraint, 'getManyBy', 'Gets many records from ' . $relation->getFQRN() . ' table');
+            $callParams = $get_method->getCallArgumentArray();
+            $get_method->setContent("return \$this->getManyBy(Factory::ALL_COLUMNS,$callParams,\$orderDirective,\$offsetLimitDirective);");
+            $get_method->addParameter('orderDirective', array('string', 'null'));
+            $get_method->addParameter('offsetLimitDirective', array('mixed', 'null'));
+            $template->addMethod($get_method);
+
+            $del_method = $this->newMethod($constraint, 'deleteManyBy', 'Deletes many records from ' . $relation->getFQRN() . ' table');
+            $callParams = $del_method->getCallArgumentArray();
+            $del_method->addParameter('stmtResult', array('string', 'null'));
+            $del_method->setContent("return \$this->deleteManyBy($callParams,\$stmtResult);");
+            $template->addMethod($del_method);
+
+            $count_method = $this->newMethod($constraint, 'countBy', 'Counts records from ' . $relation->getFQRN() . ' table');
+            $callParams = $count_method->getCallArgumentArray();
+            $count_method->setContent("return \$this->countBy($callParams);");
+            $template->addMethod($count_method);
+        } else {
+            $get_method = $this->newMethod($constraint, 'getOneBy', 'Gets a single record from ' . $relation->getFQRN() . ' table');
+            $callParams = $get_method->getCallArgumentArray();
+            $get_method->setContent("return \$this->getOneBy(Factory::ALL_COLUMNS,$callParams);");
+            $template->addMethod($get_method);
+
+            $del_method = $this->newMethod($constraint, 'deleteOneBy', 'Deletes a single record from ' . $relation->getFQRN() . ' table');
+            $callParams = $del_method->getCallArgumentArray();
+            $del_method->setContent("return \$this->deleteManyBy($callParams);");
+            $template->addMethod($del_method);
+        }
+    }
+
+    private function newMethod(Constraint $constraint, $prefix, $description)
+    {
+        $method = new Method();
+        $method->setDescription($description);
+        $name = array();
+        foreach ($constraint->getColumns() as $column) {
+            $name[] = str_identifier($this->normalizeName($column->getName()));
+            $method->addParameter(strtolower($column->getName()), strtolower($column->getType()));
+        }
+        $method->setName($prefix . implode('And', $name));
+
+        return $method;
+    }
+
     private function createModel(Relation $relation, $modelFolder)
     {
         $template = new ModelClassTemplate();
         $this->setupTemplate($relation, $template);
         $template->setBaseClassName('Model');
         $template->addUses(array(
-            'Blend\Component\Model\Model'
+            'Blend\Component\Model\Model',
         ));
         foreach ($relation->getColumns() as $column) {
-            $template->addProperty($column->getName(), $column->getType());
+            $template->addProperty($this->normalizeName($column->getName()), $column->getType());
         }
         $template->renderToFile($modelFolder . '/' . str_identifier($relation->getName()) . 'Model.php');
     }
 
     /**
-     * Gets the main namespace in which this application is running from
+     * Gets the main namespace in which this application is running from.
+     *
      * @return type
      */
     private function getApplicationNamespace()
     {
         $ns = explode('\\', get_class($this->getApplication()));
+
         return $ns[0];
     }
 
@@ -187,7 +263,8 @@ class OrmCommand extends Command
     }
 
     /**
-     * Assert if the request objects from the database actually exist
+     * Assert if the request objects from the database actually exist.
+     *
      * @throws \LogicException
      */
     private function assertRelations()
@@ -205,7 +282,7 @@ class OrmCommand extends Command
     }
 
     /**
-     * Loads relations from the current database if nothing was selected before
+     * Loads relations from the current database if nothing was selected before.
      */
     private function validateRelations()
     {

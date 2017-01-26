@@ -50,7 +50,8 @@ class Column extends Record
     }
 
     /**
-     * Gets the data type of this column
+     * Gets the data type of this column.
+     *
      * @return string
      */
     public function getType()

@@ -41,7 +41,8 @@ class Record
     }
 
     /**
-     * Gets the data collection from this Record
+     * Gets the data collection from this Record.
+     *
      * @return array
      */
     public function getData()
@@ -50,9 +51,10 @@ class Record
     }
 
     /**
-     * Sets a value of a field in the collection
+     * Sets a value of a field in the collection.
+     *
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      */
     public function setValue($name, $value)
     {

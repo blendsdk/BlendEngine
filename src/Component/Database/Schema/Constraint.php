@@ -74,4 +74,14 @@ class Constraint extends Record
     {
         return $this->columns;
     }
+
+    /**
+     * Gets the constraint type.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->getValue('constraint_type');
+    }
 }

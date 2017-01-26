@@ -1,12 +1,18 @@
 <?php
 
-namespace Blend\Framework\Console\Command\Orm;
+/*
+ *  This file is part of the BlendEngine framework.
+ *
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ */
 
-use Blend\Framework\Console\Command\Orm\Template;
+namespace Blend\Framework\Console\Command\Orm;
 
 abstract class ClassTemplate extends Template
 {
-
     public function setClassModifier($value)
     {
         $this->setValue('classModifier', $value);

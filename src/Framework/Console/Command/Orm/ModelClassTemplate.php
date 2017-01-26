@@ -1,12 +1,18 @@
 <?php
 
-namespace Blend\Framework\Console\Command\Orm;
+/*
+ *  This file is part of the BlendEngine framework.
+ *
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ */
 
-use Blend\Framework\Console\Command\Orm\ClassTemplate;
+namespace Blend\Framework\Console\Command\Orm;
 
 class ModelClassTemplate extends ClassTemplate
 {
-
     public function __construct(array $data = array())
     {
         parent::__construct($data);
@@ -21,7 +27,7 @@ class ModelClassTemplate extends ClassTemplate
             'name' => $name,
             'type' => $type,
             'getter' => 'get' . str_identifier($name),
-            'setter' => 'set' . str_identifier($name)
+            'setter' => 'set' . str_identifier($name),
         );
         $this->setValue('props', $props);
     }
