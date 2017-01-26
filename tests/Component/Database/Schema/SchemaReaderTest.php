@@ -1,20 +1,28 @@
 <?php
 
+/*
+ *  This file is part of the BlendEngine framework.
+ *
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ */
+
 namespace Blend\Tests\Component\Database\Schema;
 
-use Blend\Tests\Component\Database\DatabaseTestBase;
 use Blend\Component\Database\Schema\SchemaReader;
+use Blend\Tests\Component\Database\DatabaseTestBase;
 
 class SchemaReaderTest extends DatabaseTestBase
 {
-
     public static function getTestingDatabaseConfig()
     {
-        return [
+        return array(
             'username' => 'postgres',
             'password' => 'postgres',
-            'database' => 'database_schemareader_test'
-        ];
+            'database' => 'database_schemareader_test',
+        );
     }
 
     public function testSchemaReader()
@@ -39,7 +47,7 @@ class SchemaReaderTest extends DatabaseTestBase
         $address_table = $relations['address_table'];
         $this->assertEquals(1, count($address_table->getConstraints()));
 
-        $pkey = $address_table->getConstraint("address_table_pkey");
+        $pkey = $address_table->getConstraint('address_table_pkey');
         $keyColumns = $pkey->getColumns();
         $this->assertEquals(2, count($keyColumns));
 

@@ -1,21 +1,10 @@
 <?php
 
 /*
-
-namespace Blend\Tests\Component\Database;
-
-use Blend\Tests\Component\Database\DatabaseTestBase;
-
-class QueryBuilderTest extends DatabaseTestBase {
-
-    public static function getTestingDatabaseConfig() {
-        return array_merge(static::getDefaultDatabaseConfig(), ['database' => 'blend_unit_test_db']);
-    }
-
-    public function testSanity() {
-        $db = $this->getTestDatabase();
-        $db->executeScalar('select 1');
-    }
-
-}
- * */
+ *  This file is part of the BlendEngine framework.
+ *
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ */

@@ -13,7 +13,6 @@
  * These functions are available globally.
  */
 if (!function_exists('str_replace_template')) {
-
     /**
      * Replace all occurrences of the associative array keys with
      * the associative array values.
@@ -34,7 +33,6 @@ if (!function_exists('str_replace_template')) {
 }
 
 if (!function_exists('array_reindex')) {
-
     /**
      * Creates a new array indexed by the result of calling a closure.
      *
@@ -63,7 +61,6 @@ if (!function_exists('array_reindex')) {
 }
 
 if (!function_exists('array_remove_nulls')) {
-
     /**
      * Removes the null elements from an array.
      *
@@ -80,7 +77,6 @@ if (!function_exists('array_remove_nulls')) {
 }
 
 if (!function_exists('sql_join')) {
-
     /**
      * Shorthand helper to create a SQL JOIN condition.
      *
@@ -97,7 +93,6 @@ if (!function_exists('sql_join')) {
 }
 
 if (!function_exists('sqlstr')) {
-
     /**
      * Wrapper function around the Blend\Component\Database\SQL\SQLString class.
      *
@@ -112,7 +107,6 @@ if (!function_exists('sqlstr')) {
 }
 
 if (!function_exists('render_php_template')) {
-
     /**
      * Renders a PHP template (view) and returns the results either as string
      * or writes the contents to a file.
@@ -144,7 +138,6 @@ if (!function_exists('render_php_template')) {
 }
 
 if (!function_exists('str_identifier')) {
-
     /**
      * A wrapper around wcwords to create an identifier ike string.
      * In addition it replaces "_" with spaces so the ucwords can recongnize
@@ -163,7 +156,6 @@ if (!function_exists('str_identifier')) {
 }
 
 if (!function_exists('print_php_header')) {
-
     /**
      * Helper function for printing the php file header (<?php)
      * This function is onternally used for template generation.
@@ -175,7 +167,6 @@ if (!function_exists('print_php_header')) {
 }
 
 if (!function_exists('is_closure')) {
-
     /**
      * Check if a given object is a Closure.
      *
@@ -190,7 +181,6 @@ if (!function_exists('is_closure')) {
 }
 
 if (!function_exists('is_array_assoc')) {
-
     /**
      * Check if the given array is an associative array.
      *
@@ -207,7 +197,6 @@ if (!function_exists('is_array_assoc')) {
 }
 
 if (!function_exists('array_get_key_value')) {
-
     /**
      * Gets a value from an array using a key, and returns the $default
      * if the key does not exist.
@@ -229,9 +218,9 @@ if (!function_exists('array_get_key_value')) {
 }
 
 if (!function_exists('is_windows')) {
-
     /**
-     * Check if we are running on Windows OS
+     * Check if we are running on Windows OS.
+     *
      * @returns boolean
      */
     function is_windows()
@@ -241,14 +230,14 @@ if (!function_exists('is_windows')) {
 }
 
 if (!function_exists('path_join')) {
-
     /**
      * Joins all given path segments together using the platform specific
-     * separator as a delimiter
+     * separator as a delimiter.
+     *
      * @returns string
      */
     function path_join()
     {
-       return str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
+        return str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, implode(DIRECTORY_SEPARATOR, func_get_args()));
     }
 }

@@ -1,30 +1,29 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
 namespace Blend\Tests\Component\DI;
 
 use Blend\Component\DI\Container;
-use Blend\Tests\Component\DI\Stubs\DummyInterface;
-use Blend\Tests\Component\DI\Stubs\ClassWithNoConstructor;
-use Blend\Tests\Component\DI\Stubs\ClassWithConstructorParams;
 use Blend\Tests\Component\DI\Stubs\ClassWithConstructorAndDefaultParams;
-use Blend\Tests\Component\DI\Stubs\Counter;
-use Blend\Tests\Component\DI\Stubs\Service;
-use Blend\Tests\Component\DI\Stubs\DatabaseFactory;
-use Blend\Tests\Component\DI\Stubs\CounterFactory;
+use Blend\Tests\Component\DI\Stubs\ClassWithConstructorParams;
 use Blend\Tests\Component\DI\Stubs\ClassWithMethods;
+use Blend\Tests\Component\DI\Stubs\ClassWithNoConstructor;
+use Blend\Tests\Component\DI\Stubs\Counter;
+use Blend\Tests\Component\DI\Stubs\CounterFactory;
+use Blend\Tests\Component\DI\Stubs\DatabaseFactory;
+use Blend\Tests\Component\DI\Stubs\DummyInterface;
+use Blend\Tests\Component\DI\Stubs\Service;
 
 class TestContainer extends Container
 {
-
     public function getDefinition($interface)
     {
         return $this->definitions[$interface];
@@ -32,28 +31,24 @@ class TestContainer extends Container
 
     public function clear()
     {
-        $this->definitions = [];
+        $this->definitions = array();
     }
 }
 
 interface SomeInterface
 {
-
 }
 
 class Class1 implements SomeInterface
 {
-
 }
 
 class Class2
 {
-
 }
 
 class Class3
 {
-
     public $class2;
     public $someclass;
 
@@ -65,14 +60,14 @@ class Class3
 }
 
 /**
- * Test class for ContainerTest
+ * Test class for ContainerTest.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
 class ContainerTest extends \PHPUnit_Framework_TestCase
 {
-
-    public function testNonExistingInterfaceWithCtorDefaultArg() {
+    public function testNonExistingInterfaceWithCtorDefaultArg()
+    {
         $c = new Container();
         $result = $c->get(Class3::class);
         $this->assertNotNull($result);
@@ -99,17 +94,16 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
 
     public function testDefineClassConstructorParams()
     {
-
         $c = new TestContainer();
         $clazz = ClassWithConstructorParams::class;
         $c->defineClass($clazz);
         list($kind, $type, $params, $defCtorParams, $callSig, $reflection) = array_values($c->getDefinition($clazz));
-        $this->assertEquals(['param1', 'param2', 'param3'], array_keys($callSig));
+        $this->assertEquals(array('param1', 'param2', 'param3'), array_keys($callSig));
 
         $c->clear();
-        $c->defineClass($clazz, ['param2' => 2]);
+        $c->defineClass($clazz, array('param2' => 2));
         list($kind, $type, $params, $defCtorParams, $callSig, $reflection) = array_values($c->getDefinition($clazz));
-        $this->assertEquals(['param2' => 2], $params);
+        $this->assertEquals(array('param2' => 2), $params);
     }
 
     public function testClassWithConstructorAndDefaultParams()
@@ -118,7 +112,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $clazz = ClassWithConstructorAndDefaultParams::class;
         $c->defineClass($clazz);
         list($kind, $type, $params, $defCtorParams, $callSig, $reflection) = array_values($c->getDefinition($clazz));
-        $this->assertEquals(['param2' => null, 'param3' => []], $defCtorParams);
+        $this->assertEquals(array('param2' => null, 'param3' => array()), $defCtorParams);
     }
 
     public function testGetScalarAndObject()
@@ -147,7 +141,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testSingleton()
     {
         $c = new Container();
-        $c->defineSingleton(Counter::class, ['start' => 9]);
+        $c->defineSingleton(Counter::class, array('start' => 9));
         $c->get(Counter::class)->increment();
         $this->assertEquals(11, $c->get(Counter::class)->increment());
     }
@@ -156,7 +150,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     {
         $c = new Container();
         /* @var $service Service */
-        $c->setScalar('DATABASE_CONNECTION_INFO', ['username' => 'postgres']);
+        $c->setScalar('DATABASE_CONNECTION_INFO', array('username' => 'postgres'));
         $service = $c->get(Service::class);
         $this->assertEquals('postgres', $service->getUsername());
     }
@@ -164,7 +158,7 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testCreateByFactory()
     {
         $c = new Container();
-        $c->setScalar('DATABASE_CONNECTION_INFO', ['username' => 'postgres']);
+        $c->setScalar('DATABASE_CONNECTION_INFO', array('username' => 'postgres'));
         $obj = $c->get(DatabaseFactory::class);
         $this->assertInstanceOf(Stubs\Database::class, $obj);
     }
@@ -191,34 +185,34 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
     public function testCallWithArgs()
     {
         $c = new Container();
-        $result = $c->call(ClassWithMethods::class, 'withArgs', [
+        $result = $c->call(ClassWithMethods::class, 'withArgs', array(
             'arg1' => 'a',
-            'arg2' => 'b'
-        ]);
+            'arg2' => 'b',
+        ));
         $this->assertEquals('ab', $result);
     }
 
     public function testCallDefWithArgs()
     {
         $c = new Container();
-        $result = $c->call(ClassWithMethods::class, 'withDefaultArgs', [
+        $result = $c->call(ClassWithMethods::class, 'withDefaultArgs', array(
             'arg1' => 'a',
-            'arg3' => 'b'
-        ]);
-        $this->assertEquals(['a', 'arg2', 'b'], $result);
+            'arg3' => 'b',
+        ));
+        $this->assertEquals(array('a', 'arg2', 'b'), $result);
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testCallWithMissingArgs()
     {
         $c = new Container();
-        $result = $c->call(ClassWithMethods::class, 'withDefaultArgs', [
+        $result = $c->call(ClassWithMethods::class, 'withDefaultArgs', array(
             'arg2' => 2,
-            'arg3' => 3
-        ]);
-        $this->assertEquals(['a', 'arg2', 'b'], $result);
+            'arg3' => 3,
+        ));
+        $this->assertEquals(array('a', 'arg2', 'b'), $result);
     }
 
     public function testReplaceScalarTest()

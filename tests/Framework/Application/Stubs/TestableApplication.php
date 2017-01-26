@@ -1,12 +1,12 @@
 <?php
 
 /*
- * This file is part of the BlendEngine framework.
+ *  This file is part of the BlendEngine framework.
  *
- * (c) Gevik Babakhani <gevikb@gmail.com>
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
  */
 
 namespace Blend\Tests\Framework\Application\Stubs;
@@ -16,13 +16,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Description of TestableApplication
+ * Description of TestableApplication.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class TestableApplication extends Application {
-
-    public function run(Request $request = null) {
+class TestableApplication extends Application
+{
+    public function run(Request $request = null)
+    {
         try {
             if ($request === null) {
                 $request = Request::createFromGlobals();
@@ -36,16 +37,18 @@ class TestableApplication extends Application {
         } catch (\Exception $ex) {
             throw $this->handleRequestException($ex, $request);
         }
+
         return $response;
     }
 
-    protected function handleRequestException(\Exception $ex, \Symfony\Component\HttpFoundation\Request $request) {
+    protected function handleRequestException(\Exception $ex, \Symfony\Component\HttpFoundation\Request $request)
+    {
         return $ex;
     }
 
-    protected function confiureServices(\Blend\Component\DI\ServiceContainer $container) {
+    protected function confiureServices(\Blend\Component\DI\ServiceContainer $container)
+    {
         $container->loadServices(array(
         ));
     }
-
 }
