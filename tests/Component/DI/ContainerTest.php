@@ -34,6 +34,7 @@ class TestContainer extends Container
     {
         $this->definitions = [];
     }
+}
 
 interface SomeInterface
 {
