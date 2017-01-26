@@ -244,9 +244,10 @@ abstract class Factory
      */
     public function getAll($selectColumns = null, $orderDirective = null, $offsetLimitDirective = null)
     {
-        if($selectColumns === null) {
+        if ($selectColumns === null) {
             $selectColumns = self::ALL_COLUMNS;
         }
+
         return $this->getManyBy(
                         $selectColumns, array('true' => true), $orderDirective, $offsetLimitDirective);
     }

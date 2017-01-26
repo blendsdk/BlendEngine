@@ -28,7 +28,7 @@ class OrmConfig
         $this->tables = array();
         $this->baseclass = array(
             'factory' => array(),
-            'model' => array()
+            'model' => array(),
         );
     }
 
@@ -59,6 +59,7 @@ class OrmConfig
     private function setBaseClass($type, $table, $class)
     {
         $this->baseclass[$type][$table] = $class;
+
         return $this;
     }
 
@@ -70,6 +71,7 @@ class OrmConfig
             $clazz = $default;
         }
         $classRef = new \ReflectionClass($clazz);
+
         return array('use' => $classRef->getName(), 'class_name' => str_replace($classRef->getNamespaceName() . '\\', '', $classRef->getName()));
     }
 

@@ -12,10 +12,12 @@
 namespace Blend\Framework\Console\Command;
 
 use Blend\Component\Database\Database;
+use Blend\Component\Database\Factory\Factory;
 use Blend\Component\Database\Schema\Constraint;
 use Blend\Component\Database\Schema\Relation;
 use Blend\Component\Database\Schema\Schema;
 use Blend\Component\Database\Schema\SchemaReader;
+use Blend\Component\Model\Model;
 use Blend\Framework\Console\Command\Orm\ClassTemplate;
 use Blend\Framework\Console\Command\Orm\FactoryClassTemplate;
 use Blend\Framework\Console\Command\Orm\Method;
@@ -25,8 +27,6 @@ use Blend\Framework\Factory\DatabaseFactory;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Blend\Component\Database\Factory\Factory;
-use Blend\Component\Model\Model;
 
 /**
  * OrmCommand creates a data access layer based on a PostgreSQL
