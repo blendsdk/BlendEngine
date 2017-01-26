@@ -26,7 +26,6 @@ return PhpCsFixer\Config::create()
                 'tests',
                 'temp',
                 'vendor',
-                'bin',
                 'src/Framework/Console/Command/Orm/templates'
             ))
     )
