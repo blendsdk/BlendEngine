@@ -27,7 +27,7 @@ return PhpCsFixer\Config::create()
                 'temp',
                 'vendor',
                 'bin',
-                'src/DataModelBuilder/Builder/Template'
+                'src/Framework/Console/Command/Orm/templates'
             ))
     )
 ;
