@@ -12,6 +12,8 @@
 namespace Blend\Component\Routing;
 
 use Symfony\Component\Routing\RouteCollection;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Blend\Component\Routing\RedirectController;
 
 /**
  * RouteBuilder to help create Routes.
@@ -57,5 +59,22 @@ class RouteBuilder
         $this->routes->add($name, $route);
 
         return $route;
+    }
+
+    public function redirectRoute($path, $toRouteName, array $controlerAction)
+    {
+        $this->assertRouteExists($toRouteName);
+        $this->route(uniqid()
+                , $path
+                , $controlerAction
+                , array('routeName' => $toRouteName, 'route' => $this->routes->get($toRouteName))
+        );
+    }
+
+    private function assertRouteExists($routeName)
+    {
+        if ($this->routes->get($routeName) === null) {
+            throw new Exception("Route $routeName is not defined!");
+        }
     }
 }
