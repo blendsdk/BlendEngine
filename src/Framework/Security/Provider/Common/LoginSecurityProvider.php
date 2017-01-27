@@ -26,7 +26,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  */
 abstract class LoginSecurityProvider extends SecurityProvider
 {
-    const REFERER_URL = '_referer_url';
+    const REFERRER_URL = '_referrer_url';
 
     /**
      * @var UrlGeneratorInterface
@@ -63,9 +63,9 @@ abstract class LoginSecurityProvider extends SecurityProvider
             }
         } elseif ($accessMethod === Security::ACCESS_GUEST_ONLY) {
             if (!$user->isGuest()) {
-                $referer = $this->getReferer();
-                if ($referer !== null) {
-                    return $this->redirectTo($referer);
+                $referrer = $this->getReferer();
+                if ($referrer !== null) {
+                    return $this->redirectTo($referrer);
                 } else {
                     return $this->redirectTo($this->getSecureEntryPointURL());
                 }
@@ -96,29 +96,29 @@ abstract class LoginSecurityProvider extends SecurityProvider
     }
 
     /**
-     * The the current URI as the referer for the next request to handle
-     * If the referer is the login or the logout url we do not save anything
+     * The the current URI as the referrer for the next request to handle
+     * If the referrer is the login or the logout url we do not save anything
      * since the auto redirect mechanism will go into a loop.
      */
     protected function saveReferer()
     {
         $current = $this->request->getPathInfo();
         if ($current !== $this->getLoginURL() && $current !== $this->getLogoutURL()) {
-            $this->request->getSession()->set(self::REFERER_URL, $this->request->getUri());
+            $this->request->getSession()->set(self::REFERRER_URL, $this->request->getUri());
         }
     }
 
     /**
-     * Get the previously aved referer.
+     * Get the previously saved referrer.
      *
      * @return string
      */
     protected function getReferer()
     {
         $session = $this->request->getSession();
-        $result = $session->get(self::REFERER_URL, null);
+        $result = $session->get(self::REFERRER_URL, null);
         if ($result !== null) {
-            $session->remove(self::REFERER_URL);
+            $session->remove(self::REFERRER_URL);
         }
 
         return $result;

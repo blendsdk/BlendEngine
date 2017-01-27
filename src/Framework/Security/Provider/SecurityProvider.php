@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Request;
  */
 abstract class SecurityProvider implements SecurityProviderInterface
 {
-    const REFERER_URL = '_http_referer';
+    const REFERRER_URL = '_http_referrer';
 
     /**
      * @var Request

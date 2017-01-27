@@ -25,7 +25,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouteCollection;
 
 /**
- * Listens to the incomming requests and handles the security based on the
+ * Listens to the incoming requests and handles the security based on the
  * Route.
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
@@ -51,10 +51,11 @@ class SecurityHandler implements EventSubscriberInterface
      * @var Route
      */
     protected $route;
+    private $request;
 
     protected function initialize(KernelEvent $event)
     {
-        $request = $event->getRequest();
+        $request = $this->request = $event->getRequest();
         $this->container = $event->getContainer();
         /* @var $routes RouteCollection */
         $routes = $this->container->get(RouteCollection::class);
@@ -68,9 +69,9 @@ class SecurityHandler implements EventSubscriberInterface
         if ($this->accessMethod === Security::ACCESS_PUBLIC) {
             return; //no-op
         } else {
-            $handler = $this->getSecurityHandler($this->route->getSecurityType());
-            if ($handler !== null) {
-                $response = $handler->handle($this->accessMethod, $this->route);
+            $this->securityHandler = $this->getSecurityHandler($this->route->getSecurityType());
+            if ($this->securityHandler !== null) {
+                $response = $this->securityHandler->handle($this->accessMethod, $this->route);
                 if ($response instanceof Response) {
                     $event->setResponse($response);
                 }
@@ -94,18 +95,16 @@ class SecurityHandler implements EventSubscriberInterface
         }
         /* @var $logger LoggerInterface */
         $logger = $this->container->get(LoggerInterface::class);
-        $logger->warning('The requested security provides was'.
-                ' not met! Check your services', array('type' => $type));
+        $logger->warning('The requested security provides was' .
+                ' not met! Check your services', array('type' => $type, 'request' => $this->request->getRequestUri()));
 
         return null;
     }
 
     public function onResponse(GetFinalizeResponseEvent $event)
     {
-        $this->initialize($event);
-        $handler = $this->getSecurityHandler($this->route->getSecurityType());
-        if ($handler !== null) {
-            $handler->finalize($this->accessMethod, $this->route, $event->getResponse());
+        if ($this->securityHandler !== null) {
+            $this->securityHandler->finalize($this->accessMethod, $this->route, $event->getResponse());
         }
     }
 

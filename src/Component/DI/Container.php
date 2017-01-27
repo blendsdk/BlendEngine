@@ -82,7 +82,7 @@ class Container
             $this->defineClass($interface);
         }
         list($defaultCallParams, $callSignature, $reflection, $interfaces) = $this->reflect($interface, $method);
-        $callArgs = $this->resolveCallParameters($interface, $callSignature, array_merge($defaultCallParams, $params), $method);
+        $callArgs = $this->resolveCallParameters($interface, $callSignature, array_merge($defaultCallParams, $params), $method, array());
         $object = $this->get($interface, $interfaceParams);
 
         return call_user_func_array(array($object, $method), array_values($callArgs));
@@ -124,7 +124,7 @@ class Container
         if ($kind === 'x') {
             return $defParams[0];
         } else {
-            $callArgs = $this->resolveCallParameters($interface, $callSignature, array_merge($defCtorParams, $defParams, $params));
+            $callArgs = $this->resolveCallParameters($interface, $callSignature, array_merge($defParams, $params), '__construct', $defCtorParams);
             $obj = $this->createNewInstance($reflection, $callArgs);
             if ($kind === 's') {
                 unset($this->definitions[$interface]);
@@ -136,6 +136,71 @@ class Container
     }
 
     /**
+     * Resolves the dependencies of a call signature.
+     *
+     * @param array $callSignature
+     * @param array $callParams
+     * @param mixed $defaultArguments
+     *
+     * @return array
+     */
+    private function resolve(array $callSignature, array $callParams, $defaultArguments)
+    {
+        $result = array();
+        foreach ($callSignature as $name => $type) {
+            if (!$this->isBuiltInType($type)) {
+                try {
+                    $result[$name] = $this->get($type);
+                } catch (\Exception $ex) {
+                    if (($ex instanceof InvalidConfigException && $ex->getCode() === 1000) || ($ex instanceof \InvalidArgumentException)) {
+                        if (array_key_exists($name, $defaultArguments)) {
+                            $result[$name] = $defaultArguments[$name];
+                        } elseif (array_key_exists($name, $callParams)) {
+                            $result[$name] = $callParams[$name];
+                        } else {
+                            throw $ex;
+                        }
+                    } else {
+                        throw $ex;
+                    }
+                }
+            } else {
+                if ($this->isDefined($name)) { // scalar
+                    $result[$name] = $this->get($name);
+                } elseif (array_key_exists($name, $callParams)) {
+                    $result[$name] = $callParams[$name];
+                } elseif (array_key_exists($name, $defaultArguments)) {
+                    $result[$name] = $defaultArguments[$name];
+                }
+            }
+        }
+
+        return $result;
+//        foreach ($callSignature as $name => $type) {
+//            if (!array_key_exists($name, $callParams)) {
+//                if ($this->isDefined($name) || $this->isDefined($type) || !$this->isBuiltInType($type)) {
+//                    $ptype = is_null($type) ? $name : $type;
+//                    try {
+//                        $callParams[$name] = $this->get($ptype);
+//                    } catch (InvalidConfigException $exc) {
+//                        /*
+//                         * If the ptype is an interface and there is no class
+//                         * defined for it and also there is not default argument
+//                         * then throw the exception, otherwise we will go further
+//                         * with that default argument
+//                         */
+//                        if ($exc->getCode() === 1000 && !array_key_exists($name, $callParams)) {
+//                            throw $exc;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        return $callParams;
+    }
+
+    /**
      * Resolves call parameters based on input from class definition or
      * a method call.
      *
@@ -143,14 +208,15 @@ class Container
      * @param array  $callSignature
      * @param array  $params
      * @param string $method
+     * @param mixed  $defaultArguments
      *
      * @return array
      */
-    private function resolveCallParameters($interface, $callSignature, $params, $method = '__construct')
+    private function resolveCallParameters($interface, $callSignature, $params, $method, $defaultArguments)
     {
         $callArgs = array();
         if (!empty($callSignature)) {
-            $resolved = $this->resolve($callSignature, $params);
+            $resolved = $this->resolve($callSignature, $params, $defaultArguments);
             $callArgs = array_intersect_key($resolved, $callSignature); // clear unwanted params
             $this->assertNotMissingArguments($callSignature, $callArgs, $interface, $method);
         }
@@ -413,40 +479,6 @@ class Container
             $sigArgs = implode(', ', array_keys($callsig));
             throw new \InvalidArgumentException("Missing {$missingCnt} ($missingArgs) for {$name}::{$methodName}({$sigArgs})");
         }
-    }
-
-    /**
-     * Resolves the dependencies of a call signature.
-     *
-     * @param array $callSignature
-     * @param array $callParams
-     *
-     * @return array
-     */
-    private function resolve(array $callSignature, array $callParams)
-    {
-        foreach ($callSignature as $name => $type) {
-            if (!isset($callParams[$name])) {
-                if ($this->isDefined($name) || $this->isDefined($type) || !$this->isBuiltInType($type)) {
-                    $ptype = is_null($type) ? $name : $type;
-                    try {
-                        $callParams[$name] = $this->get($ptype);
-                    } catch (InvalidConfigException $exc) {
-                        /*
-                         * If the ptype is an interface and there is no class
-                         * defined for it and also there is not default argument
-                         * then throw the exception, otherwise we will go further
-                         * with that default argument
-                         */
-                        if ($exc->getCode() === 1000 && !array_key_exists($name, $callParams)) {
-                            throw $exc;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $callParams;
     }
 
     /**

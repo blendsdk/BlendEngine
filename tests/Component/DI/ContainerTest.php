@@ -59,6 +59,20 @@ class Class3
     }
 }
 
+class BuiltInDefArg
+{
+    public $class2;
+    public $debug;
+    public $object;
+
+    public function __construct(Class2 $class2, $_debug = false, $_object = null)
+    {
+        $this->debug = $_debug;
+        $this->class2 = $class2;
+        $this->object = $_object;
+    }
+}
+
 /**
  * Test class for ContainerTest.
  *
@@ -71,6 +85,17 @@ class ContainerTest extends \PHPUnit_Framework_TestCase
         $c = new Container();
         $result = $c->get(Class3::class);
         $this->assertNotNull($result);
+    }
+
+    public function testBuiltInDefArg()
+    {
+        $c = new Container();
+        $c->setScalar('_debug', true);
+        $c->setScalar('_object', 'DEFINED');
+        /* @var $obj BuiltInDefArg */
+        $obj = $c->get(BuiltInDefArg::class);
+        $this->assertTrue($obj->debug);
+        $this->assertEquals('DEFINED', $obj->object);
     }
 
     /**
