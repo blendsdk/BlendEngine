@@ -26,13 +26,11 @@ abstract class View
     protected $viewData;
 
     /**
-     * The name of the view to be rendered
-     * @var string
+     * @var bool
      */
-    protected $viewName;
     protected $applyParentParams;
 
-    protected abstract function getViewVile();
+    protected abstract function getViewFile();
 
     public function __construct(
     TemplateEngineInterface $renderer, RuntimeProviderInterface $runtime)
@@ -40,9 +38,6 @@ abstract class View
         $this->renderer = $renderer;
         $this->runtime = $runtime;
         $this->reset();
-        $pathInfo = new PathInformation($this->getViewVile());
-        $this->viewName = $pathInfo->getBasename();
-        $this->renderer->setViewPaths(array($pathInfo->getDirectoryName()));
         $this->applyParentParams = false;
     }
 
@@ -97,6 +92,9 @@ abstract class View
      */
     public function render(array $data = null)
     {
+        $viewFileInfo = new PathInformation($this->getViewFile());
+        $this->renderer->setViewPaths(array($viewFileInfo->getDirectoryName()));
+
         if ($data !== null && is_array($data)) {
             $this->setData($data);
         }
@@ -111,7 +109,7 @@ abstract class View
             'runtime' => $this->runtime,
             'is_authenticated' => !($this->runtime->getCurrentUser()->isGuest() === true),
                 ), $this->viewData);
-        return $this->renderer->render($this->viewName, $this->viewData);
+        return $this->renderer->render($viewFileInfo->getBasename(), $this->viewData);
     }
 
     public function __toString()
