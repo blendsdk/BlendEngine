@@ -17,7 +17,7 @@ namespace Blend\Component\Model;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Model
+class Model implements ModelInterface
 {
     private $data;
     private $updates;

@@ -47,24 +47,51 @@ class ControllerHandler implements ControllerHandlerInterface
         $this->logger = $logger;
     }
 
+    /**
+     * Merges the request attributes into one array.
+     *
+     * @param Request $request
+     *
+     * @return array
+     */
+    private function mergeRequestAttributes(Request $request)
+    {
+        return array_merge(
+                $request->attributes->all(), $request->request->all(), $request->query->all()
+        );
+    }
+
+    /**
+     * Handles the final response.
+     *
+     * @param Request  $request
+     * @param Response $response
+     *
+     * @return Response|JsonResponse
+     */
+    private function handleResponse(Request $request, $response)
+    {
+        if ($response instanceof Response) {
+            return $response;
+        } else {
+            if ($request->attributes->get(RouteAttribute::JSON_RESPONSE, false)) {
+                return new JsonResponse($response);
+            } else {
+                return new Response($response);
+            }
+        }
+    }
+
     public function handle(Request $request)
     {
         $this->assertControllerKey($request);
         $controller = $request->attributes->get(RouteAttribute::CONTROLLER);
         if ($this->isArrayDefinition($controller)) {
-            $result = $this->container->call($controller[0], $controller[1], array_merge($request->attributes->all(), $request->request->all(), $request->query->all())
-            );
-            if ($result instanceof Response) {
-                return $result;
-            } else {
-                if ($request->attributes->get(RouteAttribute::JSON_RESPONSE, false)) {
-                    return new JsonResponse($result);
-                } else {
-                    return new Response($result);
-                }
-            }
+            $result = $this->container->call($controller[0], $controller[1], $this->mergeRequestAttributes($request));
+
+            return $this->handleResponse($request, $result);
         } else {
-            $error = 'The controller has an invalid [controller,action] signature!'.
+            $error = 'The controller has an invalid [controller,action] signature!' .
                     ' You should check the Route creation!';
             $this->logger->error($error, array('RequestAttributes' => $request->attributes->add(), $request->getPathInfo()));
             throw new InvalidParameterException($error);
@@ -98,7 +125,7 @@ class ControllerHandler implements ControllerHandlerInterface
     protected function assertControllerKey(Request $request)
     {
         if (!$request->attributes->has(RouteAttribute::CONTROLLER)) {
-            $error = 'The matched route does not have a controller '.
+            $error = 'The matched route does not have a controller ' .
                     'key/value pair. You should check the Route creation!';
             $this->logger->error($error, array('RequestAttributes' => $request->attributes->add(), $request->getPathInfo()));
             throw new InvalidParameterException($error);
