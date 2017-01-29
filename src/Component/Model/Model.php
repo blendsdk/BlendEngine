@@ -10,7 +10,6 @@
  */
 
 namespace Blend\Component\Model;
-use Blend\Component\Model\ModelInterface;
 
 /**
  * Model represents a data model. It provides functionality to set and get field

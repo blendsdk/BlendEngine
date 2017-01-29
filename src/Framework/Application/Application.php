@@ -33,6 +33,7 @@ use Blend\Component\Session\SessionProviderInterface;
 use Blend\Framework\Security\SecurityHandler;
 use Blend\Framework\Support\Runtime\RuntimeAttribute;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
+use Blend\Framework\Support\TrailingSlashRedirectService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -128,6 +129,7 @@ abstract class Application extends BaseApplication
          * when possible
          */
         $this->container->defineSingleton(SecurityHandler::class);
+        $this->container->defineSingleton(TrailingSlashRedirectService::class);
         $this->confiureServices($this->container);
         $this->installEventSubscribers();
     }
@@ -188,7 +190,7 @@ abstract class Application extends BaseApplication
     {
         if (!$request->hasSession()) {
             if (!$this->container->isDefined(SessionProviderInterface::class)) {
-                $savePath = $this->filesystem->assertFolderWritable($this->rootFolder.'/var/session');
+                $savePath = $this->filesystem->assertFolderWritable($this->rootFolder . '/var/session');
                 $this->container->defineSingletonWithInterface(
                         SessionProviderInterface::class, NativeSessionProvider::class, array('save_path' => $savePath)
                 );
@@ -235,10 +237,11 @@ abstract class Application extends BaseApplication
         $context = new RequestContext();
 
         $routes = $this->collectRoutes();
+        $this->routeCollection->addCollection($routes);
         $context->fromRequest($request);
 
         $this->container->setScalars(array(
-            RouteCollection::class => $routes,
+            RouteCollection::class => $this->routeCollection,
             RequestContext::class => $context,
         ));
 
@@ -307,7 +310,7 @@ abstract class Application extends BaseApplication
 
     protected function collectRoutes()
     {
-        return $this->localCache->withCache(__CLASS__.__FUNCTION__, function () {
+        return $this->localCache->withCache(__CLASS__ . __FUNCTION__, function () {
             $routes = new RouteCollection();
             $routeBuilder = new RouteBuilder($routes);
             $services = $this->container->getByInterface(RouteProviderInterface::class);

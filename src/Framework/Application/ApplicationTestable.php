@@ -11,6 +11,7 @@
 
 namespace Blend\Framework\Application;
 
+use Blend\Component\Routing\Route;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
@@ -46,5 +47,10 @@ abstract class ApplicationTestable extends Application
     public function getContainer()
     {
         return $this->container;
+    }
+
+    public function addRoute($name, $path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '')
+    {
+        $this->routeCollection->add($name, new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition));
     }
 }

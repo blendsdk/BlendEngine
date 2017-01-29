@@ -1,11 +1,20 @@
 <?php
 
+/*
+ *  This file is part of the BlendEngine framework.
+ *
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ */
+
 namespace Blend\Component\Filesystem;
 
 use Blend\Component\Exception\InvalidOperationException;
 
 /**
- * A wrapper class for the pathinfo utility
+ * A wrapper class for the pathinfo utility.
  */
 class PathInformation
 {
@@ -21,7 +30,8 @@ class PathInformation
     }
 
     /**
-     * Returns the directory name
+     * Returns the directory name.
+     *
      * @return string
      */
     public function getDirectoryName()
@@ -30,7 +40,8 @@ class PathInformation
     }
 
     /**
-     * Gets the filename including the extension
+     * Gets the filename including the extension.
+     *
      * @return string
      */
     public function getBasename()
@@ -39,7 +50,8 @@ class PathInformation
     }
 
     /**
-     * Gets the file extension
+     * Gets the file extension.
+     *
      * @return string
      */
     public function getExtension()
@@ -48,7 +60,8 @@ class PathInformation
     }
 
     /**
-     * Gets the filename without the extension
+     * Gets the filename without the extension.
+     *
      * @return string
      */
     public function getFilename()

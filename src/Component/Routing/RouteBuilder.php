@@ -12,8 +12,6 @@
 namespace Blend\Component\Routing;
 
 use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Blend\Component\Routing\RedirectController;
 
 /**
  * RouteBuilder to help create Routes.
@@ -41,6 +39,22 @@ class RouteBuilder
     }
 
     /**
+     * @param string       $path         The path pattern to match
+     * @param array        $defaults     An array of default parameter values
+     * @param array        $requirements An array of requirements for parameters (regexes)
+     * @param array        $options      An array of options
+     * @param string       $host         The host pattern to match
+     * @param string|array $schemes      A required URI scheme or an array of restricted schemes
+     * @param string|array $methods      A required HTTP method or an array of restricted methods
+     * @param string       $condition    A condition that should evaluate to true for the route to match
+     * @param mixed        $name
+     */
+    public function addRoute($name, $path, array $defaults = array(), array $requirements = array(), array $options = array(), $host = '', $schemes = array(), $methods = array(), $condition = '')
+    {
+        $this->routes->add($name, new Route($path, $defaults, $requirements, $options, $host, $schemes, $methods, $condition));
+    }
+
+    /**
      * Adds a Route to the Route Collection.
      *
      * @param type  $name
@@ -64,10 +78,7 @@ class RouteBuilder
     public function redirectRoute($path, $toRouteName, array $controlerAction)
     {
         $this->assertRouteExists($toRouteName);
-        $this->route(uniqid()
-                , $path
-                , $controlerAction
-                , array('routeName' => $toRouteName, 'route' => $this->routes->get($toRouteName))
+        $this->route(uniqid(), $path, $controlerAction, array('routeName' => $toRouteName, 'route' => $this->routes->get($toRouteName))
         );
     }
 

@@ -1,11 +1,20 @@
 <?php
 
+/*
+ *  This file is part of the BlendEngine framework.
+ *
+ *  (c) Gevik Babakhani <gevikb@gmail.com>
+ *
+ *  For the full copyright and license information, please view the LICENSE
+ *  file that was distributed with this source code.
+ */
+
 namespace Blend\Component\View;
 
-use Blend\Component\Templating\TemplateEngineInterface;
-use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 use Blend\Component\Filesystem\PathInformation;
 use Blend\Component\Model\ModelInterface;
+use Blend\Component\Templating\TemplateEngineInterface;
+use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 
 abstract class View
 {
@@ -20,7 +29,8 @@ abstract class View
     protected $runtime;
 
     /**
-     * Array folding the view data
+     * Array folding the view data.
+     *
      * @var mixed
      */
     protected $viewData;
@@ -30,7 +40,7 @@ abstract class View
      */
     protected $applyParentParams;
 
-    protected abstract function getViewFile();
+    abstract protected function getViewFile();
 
     public function __construct(
     TemplateEngineInterface $renderer, RuntimeProviderInterface $runtime)
@@ -42,7 +52,8 @@ abstract class View
     }
 
     /**
-     * Apply the parent Views parameters to this View
+     * Apply the parent Views parameters to this View.
+     *
      * @param type $value
      */
     public function applyParentParameters()
@@ -51,7 +62,8 @@ abstract class View
     }
 
     /**
-     * Check if the parent View parameters should be passed to this View
+     * Check if the parent View parameters should be passed to this View.
+     *
      * @return type
      */
     public function shouldApplyParentParameters()
@@ -60,7 +72,7 @@ abstract class View
     }
 
     /**
-     * Reset/clear the view data
+     * Reset/clear the view data.
      */
     public function reset()
     {
@@ -68,7 +80,8 @@ abstract class View
     }
 
     /**
-     * Sets the view data by an array
+     * Sets the view data by an array.
+     *
      * @param array $data
      */
     public function setData(array $data)
@@ -77,7 +90,8 @@ abstract class View
     }
 
     /**
-     * Sets the view data by a Model
+     * Sets the view data by a Model.
+     *
      * @param ModelInterface $model
      */
     public function setModel(ModelInterface $model)
@@ -86,8 +100,10 @@ abstract class View
     }
 
     /**
-     * Renders the view optionally taking additional data parameters
+     * Renders the view optionally taking additional data parameters.
+     *
      * @param array $data
+     *
      * @return string
      */
     public function render(array $data = null)
@@ -99,7 +115,7 @@ abstract class View
             $this->setData($data);
         }
         foreach ($this->viewData as $key => $value) {
-            if ($value instanceof View) {
+            if ($value instanceof self) {
                 $this->viewData[$key] = $value->render($value->shouldApplyParentParameters() === true ? $this->viewData : array());
             }
         }
@@ -109,6 +125,7 @@ abstract class View
             'runtime' => $this->runtime,
             'is_authenticated' => !($this->runtime->getCurrentUser()->isGuest() === true),
                 ), $this->viewData);
+
         return $this->renderer->render($viewFileInfo->getBasename(), $this->viewData);
     }
 

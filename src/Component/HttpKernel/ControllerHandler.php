@@ -48,23 +48,25 @@ class ControllerHandler implements ControllerHandlerInterface
     }
 
     /**
-     * Merges the request attributes into one array
+     * Merges the request attributes into one array.
+     *
      * @param Request $request
+     *
      * @return array
      */
     private function mergeRequestAttributes(Request $request)
     {
         return array_merge(
-                $request->attributes->all()
-                , $request->request->all()
-                , $request->query->all()
+                $request->attributes->all(), $request->request->all(), $request->query->all()
         );
     }
 
     /**
-     * Handles the final response
-     * @param Request $request
+     * Handles the final response.
+     *
+     * @param Request  $request
      * @param Response $response
+     *
      * @return Response|JsonResponse
      */
     private function handleResponse(Request $request, $response)
@@ -85,9 +87,8 @@ class ControllerHandler implements ControllerHandlerInterface
         $this->assertControllerKey($request);
         $controller = $request->attributes->get(RouteAttribute::CONTROLLER);
         if ($this->isArrayDefinition($controller)) {
-            $result = $this->container->call($controller[0]
-                    , $controller[1]
-                    , $this->mergeRequestAttributes($request));
+            $result = $this->container->call($controller[0], $controller[1], $this->mergeRequestAttributes($request));
+
             return $this->handleResponse($request, $result);
         } else {
             $error = 'The controller has an invalid [controller,action] signature!' .
