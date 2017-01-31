@@ -69,6 +69,11 @@ abstract class Application extends BaseApplication
     protected $routeCollection;
 
     /**
+     * @var RequestContext
+     */
+    protected $requestContext;
+
+    /**
      * @var LocalCache
      */
     protected $localCache;
@@ -111,6 +116,7 @@ abstract class Application extends BaseApplication
         $this->container = new ServiceContainer();
         $this->dispatcher = new EventDispatcher();
         $this->filesystem = new Filesystem();
+        $this->requestContext = new RequestContext();
         $this->container->setScalars(array(
             LoggerInterface::class => $this->logger,
             Configuration::class => $config,
@@ -120,6 +126,8 @@ abstract class Application extends BaseApplication
             RuntimeAttribute::APPLICATION_ROOT_FOLDER => $this->rootFolder,
             RuntimeAttribute::APPLICATION_CACHE_FOLDER => $this->localCache->getCacheFolder(),
             RuntimeAttribute::DEBUG => $config->get('debug', false),
+            RouteCollection::class => $this->routeCollection,
+            RequestContext::class => $this->requestContext
         ));
 
         /*
@@ -130,6 +138,7 @@ abstract class Application extends BaseApplication
          */
         $this->container->defineSingleton(SecurityHandler::class);
         $this->container->defineSingleton(TrailingSlashRedirectService::class);
+        $this->container->defineSingletonWithInterface(UrlGeneratorInterface::class, UrlGenerator::class);
         $this->confiureServices($this->container);
         $this->installEventSubscribers();
     }
@@ -155,6 +164,9 @@ abstract class Application extends BaseApplication
 
     protected function handleRequest(Request $request)
     {
+        $requestConext = $this->container->get(RequestContext::class);
+        $requestConext->fromRequest($request);
+
         $this->container->setScalar(Request::class, $request);
         $request->attributes->replace($this->matchRequestToRoutes($request));
 
@@ -234,28 +246,14 @@ abstract class Application extends BaseApplication
      */
     protected function prepareRouting(Request $request)
     {
-        $context = new RequestContext();
-
         $routes = $this->collectRoutes();
         $this->routeCollection->addCollection($routes);
-        $context->fromRequest($request);
-
-        $this->container->setScalars(array(
-            RouteCollection::class => $this->routeCollection,
-            RequestContext::class => $context,
-        ));
-
-        $this->container->defineSingletonWithInterface(
-                UrlGeneratorInterface::class, UrlGenerator::class);
-
-        return array($routes, $context);
     }
 
     protected function matchRequestToRoutes(Request $request)
     {
-        list($routes, $context) = $this->prepareRouting($request);
-        $matcher = new UrlMatcher($routes, $context);
-
+        $this->prepareRouting($request);
+        $matcher = $this->container->get(UrlMatcher::class);
         return $matcher->match($request->getPathInfo());
     }
 
@@ -311,14 +309,14 @@ abstract class Application extends BaseApplication
     protected function collectRoutes()
     {
         return $this->localCache->withCache(__CLASS__ . __FUNCTION__, function () {
-            $routes = new RouteCollection();
-            $routeBuilder = new RouteBuilder($routes);
-            $services = $this->container->getByInterface(RouteProviderInterface::class);
-            foreach ($services as $service) {
-                $service->loadRoutes($routeBuilder);
-            }
+                    $routes = new RouteCollection();
+                    $routeBuilder = new RouteBuilder($routes);
+                    $services = $this->container->getByInterface(RouteProviderInterface::class);
+                    foreach ($services as $service) {
+                        $service->loadRoutes($routeBuilder);
+                    }
 
-            return $routeBuilder->getRoutes();
-        });
+                    return $routeBuilder->getRoutes();
+                });
     }
 }
