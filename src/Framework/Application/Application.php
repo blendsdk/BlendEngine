@@ -30,7 +30,7 @@ use Blend\Component\Routing\RouteBuilder;
 use Blend\Component\Routing\RouteProviderInterface;
 use Blend\Component\Session\NativeSessionProvider;
 use Blend\Component\Session\SessionProviderInterface;
-use Blend\Framework\Security\SecurityHandler;
+use Blend\Framework\Security\SecurityHandlerService;
 use Blend\Framework\Support\Runtime\RuntimeAttribute;
 use Blend\Framework\Support\Runtime\RuntimeProviderInterface;
 use Blend\Framework\Support\TrailingSlashRedirectService;
@@ -130,17 +130,26 @@ abstract class Application extends BaseApplication
             RequestContext::class => $this->requestContext
         ));
 
+        $this->configureBuiltinServices();
+        $this->confiureServices($this->container);
+        $this->installEventSubscribers();
+    }
+
+    protected function configureBuiltinServices()
+    {
+        /**
+         * Define the URLGenerator service which is required for Route definition
+         */
+        $this->container->defineSingletonWithInterface(UrlGeneratorInterface::class, UrlGenerator::class);
         /*
          * Adds the SecurityHandler class by default. This will
          * add a small overhead to the request/response cycle
          * but we gain functionality by having a _authenticated_user
          * when possible
          */
-        $this->container->defineSingleton(SecurityHandler::class);
+        $this->container->defineSingleton(SecurityHandlerService::class);
+
         $this->container->defineSingleton(TrailingSlashRedirectService::class);
-        $this->container->defineSingletonWithInterface(UrlGeneratorInterface::class, UrlGenerator::class);
-        $this->confiureServices($this->container);
-        $this->installEventSubscribers();
     }
 
     /**

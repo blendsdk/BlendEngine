@@ -30,7 +30,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class SecurityHandler implements EventSubscriberInterface
+class SecurityHandlerService implements EventSubscriberInterface
 {
     /**
      * @var Container
