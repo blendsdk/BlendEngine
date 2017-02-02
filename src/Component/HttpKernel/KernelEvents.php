@@ -20,10 +20,11 @@ class KernelEvents
 {
     const REQUEST = 'http.request';
     const REQUEST_EXCEPTION = 'http.request.exception';
-    const CONTROLLER_RESPONSE = 'http.controller.response';
     const FINALIZE_RESPONSE = 'http.finalize.response';
-
-    const PRIORITY_HIGHT = 1500;
-    const PRIORITY_MEDIUM = 1000;
-    const PRIORITY_LOW = 500;
+    const PRIORITY_BOOT_SERVICE = 1000;
+    const PRIORITY_SECURITY_SERVICE = 900;
+    const PRIORITY_CONTROLLER_SERVICE = 800;
+    const PRIORITY_HIGHT = 500;
+    const PRIORITY_MEDIUM = 400;
+    const PRIORITY_LOW = 300;
 }

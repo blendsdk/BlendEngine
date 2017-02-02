@@ -17,9 +17,6 @@ use Blend\Component\Configuration\Configuration;
 use Blend\Component\DI\Container;
 use Blend\Component\DI\ServiceContainer;
 use Blend\Component\Filesystem\Filesystem;
-use Blend\Component\HttpKernel\ControllerHandler;
-use Blend\Component\HttpKernel\ControllerHandlerInterface;
-use Blend\Component\HttpKernel\Event\GetControllerResponseEvent;
 use Blend\Component\HttpKernel\Event\GetExceptionResponseEvent;
 use Blend\Component\HttpKernel\Event\GetFinalizeResponseEvent;
 use Blend\Component\HttpKernel\Event\GetResponseEvent;
@@ -127,7 +124,7 @@ abstract class Application extends BaseApplication
             RuntimeAttribute::APPLICATION_CACHE_FOLDER => $this->localCache->getCacheFolder(),
             RuntimeAttribute::DEBUG => $config->get('debug', false),
             RouteCollection::class => $this->routeCollection,
-            RequestContext::class => $this->requestContext
+            RequestContext::class => $this->requestContext,
         ));
 
         $this->configureBuiltinServices();
@@ -137,7 +134,7 @@ abstract class Application extends BaseApplication
 
     protected function configureBuiltinServices()
     {
-        /**
+        /*
          * Define the URLGenerator service which is required for Route definition
          */
         $this->container->defineSingletonWithInterface(UrlGeneratorInterface::class, UrlGenerator::class);
@@ -148,8 +145,15 @@ abstract class Application extends BaseApplication
          * when possible
          */
         $this->container->defineSingleton(SecurityHandlerService::class);
-
+        /*
+         * This services is used to handle Routes ending with a trailing slash
+         * to the same Route without the trailing slash
+         */
         $this->container->defineSingleton(TrailingSlashRedirectService::class);
+        /*
+         * This service handles Controller/Action call defined in the Route
+         */
+        $this->container->defineSingleton(ControllerHandlerService::class);
     }
 
     /**
@@ -183,28 +187,13 @@ abstract class Application extends BaseApplication
         $this->checkAndInstallRuntimeProvider();
 
         /* @var $event GetResponseEvent */
-        $responseEvent = $this->container->get(GetResponseEvent::class);
-        $this->dispatcher->dispatch(KernelEvents::REQUEST, $responseEvent);
-        if ($responseEvent->hasResponse()) {
-            return $responseEvent->getResponse();
+        $event = $this->container->get(GetResponseEvent::class);
+        $this->dispatcher->dispatch(KernelEvents::REQUEST, $event);
+        if ($event->hasResponse()) {
+            return $event->getResponse();
+        } else {
+            return null;
         }
-
-        $controllerHandler = $this->getControllerHandler();
-        $controllerResponse = $controllerHandler->handle($request);
-        if ($controllerResponse instanceof Response) {
-            return $controllerResponse;
-        }
-
-        /* @var $controllerResposeEvent GetControllerResponseEvent */
-        $controllerResposeEvent = $this->container->get(GetControllerResponseEvent::class, array(
-            'controllerResponse' => $controllerResponse,
-        ));
-        $this->dispatcher->dispatch(KernelEvents::CONTROLLER_RESPONSE, $controllerResposeEvent);
-        if ($controllerResposeEvent->hasResponse()) {
-            return $controllerResposeEvent->getResponse();
-        }
-
-        return $controllerResponse;
     }
 
     protected function initializeSession(Request $request)
@@ -232,21 +221,6 @@ abstract class Application extends BaseApplication
     }
 
     /**
-     * Returns a controller handler Service.
-     *
-     * @return ControllerHandlerInterface
-     */
-    protected function getControllerHandler()
-    {
-        if (!$this->container->isDefined(ControllerHandlerInterface::class)) {
-            $this->container->defineSingletonWithInterface(
-                    ControllerHandlerInterface::class, ControllerHandler::class);
-        }
-
-        return $this->container->get(ControllerHandlerInterface::class);
-    }
-
-    /**
      * Prepares the Routing and the UrlGenerator.
      *
      * @param Request $request
@@ -263,6 +237,7 @@ abstract class Application extends BaseApplication
     {
         $this->prepareRouting($request);
         $matcher = $this->container->get(UrlMatcher::class);
+
         return $matcher->match($request->getPathInfo());
     }
 
@@ -318,14 +293,14 @@ abstract class Application extends BaseApplication
     protected function collectRoutes()
     {
         return $this->localCache->withCache(__CLASS__ . __FUNCTION__, function () {
-                    $routes = new RouteCollection();
-                    $routeBuilder = new RouteBuilder($routes);
-                    $services = $this->container->getByInterface(RouteProviderInterface::class);
-                    foreach ($services as $service) {
-                        $service->loadRoutes($routeBuilder);
-                    }
+            $routes = new RouteCollection();
+            $routeBuilder = new RouteBuilder($routes);
+            $services = $this->container->getByInterface(RouteProviderInterface::class);
+            foreach ($services as $service) {
+                $service->loadRoutes($routeBuilder);
+            }
 
-                    return $routeBuilder->getRoutes();
-                });
+            return $routeBuilder->getRoutes();
+        });
     }
 }
