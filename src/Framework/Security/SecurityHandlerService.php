@@ -30,7 +30,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class SecurityHandler implements EventSubscriberInterface
+class SecurityHandlerService implements EventSubscriberInterface
 {
     /**
      * @var Container
@@ -111,8 +111,8 @@ class SecurityHandler implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::REQUEST => array('onRequest', KernelEvents::PRIORITY_HIGHT + 900),
-            KernelEvents::FINALIZE_RESPONSE => array('onResponse', KernelEvents::PRIORITY_HIGHT + 900),
+            KernelEvents::REQUEST => array('onRequest', KernelEvents::PRIORITY_SECURITY_SERVICE),
+            KernelEvents::FINALIZE_RESPONSE => array('onResponse', KernelEvents::PRIORITY_SECURITY_SERVICE + 900),
         );
     }
 }
