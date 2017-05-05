@@ -175,6 +175,12 @@ abstract class Application extends BaseApplication
         }
     }
 
+    /**
+     * Handles the incoming Request by dispatching a GetResponseEvent to get a
+     * Response
+     * @param Request $request
+     * @return Response|null
+     */
     protected function handleRequest(Request $request)
     {
         $requestConext = $this->container->get(RequestContext::class);
@@ -196,6 +202,10 @@ abstract class Application extends BaseApplication
         }
     }
 
+    /**
+     * Initializes a Session handler by checking the the incoming Request
+     * @param Request $request
+     */
     protected function initializeSession(Request $request)
     {
         if (!$request->hasSession()) {
