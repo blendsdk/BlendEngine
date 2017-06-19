@@ -249,7 +249,8 @@ abstract class Factory {
      *
      * @return type
      */
-    protected function getOneBy(array $selectColumns, array $byColumns) {
+    protected function getOneBy($selectColumns, array $byColumns) {
+
         if (is_null($selectColumns)) {
             $selectColumns = array(self::ALL_COLUMNS);
         } elseif (!is_array($selectColumns)) {
