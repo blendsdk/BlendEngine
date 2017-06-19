@@ -23,8 +23,8 @@ use Blend\Component\Model\Model;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-abstract class Factory
-{
+abstract class Factory {
+
     const ALL_COLUMNS = '*';
 
     /**
@@ -53,8 +53,7 @@ abstract class Factory
      */
     protected $container;
 
-    public function __construct(Database $database, $modelClass, $relationName)
-    {
+    public function __construct(Database $database, $modelClass, $relationName) {
         $this->database = $database;
         $this->modelClass = $modelClass;
         $this->relation = $relationName;
@@ -67,8 +66,7 @@ abstract class Factory
      *
      * @param Model $model The Model to save
      */
-    public function save(Model $model)
-    {
+    public function save(Model $model) {
         if ($model->isNew()) {
             $this->insertModel($model);
         } else {
@@ -81,8 +79,7 @@ abstract class Factory
      *
      * @param Model $model The Model that was deleted
      */
-    public function delete(Model $model)
-    {
+    public function delete(Model $model) {
         if (!$model->isNew()) {
             $stmtResult = new StatementResult();
 
@@ -114,8 +111,7 @@ abstract class Factory
      *
      * @throws InvalidConfigException
      */
-    protected function updateModel(Model $model)
-    {
+    protected function updateModel(Model $model) {
         $stmtResult = new StatementResult();
 
         list($condition, $conditionParameters) = $this->createAndCondition(
@@ -141,8 +137,7 @@ abstract class Factory
      *
      * @throws InvalidConfigException
      */
-    protected function insertModel(Model $model)
-    {
+    protected function insertModel(Model $model) {
         $stmtResult = new StatementResult();
         $result = $this->database->insert(
                 $this->relation, $this->convertFromModel($model->getData()), $stmtResult
@@ -163,8 +158,7 @@ abstract class Factory
      *
      * @return model
      */
-    protected function syncModel(Model $model, $record)
-    {
+    protected function syncModel(Model $model, $record) {
         $model->sync($this->convertFromRecord($record));
     }
 
@@ -173,8 +167,7 @@ abstract class Factory
      *
      * @return Model
      */
-    public function newModel()
-    {
+    public function newModel() {
         return $this->container->get('model');
     }
 
@@ -185,8 +178,7 @@ abstract class Factory
      *
      * @return array
      */
-    protected function convertFromModel(array $data)
-    {
+    protected function convertFromModel(array $data) {
         return $data;
     }
 
@@ -197,8 +189,7 @@ abstract class Factory
      *
      * @return array
      */
-    protected function convertFromRecord(array $record)
-    {
+    protected function convertFromRecord(array $record) {
         return $record;
     }
 
@@ -209,8 +200,7 @@ abstract class Factory
      *
      * @return array
      */
-    protected function createAndCondition(array $params)
-    {
+    protected function createAndCondition(array $params) {
         $condition = sqlstr('');
         $conditionParameters = array();
         $first = true;
@@ -242,8 +232,7 @@ abstract class Factory
      *
      * @return type
      */
-    public function getAll($selectColumns = null, $orderDirective = null, $offsetLimitDirective = null)
-    {
+    public function getAll($selectColumns = null, $orderDirective = null, $offsetLimitDirective = null) {
         if ($selectColumns === null) {
             $selectColumns = self::ALL_COLUMNS;
         }
@@ -260,8 +249,13 @@ abstract class Factory
      *
      * @return type
      */
-    protected function getOneBy(array $selectColumns, array $byColumns)
-    {
+    protected function getOneBy(array $selectColumns, array $byColumns) {
+        if (is_null($selectColumns)) {
+            $selectColumns = array(self::ALL_COLUMNS);
+        } elseif (!is_array($selectColumns)) {
+            $selectColumns = array($selectColumns);
+        }
+
         list($condition, $conditionParams) = $this->createAndCondition($byColumns);
         $sql = 'SELECT '
                 . implode(', ', $selectColumns)
@@ -281,8 +275,7 @@ abstract class Factory
      *
      * @param array $byColumns
      */
-    protected function deleteOneBy(array $byColumns)
-    {
+    protected function deleteOneBy(array $byColumns) {
         $stmtResult = new StatementResult();
         list($condition, $conditionParams) = $this->createAndCondition($byColumns);
         $result = $this->database->delete($this->relation, $condition, $conditionParams, $stmtResult);
@@ -301,8 +294,7 @@ abstract class Factory
      *
      * @param array $byColumns
      */
-    protected function deleteManyBy(array $byColumns, StatementResult $stmtResult = null)
-    {
+    protected function deleteManyBy(array $byColumns, StatementResult $stmtResult = null) {
         list($condition, $conditionParams) = $this->createAndCondition($byColumns);
         $result = $this->database->delete($this->relation, $condition, $conditionParams, $stmtResult);
 
@@ -316,8 +308,7 @@ abstract class Factory
      *
      * @return int
      */
-    protected function countBy(array $byCondition)
-    {
+    protected function countBy(array $byCondition) {
         list($condition, $conditionParams) = $this->createAndCondition($byCondition);
         $sql = 'SELECT COUNT(true)'
                 . ' FROM ' . $this->relation
@@ -331,8 +322,7 @@ abstract class Factory
      *
      * @return int
      */
-    public function countAll()
-    {
+    public function countAll() {
         $sql = 'SELECT COUNT(true) FROM ' . $this->relation;
 
         return $this->database->executeScalar($sql);
@@ -348,8 +338,7 @@ abstract class Factory
      *
      * @return array
      */
-    protected function getManyBy($selectColumns, array $byColumns, $orderDirective = null, $offsetLimitDirective = null)
-    {
+    protected function getManyBy($selectColumns, array $byColumns, $orderDirective = null, $offsetLimitDirective = null) {
         if (is_null($selectColumns)) {
             $selectColumns = array(self::ALL_COLUMNS);
         } elseif (!is_array($selectColumns)) {
@@ -376,8 +365,7 @@ abstract class Factory
      *
      * @return array array of models
      */
-    protected function recordsToModels(&$records)
-    {
+    protected function recordsToModels(&$records) {
         if (is_array($records) && count($records) !== 0) {
             foreach ($records as $key => $record) {
                 $records[$key] = $this->container->get('model', array('data' => $this->convertFromRecord($record)));
@@ -396,8 +384,7 @@ abstract class Factory
      *
      * @return string
      */
-    protected function createOffsetLimitDirective($offsetLimitDirective)
-    {
+    protected function createOffsetLimitDirective($offsetLimitDirective) {
         $sql = '';
         if (is_array($offsetLimitDirective)) {
             foreach (array('limit', 'offset') as $directive) {
@@ -419,8 +406,7 @@ abstract class Factory
      *
      * @return string
      */
-    protected function createOrderDirective($orderDirective)
-    {
+    protected function createOrderDirective($orderDirective) {
         $sql = '';
         if (is_array($orderDirective) && count($orderDirective) !== 0) {
             foreach ($orderDirective as $col => $orderType) {
@@ -431,4 +417,5 @@ abstract class Factory
 
         return $sql;
     }
+
 }
