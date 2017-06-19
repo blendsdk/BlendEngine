@@ -17,21 +17,19 @@ namespace Blend\Component\Model;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class Model implements ModelInterface
-{
+class Model implements ModelInterface {
+
     private $data;
     private $updates;
     private $isNew;
 
-    public function __construct($data = array())
-    {
+    public function __construct($data = array()) {
         $this->data = $data;
         $this->updates = array();
         $this->isNew = empty($data);
     }
 
-    public function sync($data)
-    {
+    public function sync($data) {
         $this->data = $data;
         $this->updates = array();
         $this->isNew = false;
@@ -42,8 +40,7 @@ class Model implements ModelInterface
      *
      * @return bool
      */
-    public function isNew()
-    {
+    public function isNew() {
         return $this->isNew;
     }
 
@@ -57,8 +54,7 @@ class Model implements ModelInterface
      *
      * @return mixed
      */
-    public function getValue($field, $default = null)
-    {
+    public function getValue($field, $default = null) {
         if (array_key_exists($field, $this->updates)) {
             return $this->updates[$field];
         } elseif (array_key_exists($field, $this->data)) {
@@ -76,8 +72,7 @@ class Model implements ModelInterface
      *
      * @return \Blend\Component\Model\Model
      */
-    public function setValue($field, $value)
-    {
+    public function setValue($field, $value) {
         $this->updates[$field] = $value;
 
         return $this;
@@ -88,8 +83,7 @@ class Model implements ModelInterface
      *
      * @return type
      */
-    public function getUpdates()
-    {
+    public function getUpdates() {
         return $this->updates;
     }
 
@@ -99,8 +93,7 @@ class Model implements ModelInterface
      *
      * @return type
      */
-    public function getInitial()
-    {
+    public function getInitial() {
         return $this->data;
     }
 
@@ -109,18 +102,16 @@ class Model implements ModelInterface
      *
      * @return array
      */
-    public function getData()
-    {
+    public function getData() {
         return array_merge($this->data, $this->updates);
     }
 
     /**
-     * Reruns the JSON version of the getData.
-     *
-     * @return string
+     * Returns a mixed array containing the data
+     * @return type
      */
-    public function __toString()
-    {
+    public function toArray() {
         return $this->getData();
     }
+
 }
