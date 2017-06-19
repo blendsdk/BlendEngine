@@ -11,6 +11,7 @@ use <?php echo $use; ?>;
  */
 <?php if (isset($classModifier)) echo $classModifier . ' '; ?>class <?php echo $className ?> extends <?php echo $classBaseClass; ?> {
 
+<?php if(isset($extensionClass)) echo "    use " . $extensionClass . ";\n\n";?>
 <?php if (isset($generate)) foreach ($props as $prop): ?>
     /**
      * Gets the value of the <?php echo "'{$prop['name']}' column.\n"?>

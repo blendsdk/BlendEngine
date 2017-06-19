@@ -121,6 +121,6 @@ class Model implements ModelInterface
      */
     public function __toString()
     {
-        return json_encode($this->getData());
+        return $this->getData();
     }
 }

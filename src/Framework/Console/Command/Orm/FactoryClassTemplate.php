@@ -11,43 +11,42 @@
 
 namespace Blend\Framework\Console\Command\Orm;
 
-class FactoryClassTemplate extends ClassTemplate
-{
-    public function __construct(array $data = array())
-    {
+class FactoryClassTemplate extends ClassTemplate {
+
+    public function __construct(array $data = array()) {
         parent::__construct($data);
         $this->setValue('methods', array());
     }
 
-    public function addMethod(Method $method)
-    {
+    public function addMethod(Method $method) {
         $methods = $this->getValue('methods');
         $methods[] = $method->getData();
         $this->setValue('methods', $methods);
     }
 
-    public function setClassName($value)
-    {
+    public function setClassName($value) {
         parent::setClassName($value . 'Factory');
     }
 
-    public function setClassNamespace($value)
-    {
+    public function setExtensionClass($value) {
+        $this->setValue('extensionClass', $value);
+    }
+
+    public function setClassNamespace($value) {
         $value = $this->getValue('appNamespace') . '\\' . $value;
         parent::setClassNamespace($value . '\\Factory');
         $this->setValue('modelNamespace', $value . '\\Model');
     }
 
-    public function setModelClass($value)
-    {
+    public function setModelClass($value) {
         $this->setValue('modelClass', $value . 'Model');
         $uses = $this->getValue('uses');
         $uses[] = $this->getValue('modelNamespace') . '\\' . $this->getValue('modelClass');
         $this->addUses($uses);
     }
 
-    protected function getTemplateFile()
-    {
+    protected function getTemplateFile() {
         return 'factory.php';
     }
+
 }

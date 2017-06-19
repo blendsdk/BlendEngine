@@ -34,8 +34,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author Gevik Babakhani <gevikb@gmail.com>
  */
-class OrmCommand extends Command
-{
+class OrmCommand extends Command {
+
     /**
      * @var Database
      */
@@ -56,15 +56,13 @@ class OrmCommand extends Command
      */
     private $schemas;
 
-    protected function configure()
-    {
+    protected function configure() {
         $this->setName('ormgenerate')
                 ->setDescription('Generates data objects and data factories from your database ')
                 ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'The configuration class file');
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
+    protected function initialize(InputInterface $input, OutputInterface $output) {
         parent::initialize($input, $output);
         /* @var $database Database */
         $this->database = $this->container->get(DatabaseFactory::class);
@@ -80,8 +78,7 @@ class OrmCommand extends Command
      *
      * @return string
      */
-    private function normalizeName($name)
-    {
+    private function normalizeName($name) {
         if ($name === 'public') {
             return 'common';
         } else {
@@ -89,12 +86,12 @@ class OrmCommand extends Command
         }
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
+    protected function execute(InputInterface $input, OutputInterface $output) {
         $this->loadOrmConfig();
         $this->validateConfig();
 
         $this->ormConfig->setRootFolder($this->rootFolder);
+
         $this->fileSystem->ensureFolder($this->ormConfig->getOutputFolder());
 
         foreach ($this->ormConfig->getTables() as $tableItem) {
@@ -114,21 +111,18 @@ class OrmCommand extends Command
         }
     }
 
-    private function getSchemaNamespace(Relation $relation)
-    {
+    private function getSchemaNamespace(Relation $relation) {
         return 'Database\\' . str_identifier($this->normalizeName($relation->getSchema()->getName()));
     }
 
-    private function setupTemplate(Relation $relation, ClassTemplate $template)
-    {
+    private function setupTemplate(Relation $relation, ClassTemplate $template) {
         $template->setApplicationNamespace($this->getApplicationNamespace());
         $template->setClassNamespace($this->getSchemaNamespace($relation));
         $template->setClassName(str_identifier($relation->getName()));
         $template->setFQRN($relation->getFQRN());
     }
 
-    private function createFactory(Relation $relation, $factoryFolder)
-    {
+    private function createFactory(Relation $relation, $factoryFolder) {
         $template = new FactoryClassTemplate();
         $this->setupTemplate($relation, $template);
         $baseClass = $this->ormConfig->getBaseClass('factory', $relation->getFQRN(), Factory::class);
@@ -137,6 +131,28 @@ class OrmCommand extends Command
             'Blend\Component\Database\Database',
             $baseClass['use'],
         );
+
+        $extensionClassFile = $this->ormConfig->getExtensionsFolder()
+                . DIRECTORY_SEPARATOR . str_identifier($this->normalizeName($relation->getSchema()->getName()))
+                . DIRECTORY_SEPARATOR . 'Factory'
+                . DIRECTORY_SEPARATOR . str_identifier($relation->getName()) . 'FactoryExtension.php';
+
+        if (file_exists($extensionClassFile)) {
+            include $extensionClassFile;
+
+            $query = str_replace(DIRECTORY_SEPARATOR, "\\", DIRECTORY_SEPARATOR . str_identifier($this->normalizeName($relation->getSchema()->getName()))
+                    . DIRECTORY_SEPARATOR . 'Factory'
+                    . DIRECTORY_SEPARATOR . str_identifier($relation->getName()) . 'FactoryExtension'
+            );
+
+            $traits = get_declared_traits();
+            foreach ($traits as $item) {
+                if (stripos($item, $query) !== false) {
+                    $uses[] = $item;
+                    $template->setExtensionClass(str_identifier($relation->getName()) . 'FactoryExtension');
+                }
+            }
+        }
 
         $template->addUses(array_unique($uses));
         $template->setModelClass(str_identifier($relation->getName()));
@@ -157,8 +173,7 @@ class OrmCommand extends Command
      *
      * @return Method
      */
-    private function createMethod(Relation $relation, Constraint $constraint, FactoryClassTemplate $template)
-    {
+    private function createMethod(Relation $relation, Constraint $constraint, FactoryClassTemplate $template) {
         if ($constraint->getType() === 'FOREIGN KEY') {
             $get_method = $this->newMethod($constraint, 'getManyBy', 'Gets many records from ' . $relation->getFQRN() . ' table');
             $callParams = $get_method->getCallArgumentArray();
@@ -190,8 +205,7 @@ class OrmCommand extends Command
         }
     }
 
-    private function newMethod(Constraint $constraint, $prefix, $description)
-    {
+    private function newMethod(Constraint $constraint, $prefix, $description) {
         $method = new Method();
         $method->setDescription($description);
         $name = array();
@@ -204,15 +218,41 @@ class OrmCommand extends Command
         return $method;
     }
 
-    private function createModel(Relation $relation, $modelFolder)
-    {
+    private function createModel(Relation $relation, $modelFolder) {
         $template = new ModelClassTemplate();
         $this->setupTemplate($relation, $template);
         $baseClass = $this->ormConfig->getBaseClass('model', $relation->getFQRN(), Model::class);
         $template->setBaseClassName($baseClass['class_name']);
-        $template->addUses(array(
+        $uses = array(
             $baseClass['use'],
-        ));
+        );
+
+
+        $extensionClassFile = $this->ormConfig->getExtensionsFolder()
+                . DIRECTORY_SEPARATOR . str_identifier($this->normalizeName($relation->getSchema()->getName()))
+                . DIRECTORY_SEPARATOR . 'Model'
+                . DIRECTORY_SEPARATOR . str_identifier($relation->getName()) . 'ModelExtension.php';
+
+        if (file_exists($extensionClassFile)) {
+            
+            include $extensionClassFile;
+
+            $query = str_replace(DIRECTORY_SEPARATOR, "\\", DIRECTORY_SEPARATOR . str_identifier($this->normalizeName($relation->getSchema()->getName()))
+                    . DIRECTORY_SEPARATOR . 'Model'
+                    . DIRECTORY_SEPARATOR . str_identifier($relation->getName()) . 'ModelExtension'
+            );
+            
+            $traits = get_declared_traits();
+            foreach ($traits as $item) {
+                if (stripos($item, $query) !== false) {
+                    $uses[] = $item;
+                    $template->setExtensionClass(str_identifier($relation->getName()) . 'ModelExtension');
+                }
+            }
+        }
+
+        $template->addUses($uses);
+
         foreach ($relation->getColumns() as $column) {
             $template->addProperty($this->normalizeName($column->getName()), $column->getType());
         }
@@ -224,20 +264,17 @@ class OrmCommand extends Command
      *
      * @return type
      */
-    private function getApplicationNamespace()
-    {
+    private function getApplicationNamespace() {
         $ns = explode('\\', get_class($this->getApplication()));
 
         return $ns[0];
     }
 
-    private function getSchemaFolderName($schemaName)
-    {
+    private function getSchemaFolderName($schemaName) {
         return $this->ormConfig->getOutputFolder() . DIRECTORY_SEPARATOR . str_identifier($schemaName);
     }
 
-    private function validateConfig()
-    {
+    private function validateConfig() {
         $this->output->writeln('<info>Validating the configuration.</info>');
 
         $this->validateRelations();
@@ -251,8 +288,7 @@ class OrmCommand extends Command
      *
      * @throws \LogicException
      */
-    private function loadOrmConfig()
-    {
+    private function loadOrmConfig() {
         $configFile = $this->rootFolder . '/.ormconfig.dist';
         if ($this->fileSystem->exists($configFile)) {
             $config = include $configFile;
@@ -273,8 +309,7 @@ class OrmCommand extends Command
      *
      * @throws \LogicException
      */
-    private function assertRelations()
-    {
+    private function assertRelations() {
         foreach ($this->ormConfig->getTables() as $item) {
             list($schemaName, $tableName) = $item;
             if (!array_key_exists($schemaName, $this->schemas)) {
@@ -290,8 +325,7 @@ class OrmCommand extends Command
     /**
      * Loads relations from the current database if nothing was selected before.
      */
-    private function validateRelations()
-    {
+    private function validateRelations() {
         if (count($this->ormConfig->getTables()) === 0) {
             foreach ($this->schemas as $schema) {
                 $relations = $schema->getRelations();
@@ -301,9 +335,9 @@ class OrmCommand extends Command
             }
         }
     }
+
 }
 
-function print_php_header()
-{
+function print_php_header() {
     echo "<?php\n\n";
 }

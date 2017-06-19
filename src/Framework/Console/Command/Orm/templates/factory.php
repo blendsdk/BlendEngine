@@ -12,12 +12,17 @@ use <?php echo $use; ?>;
  */
 <?php if (isset($classModifier)) echo $classModifier . ' ' ?>class <?php echo $className ?> extends <?php echo $classBaseClass; ?> {
 
+<?php if(isset($extensionClass)) echo "    use " . $extensionClass . ";\n";?>
+
+    /**
+     * Class constructor
+     * @param Database $database
+     */
     public function __construct(Database $database) {
         parent::__construct($database, <?php echo $modelClass?>::class,'<?php echo $classFQRN?>');
     }
 
 <?php foreach ($methods as $method_type => $method):?>
-
     /**
      * <?php echo $method['method_description']."\n"; ?>
 <?php foreach ($method['parameters'] as $param_name => $param_type):?>
